@@ -1,7 +1,7 @@
 Package: Matrix
 Version: 1.8-0
 VersionNote: do also bump src/version.h, inst/include/Matrix/version.h
-Date: 2024-12-06
+Date: 2024-12-09
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,

@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2024-12-06, svn r5102)}{
+\section{Changes in version 1.8-0 (2024-12-09, svn r5103)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -3390,13 +3390,367 @@
   }
 }
 
-%% \section{Version 0.2-4}{
-%%   \subsection{..., 0.3-n (n=1,3,5,...,26): 22 more CRAN releases}{
-%%     \itemize{
-%%       \item .............................................
-%%     }
-%%   }
-%% }
+\section{Changes in version 0.3-26 (2003-11-03)}{
+  \subsection{Installation}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 0.3-25 (2003-10-30)}{
+  \subsection{Installation}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 0.3-24 (2003-04-20)}{
+  \subsection{Installation}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 0.3-23 (2003-03-30)}{
+  \subsection{Installation}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 0.3-22 (2003-02-03)}{
+  \subsection{Installation}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 0.3-21 (2002-10-25)}{
+  \subsection{Installation}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 0.3-20 (2002-10-08)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \command{configure.ac} sets \code{CFLAGS} before expanding
+      \code{AC_PROG_CC} and sets \code{FLIBS} before expanding
+      \code{ACX_BLAS} and \code{ACX_LAPACK}.
+
+      \item Autoconf macro \code{OCTAVE_BLAS_LIBS}, which is no longer
+      used, is removed from \file{aclocal.m4}.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Unwanted Autoconf output is removed from \file{aclocal.m4}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-19 (2002-07-22)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{PACKAGE = "Matrix"} is passed to \code{.Call} to
+      restrict name lookup to \pkg{Matrix}.
+
+      \item The \proglang{C++} sources use qualified name lookup (as in
+      \code{std::<name>}) in more places.
+
+      \item The \proglang{C++} sources get pointers to matrix data
+      without taking the address of the first element, which is wrong for
+      a matrix of length 0.
+    }
+  }
+}
+
+\section{Changes in version 0.3-18 (2002-05-03)}{
+  \subsection{Compatibility}{
+    \itemize{
+      \item \code{*_ELT} macros are no longer defined for \R{} \eqn{<}
+      1.2.0 as \pkg{Matrix} depends on \R{} \eqn{\ge}{>=} 1.5.0.
+    }
+  }
+}
+
+\section{Changes in version 0.3-17 (2002-04-30)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 0.3-17 depends on \R{}
+      \eqn{\ge}{>=} 1.5.0.
+
+      \item \file{configure.in} is replaced with \file{configure.ac}
+      contributed by Kurt Hornik.  \file{configure.ac} makes use of
+      \command{R CMD config}, a utility added in \R{} version 1.5-0.
+
+      \item Autoconf macros \code{ACX_BLAS} and \code{ACX_LAPACK},
+      written by Steven G. Johnson, are added to \file{aclocal.m4} and
+      expanded in \file{configure.ac}.
+
+      \item The configured value of \code{LAPACK_LIBS} is prepended to
+      \code{PKG_LIBS} in \file{src/Makevars.in}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-16 (2001-12-10)}{
+  \subsection{Documentation}{
+    \itemize{
+      \item A preliminary \file{ChangeLog}.
+    }
+  }
+  \subsection{Compatibility}{
+    \itemize{
+      \item Rd files are adapted to use \code{\method{}{}} markup
+      introduced in \R{} version 1.2.2.
+
+      \item One usage of \code{.Alias}, deprecated in \R{} version
+      1.4.1, is removed.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item S3 methods gain formal argument \code{\dots} where needed to
+      match the generic function.
+
+      \item The name of a class member function in \file{src/tgmd.h} was
+      was spuriously qualified.
+    }
+  }
+}
+
+\section{Changes in version 0.3-15 (2001-05-15)}{
+  \subsection{Installation}{
+    \itemize{
+      \item The configured value of \code{BLAS_LIBS} is prepended to
+      \code{PKG_LIBS} in \file{src/Makevars.in}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-13 (2001-05-10)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item The \proglang{C++} sources undefine macros \code{length} and
+      \code{append} in many places to avoid conflicts with definitions in
+      \file{Rinternals.h}.
+	}
+  }
+}
+
+\section{Changes in version 0.3-10 (2001-05-04)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item The \proglang{C++} sources use qualified name lookup (as in
+      \code{std::<name>}) in more places.
+    }
+  }
+}
+
+\section{Changes in version 0.3-9 (2001-03-09)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item The \proglang{C++} sources no longer write to \code{stderr}
+      and (in most places) \code{stdout}, no longer use the
+      \code{assert} macro, and no longer call \code{exit}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-8 (2001-01-10)}{
+  \subsection{Authorship}{
+    \itemize{
+      \item \file{DESCRIPTION} gets a \code{Maintainer} field and
+      Douglas Bates is named there.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Removes around 100 non-source files wrongly bundled in
+      \pkg{Matrix} version 0.3-7.
+    }
+  }
+}
+
+\section{Changes in version 0.3-7 (2000-12-03)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \code{FLIBS} is appended to \code{PKG_LIBS} in
+      \file{src/Makevars.in}.
+    }
+  }
+  \subsection{Documentation}{
+    \itemize{
+      \item A basic \file{README}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-6 (2000-10-30)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 0.3-6 depends on \R{}
+      \eqn{\ge}{>=} 1.1.1.
+
+      \item \command{configure} makes use of \code{HAVE_F77_UNDERSCORE}
+      in \file{Rconfig.h}.
+
+      \item \code{PKG_LIBS} and \code{PKG_LDFLAGS} to the configured
+      values of \code{LIBS} and \code{LDFLAGS} in \file{src/Makevars.in}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-5 (2000-08-20)}{
+  \subsection{Deprecated and Defunct}{
+    \itemize{
+      \item \code{eigen.Matrix} argument \code{schur}, which was unused,
+      is removed.
+    }
+  }
+  \subsection{Methods}{
+    \itemize{
+      \item An S3 method \code{schur.Matrix} interfacing LAPACK routine
+      \code{dgeesx}.  It returns \code{list(values, schur, vectors)}.
+
+      \item For arguments not inheriting from \code{Matrix} subclass
+      \code{Hermitian}, \code{eigen.Matrix} is now an interface to
+      LAPACK routine \code{dgeevx}, and its optional arguments
+      \code{balance} and \code{rcond}, which were unused, can now be
+      used to request balancing and the reciprocal condition numbers of
+      the eigenvalues and right eigenvectors.  The return value is now
+      \code{list(values, vectors, rcond)} with
+      \code{vectors = list(left, right)} and
+      \code{rcond = list(values, vectors)}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-3 (2000-08-11)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \command{configure} skips the check for BLAS in the Sun
+      Performance Library if the \proglang{C} compiler is \command{gcc}.
+    }
+  }
+  \subsection{Compatibility}{
+    \itemize{
+      \item \code{STRING_ELT}, \code{SET_STRING_ELT}, \code{VECTOR_ELT},
+      and \code{SET_VECTOR_ELT} are used in place of \code{STRING} and
+      \code{VECTOR}.  \code{*_ELT} macros are defined for \R{} \eqn{<}
+      1.2.0 to not break compatibility.
+    }
+  }
+  \subsection{Significant User-Visible Changes}{
+    \itemize{
+      \item \code{SVD(x, nu = 0, nv)$u} and \code{SVD(x, nu, nv = 0)$vt}
+      are \code{NULL} rather than empty matrices.
+    }
+  }
+  \subsection{Methods}{
+    \itemize{
+      \item An S3 method \code{lu.Matrix} interfacing LAPACK routine
+      \code{dgetrf}.  It returns \code{list(l, u, permutation)}, with
+      attribute \code{norms = list(one, infinity)} containing the one
+      and infinity norms.  An optional argument is provided to disable
+      computation of \code{one} and \code{infinity}.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{SVD(x, nu, nv)} allocated for the right singular
+      values a matrix with dimensions \code{c(ncol(x), nv)} instead of
+      \code{c(nv, ncol(x))}.  Buffer overflow could occur in LAPACK
+      routine \code{dgesvd} if \code{nv < ncol(x)}.
+    }
+  }
+}
+
+\section{Changes in version 0.3-1 (2000-07-24)}{
+  \subsection{Generic Functions}{
+    \itemize{
+      \item S3 generic function \code{eigen}.
+    }
+  }
+  \subsection{Methods}{
+    \itemize{
+      \item An S3 method \code{eigen.Matrix} interfacing LAPACK routines
+      \code{dgeev} and \code{dsyev}, the latter only for arguments
+      inheriting from \code{Matrix} subclass \code{Hermitian}.  It
+      returns \code{list(values, vectors)}, where \code{vectors} is
+      \code{list(left, right)} for non-\code{Hermitian} arguments and a
+      numeric matrix for \code{Hermitian} arguments.  An optional
+      argument is provided to disable computation of \code{vectors}.
+
+      \item S3 methods \code{det.Matrix}, \code{det.UpperTriangular},
+      \code{det.UnitUpperTriangular}, \code{det.LowerTriangular}, and
+      \code{det.UnitLowerTriangular} computing the modulus of the
+      determinant, or its logarithm, from the eigenvalues.  These return
+      \code{list(modulus, sign)}.  Component \code{modulus} has a
+      logical attribute \code{logarithm} indicating if the determinant
+      is \code{sign * exp(modulus)} or \code{sign * modulus}.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{Matrix.class(x)} could be incomplete or contain bad
+      elements for orthogonal \code{x}.
+    }
+  }
+  \subsection{New Features}{
+    \itemize{
+      \item Utility functions \code{asObject} and \code{prependClass}
+      for setting and prepending to the \code{class} attribute of the
+      argument.
+    }
+  }
+}
+
+\section{Changes in version 0.2-4 (2000-07-18)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \command{configure} and \command{cleanup} scripts,
+      \command{configure} detecting options for linking BLAS and LAPACK.
+      \command{configure} is generated from \file{configure.in} which
+      makes use of an Autoconf macro \code{OCTAVE_BLAS_LIBS} defined in
+      \file{aclocal.m4}.
+
+      \item \file{src/Makevars} is generated by substitution of output
+      variables in \file{src/Makevars.in}.
+    }
+  }
+  \subsection{Documentation}{
+    \itemize{
+      \item A Texinfo manual \file{R-Matrix.texi} containing
+      implementation details and describing how LAPACK++ was modified
+      for \pkg{Matrix}.
+    }
+  }
+  \subsection{Methods}{
+    \itemize{
+      \item An S3 method \code{rcond.Matrix} interfacing LAPACK routines
+      \code{d*con}.
+    }
+  }
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item Exceptions thrown by LAPACK++ are caught and handled as \R{}
+      errors.
+
+      \item \code{UpperTriangular.test} and \code{LowerTriangular.test}
+      returned a maximum rather than a maximum modulus for real
+      arguments.
+    }
+  }
+}
 
 \section{Changes in version 0.2-1 (2000-07-15)}{
   \pkg{Matrix} version 0.2-1 is the first one to be distributed by CRAN.
@@ -3407,24 +3761,79 @@
       Saikat DebRoy is a co-author.
     }
   }
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 0.2-1 depends on \R{}
+      \eqn{\ge}{>=} 1.1.0.
+
+      \item A modified LAPACK++ (Linear Algebra PACKage in C++, version
+      1.1a) is compiled alongside the \pkg{Matrix} sources.  LAPACK++ is
+      a \proglang{C++} interface to LAPACK originally developed by
+      Roldan Pozo.
+    }
+  }
+  \subsection{Classes}{
+    \itemize{
+      \item S3 class \code{Matrix} with subclasses \code{Hermitian},
+      \code{UpperTriangular} (recursively, \code{UnitUpperTriangular}),
+      and \code{LowerTriangular} (recursively,
+      \code{UnitLowerTriangular}).  Objects are traditional numeric
+      matrices with a \code{class} attribute indicating their
+      structural properties.  Objects are interfaced in \proglang{C++}
+      using the parallel class hierarchy defined by LAPACK++.
+    }
+  }
+  \subsection{Generic Functions}{
+    \itemize{
+      \item S3 generic functions \code{det}, \code{expand},
+      \code{facmul}, \code{lu}, \code{norm}, \code{rcond}, \code{schur},
+      and \code{unpack}.
+    }
+  }
+  \subsection{Methods}{
+    \itemize{
+      \item An S3 method \code{norm.Matrix} interfacing LAPACK routines
+      \code{dlan*}.
+
+      \item An S3 method \code{solve.Matrix} interfacing LAPACK routines
+      \code{d*trf} and \code{d*trs}.
+
+      \item An S3 method \code{as.matrix.Matrix} just dropping the class
+      attribute.
+
+      \item An S3 method \code{print.Matrix} just printing the
+      \code{as.matrix} result.
+    }
+  }
   \subsection{New Features}{
     \itemize{
-      \item \code{Matrix()} constructor for \R{} objects of class
-      \code{Matrix}.
+      \item A function \code{Matrix} constructing objects of class
+      \code{Matrix} from numeric vectors and matrices, parallel to
+      \pkg{base} function \code{matrix}.
 
-      \item \code{Matrix.class()} returning informal subclasses such as
-      \code{Hermitian}, \code{LowerTriangular}
+      \item A function \code{Matrix.class} returning a character vector
+      containing the subclasses of \code{Matrix} that would be valid for
+      the argument.
 
-      \item \code{is.Orthonormal()}, \code{is.Hermitian()} ,
-      \code{is.UpperTriangular()} functions.
+      \item Functions \code{Hermitian.test},
+      \code{UpperTriangular.test}, \code{LowerTriangular.test},
+      \code{Orthogonal.test}, and \code{Orthonormal.test} returning a
+      maximum modulus distance useful for testing the respective
+      property.
 
-      \item \code{SVD()}, \code{lu()}, and \code{schur()} decomposition
-      generics with \code{Matrix} methods.
+      \item Functions \code{is.Hermitian}, \code{is.UpperTriangular},
+      \code{is.LowerTriangular}, and \code{is.Orthonormal} testing if
+      the \code{*.test} value does not exceed a tolerance.
 
-      \item \code{rcond()}, \code{norm()}, \code{det()}; \code{expand()}
-      and \code{facmul()}.
+      \item Function \code{SVD} interfacing LAPACK routine
+      \code{dgesvd}.  \code{SVD(x, nu, nv)} returns
+      \code{list(d, u, vt)} containing the singular values (sorted
+      non-increasingly), first \code{nu} left singular vectors (stored
+      column-wise), and first \code{nv} right singular vectors (stored
+      row-wise).
 
-      \item \proglang{C++} interface to LAPACK
+      \item Function \code{hilbert} constructing the \eqn{n}-by-\eqn{n}
+      Hilbert matrix.
     }
   }
 }
