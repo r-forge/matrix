@@ -3372,68 +3372,136 @@
   }
 }
 
-%--------------- pre-pre-history: ------------------------
-
-\section{Changes in version 0.8-2 (2004-04-06, svn r51)}{
-  \subsection{Authorship}{
+\section{Changes in version 0.8-2 (2004-04-05, svn r51)}{
+  \subsection{Description}{
     \itemize{
-      \item Douglas Bates becomes sole author of \pkg{Matrix}.
-    }
-  }
-  \subsection{New Features}{
-    \itemize{
-      \item Sparse matrices, classes and methods, partly via
+      \item \pkg{Matrix} version 0.8-2 is a full refactor.  Classes,
+      generic functions, and methods are newly implemented in S4.
+      S3 machinery is removed.  The remaining items in this section
+      describe the state of things in version 0.8-2 rather than changes
+      since version 0.3-26.
 
-      \item Interface to LDL, TAUCS, Metis and UMFPACK \proglang{C}
-      libraries
+      \item \pkg{Matrix} \eqn{\ge}{>=} 0.8-2 depends on \R{}
+      \eqn{\ge}{>=} 1.9.0.
+
+      \item \code{Depends: methods} is added to \file{DESCRIPTION}.
+
+      \item Douglas Bates becomes the sole author of \pkg{Matrix}.
+
+      \item The package is retitled \dQuote{Classes and Methods for
+        Numerical Linear Algebra using LAPACK, LDL, TAUCS, METIS, and
+        UMFPACK}.
+
+      \item The package sources are now maintained in a Subversion
+      repository.
     }
   }
 }
 
 \section{Changes in version 0.3-26 (2003-11-03)}{
-  \subsection{Installation}{
+  \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item The default expressions of formal arguments \code{transpose}
+      and \code{left} of generic function \code{facmul} are changed from
+      \code{F} and \code{T} to \code{FALSE} and \code{TRUE}, as only the
+      latter are reserved words.
     }
   }
 }
 
 \section{Changes in version 0.3-25 (2003-10-30)}{
-  \subsection{Installation}{
+  \subsection{Deprecated and Defunct}{
     \itemize{
-      \item .
+      \item S3 generic function \code{determinant} is removed as it was
+      ported to \R{} \eqn{\ge}{>=} 1.8.0.
+    }
+  }
+  \subsection{Significant User-Visible Changes}{
+    \itemize{
+      \item A namespace for \pkg{Matrix} is defined using directives in
+      \file{NAMESPACE}.
+
+      \item S3 generic functions \code{eigen}, \code{expand},
+      \code{facmul}, \code{lu}, \code{norm}, \code{rcond}, \code{schur},
+      and \code{unpack} are exported.
+
+      \item S3 methods are registered and not exported, hence they
+      continue to be available but only through calls to exported S3
+      generic functions.
+
+      \item Functions \code{Matrix}, \code{SVD}, \code{as.Matrix},
+      \code{diagDet}, and \code{hilbert} are exported.
+
+      \item Functions \code{Matrix.class}, \code{*.test}, and
+      \code{is.*} are exported but intended only for internal use.
+
+      \item Functions \code{asObject} and \code{prependClass} are not
+      exported.
+
+      \item Load hook \code{.First.lib} is removed and replaced by a
+      \code{useDynLib} directive in \file{NAMESPACE}.
     }
   }
 }
 
 \section{Changes in version 0.3-24 (2003-04-20)}{
-  \subsection{Installation}{
+  \subsection{Significant User-Visible Changes}{
     \itemize{
-      \item .
+      \item S3 generic function \code{det} is renamed
+      \code{determinant}.
+    }
+  }
+  \subsection{Methods}{
+    \itemize{
+      \item \code{determinant.Matrix} (formerly \code{det.Matrix})
+      computes the \eqn{LU} factorization of its argument instead of the
+      \eqn{QR} factorization.
     }
   }
 }
 
 \section{Changes in version 0.3-23 (2003-03-30)}{
+  \subsection{Description}{
+    \itemize{
+      \item \pkg{Matrix} \eqn{\ge}{>=} 0.3-23 depends on \R{}
+      \eqn{\ge}{>=} 1.7.0.
+    }
+  }
   \subsection{Installation}{
     \itemize{
-      \item .
+      \item \file{configure}, \file{configure.in}, \file{configure.win},
+      \file{cleanup}, \file{src/Makevars.in}, and
+      \file{src/Makevars.win} are removed and replaced by a simple
+      \file{src/Makevars} arranging for \pkg{Matrix} to use \R{}'s
+      \code{LAPACK_LIBS} and \code{BLAS_LIBS}.  The simplification is
+      made possible by \R{} version 1.7-0, which is configured by
+      default to build, link against, and install a shared LAPACK.
     }
   }
 }
 
 \section{Changes in version 0.3-22 (2003-02-03)}{
-  \subsection{Installation}{
+  \subsection{Bug Fixes}{
     \itemize{
-      \item .
+      \item Empty directory \file{data} is removed.
     }
   }
 }
 
 \section{Changes in version 0.3-21 (2002-10-25)}{
+  \subsection{Description}{
+    \itemize{
+      \item The package is retitled \dQuote{Classes and Methods for
+        Numerical Linear Algebra using LAPACK}.
+    }
+  }
   \subsection{Installation}{
     \itemize{
-      \item .
+      \item \file{configure.win} and \file{src/Makevars.win} are added
+      to support installation under Windows, thanks to Brian Ripley.
+
+      \item More \code{#undef} in the \proglang{C++} sources to support
+      installation under Windows, thanks to Brian Ripley.
     }
   }
 }
@@ -3441,7 +3509,7 @@
 \section{Changes in version 0.3-20 (2002-10-08)}{
   \subsection{Installation}{
     \itemize{
-      \item \command{configure.ac} sets \code{CFLAGS} before expanding
+      \item \file{configure.ac} sets \code{CFLAGS} before expanding
       \code{AC_PROG_CC} and sets \code{FLIBS} before expanding
       \code{ACX_BLAS} and \code{ACX_LAPACK}.
 
@@ -3482,12 +3550,15 @@
 }
 
 \section{Changes in version 0.3-17 (2002-04-30)}{
-  \subsection{Installation}{
+  \subsection{Description}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 0.3-17 depends on \R{}
       \eqn{\ge}{>=} 1.5.0.
-
-      \item \file{configure.in} is replaced with \file{configure.ac}
+    }
+  }
+  \subsection{Installation}{
+    \itemize{
+      \item \file{configure.in} is replaced by \file{configure.ac}
       contributed by Kurt Hornik.  \file{configure.ac} makes use of
       \command{R CMD config}, a utility added in \R{} version 1.5-0.
 
@@ -3537,12 +3608,12 @@
 }
 
 \section{Changes in version 0.3-13 (2001-05-10)}{
-  \subsection{Bug Fixes}{
+  \subsection{Installation}{
     \itemize{
       \item The \proglang{C++} sources undefine macros \code{length} and
-      \code{append} in many places to avoid conflicts with definitions in
-      \file{Rinternals.h}.
-	}
+      \code{append} in many places to allow for class member functions
+      with those names.
+    }
   }
 }
 
@@ -3566,7 +3637,7 @@
 }
 
 \section{Changes in version 0.3-8 (2001-01-10)}{
-  \subsection{Authorship}{
+  \subsection{Description}{
     \itemize{
       \item \file{DESCRIPTION} gets a \code{Maintainer} field and
       Douglas Bates is named there.
@@ -3595,13 +3666,16 @@
 }
 
 \section{Changes in version 0.3-6 (2000-10-30)}{
-  \subsection{Installation}{
+  \subsection{Description}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 0.3-6 depends on \R{}
       \eqn{\ge}{>=} 1.1.1.
-
-      \item \command{configure} makes use of \code{HAVE_F77_UNDERSCORE}
-      in \file{Rconfig.h}.
+    }
+  }
+  \subsection{Installation}{
+    \itemize{
+      \item \file{configure} makes use of \code{HAVE_F77_UNDERSCORE} in
+      \file{Rconfig.h}.
 
       \item \code{PKG_LIBS} and \code{PKG_LDFLAGS} to the configured
       values of \code{LIBS} and \code{LDFLAGS} in \file{src/Makevars.in}.
@@ -3637,7 +3711,7 @@
 \section{Changes in version 0.3-3 (2000-08-11)}{
   \subsection{Installation}{
     \itemize{
-      \item \command{configure} skips the check for BLAS in the Sun
+      \item \file{configure} skips the check for BLAS in the Sun
       Performance Library if the \proglang{C} compiler is \command{gcc}.
     }
   }
@@ -3693,10 +3767,12 @@
       \item S3 methods \code{det.Matrix}, \code{det.UpperTriangular},
       \code{det.UnitUpperTriangular}, \code{det.LowerTriangular}, and
       \code{det.UnitLowerTriangular} computing the modulus of the
-      determinant, or its logarithm, from the eigenvalues.  These return
+      determinant or its logarithm.  These return
       \code{list(modulus, sign)}.  Component \code{modulus} has a
       logical attribute \code{logarithm} indicating if the determinant
       is \code{sign * exp(modulus)} or \code{sign * modulus}.
+      \code{det.Matrix} computes the \eqn{QR} factorization of its
+      argument using LAPACK routine \code{dgeqrf}.
     }
   }
   \subsection{Bug Fixes}{
@@ -3707,9 +3783,17 @@
   }
   \subsection{New Features}{
     \itemize{
-      \item Utility functions \code{asObject} and \code{prependClass}
-      for setting and prepending to the \code{class} attribute of the
+      \item A function \code{as.Matrix} for coercing an object to
+      class \code{Matrix}, parallel to \code{as.matrix}.  The return
+      value inherits from subclasses of \code{Matrix} if tests for
+      structure are satisfied.
+
+      \item Functions \code{asObject} and \code{prependClass} for
+      setting and prepending to the \code{class} attribute of the
       argument.
+
+      \item A function \code{diagDet} for computing the determinant of a
+      triangular matrix given the diagonal entries.
     }
   }
 }
@@ -3717,14 +3801,15 @@
 \section{Changes in version 0.2-4 (2000-07-18)}{
   \subsection{Installation}{
     \itemize{
-      \item \command{configure} and \command{cleanup} scripts,
-      \command{configure} detecting options for linking BLAS and LAPACK.
-      \command{configure} is generated from \file{configure.in} which
-      makes use of an Autoconf macro \code{OCTAVE_BLAS_LIBS} defined in
+      \item A \file{configure} script detecting options for linking BLAS
+      and LAPACK.  It is generated from \file{configure.in} which makes
+      use of an Autoconf macro \code{OCTAVE_BLAS_LIBS} defined in
       \file{aclocal.m4}.
 
-      \item \file{src/Makevars} is generated by substitution of output
-      variables in \file{src/Makevars.in}.
+      \item \file{src/Makevars} is now generated from
+      \file{src/Makevars.in}.
+
+      \item A \file{cleanup} script removing generated files.
     }
   }
   \subsection{Documentation}{
@@ -3753,19 +3838,22 @@
 }
 
 \section{Changes in version 0.2-1 (2000-07-15)}{
-  \pkg{Matrix} version 0.2-1 is the first one to be distributed by CRAN.
-  It is titled \dQuote{A Matrix Library for \R{}}.
-  \subsection{Authorship}{
+  \subsection{Description}{
     \itemize{
+      \item \pkg{Matrix} version 0.2-1 is the first one to be
+      distributed by CRAN.
+
+      \item The package is titled \dQuote{A Matrix Library for \R{}}.
+
       \item Douglas Bates is the maintainer and principal author.
       Saikat DebRoy is a co-author.
+
+      \item \pkg{Matrix} \eqn{\ge}{>=} 0.2-1 depends on \R{}
+      \eqn{\ge}{>=} 1.1.0.
     }
   }
   \subsection{Installation}{
     \itemize{
-      \item \pkg{Matrix} \eqn{\ge}{>=} 0.2-1 depends on \R{}
-      \eqn{\ge}{>=} 1.1.0.
-
       \item A modified LAPACK++ (Linear Algebra PACKage in C++, version
       1.1a) is compiled alongside the \pkg{Matrix} sources.  LAPACK++ is
       a \proglang{C++} interface to LAPACK originally developed by
