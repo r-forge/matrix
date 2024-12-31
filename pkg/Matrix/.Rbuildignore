@@ -3,7 +3,7 @@
 ## ~~~~ Not under version control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Unwanted by DB or MM (still?)
-^[A-Za-z0-9][-_A-Za-z0-9]*[.]R$
+^[A-Za-z0-9][-._A-Za-z0-9]*[.]R$
 auto$
 -log-
 -[a-zA-Z0-9]*$
@@ -11,21 +11,22 @@ auto$
 _check_
 [.]MM$
 [.]li?st$
-[A-Za-z][+]$
-[A-Za-z][+][A-Za-z0-9]$
-M1mac
-Matrix_[1-9][0-9]*[.][0-9]
-_results
+[A-Za-z][+][A-Za-z0-9]?$
+^CRAN
+^Lapack
+^M1mac
+^Matrix[-._0-9][-._+A-Z0-9]*$
 TAGS
+_results
 _no_UFlong
 ^do-
 ^svn-?
-^R/.*[.]R_+$
+^(tests|R)/.*[.]R[-_+]
+^tests/.*_(doExtra|nX)$
+^man/.*[.]Rd[-_+]
 ^misc$
 ^old$
-^src/SuiteSparse-
-^tests/.*[.]Rout.*[24]b$
-^tests/.*_(doExtra|nX)$
+^src/SuiteSparse[-._]
 
 ## Unwanted by everyone
 [.]Rhistory$
@@ -40,11 +41,16 @@ _no_UFlong
 [.]log$
 [.]orig$
 [.]out$
+[.]patch$
 [.]rej$
 [.]tar[.]gz$
 [.]tex$
 [.]tgz$
 [.]zip$
+# extra saved test results
+^tests/.*[.]Rout_
+# top-level .txt files ( ^[^/]*[.]txt$ fails: [^/] (= not '/') fails)
+^[-_.+A-Z0-9]*[.]txt$
 
 
 ## ~~~~ Under version control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

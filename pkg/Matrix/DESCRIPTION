@@ -1,7 +1,7 @@
 Package: Matrix
 Version: 1.8-0
 VersionNote: do also bump src/version.h, inst/include/Matrix/version.h
-Date: 2024-12-09
+Date: 2024-12-31
 Priority: recommended
 Title: Sparse and Dense Matrix Classes and Methods
 Description: A rich hierarchy of sparse and dense matrix classes,
@@ -36,7 +36,7 @@ Authors@R:
 	  person("Jens", "Oehlschlägel", role = "ctb",
 	         comment = "initial nearPD()"),
 	  person("R Core Team", role = "ctb",
-	         comment = "base R's matrix implementation"))
+	         comment = c(ROR = "02zz1nj61", "base R's matrix implementation")))
 Depends: R (>= 4.5), methods
 Imports: grDevices, graphics, grid, lattice, stats, utils
 Suggests: MASS, datasets, sfsmisc, tools
