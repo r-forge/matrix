@@ -267,8 +267,13 @@ exportMethods("!",
               tcrossprod, # internal
               which,
               zapsmall) # implicit
-export(crossprod, tcrossprod) # *necessary* once primitive in base
-## MJ: why these and not also other primitive generic functions ??
+## To not break reverse Imports that use
+##     importFrom(Matrix, crossprod, tcrossprod)
+## instead of
+##     importMethodsFrom(Matrix, crossprod, tcrossprod)
+## even though the latter was always sufficient and safer for S4
+## generic functions with original definitions not local to Matrix:
+export(crossprod, tcrossprod)
 
 ## From 'graphics'
 exportMethods(image)
