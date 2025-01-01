@@ -267,6 +267,8 @@ exportMethods("!",
               tcrossprod, # internal
               which,
               zapsmall) # implicit
+export(crossprod, tcrossprod) # *necessary* once primitive in base
+## MJ: why these and not also other primitive generic functions ??
 
 ## From 'graphics'
 exportMethods(image)
