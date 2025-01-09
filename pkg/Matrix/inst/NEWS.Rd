@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2024-12-09, svn r5103)}{
+\section{Changes in version 1.8-0 (2025-01-09, svn r5109)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -15,6 +15,9 @@
 
       \item Warnings surfaced by \option{-Wconversion} (but not those
       originating in SuiteSparse) are squashed.
+
+      \item \pkg{Matrix} can be installed with parallel \command{bmake}.
+      Thanks to Sebastian Meyer for the report and patch in \MPR{6861}.
     }
   }
   \subsection{Deprecated and Defunct}{
@@ -3336,7 +3339,7 @@
   }
 }
 
-%--------------- start of DB+MM history: ------------------------
+%% ---------------- Start of DB+MM history -----------------------------
 
 \section{Changes in version 0.95-1 (2005-02-18, svn r561)}{
   \subsection{Authorship}{
@@ -3397,6 +3400,8 @@
     }
   }
 }
+
+%% ---------------- Start of S4 history --------------------------------
 
 \section{Changes in version 0.3-26 (2003-11-03)}{
   \subsection{Bug Fixes}{
@@ -3925,3 +3930,5 @@
     }
   }
 }
+
+%% ---------------- Start of CRAN history ------------------------------
