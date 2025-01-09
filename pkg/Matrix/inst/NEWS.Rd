@@ -4,14 +4,15 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-01-09, svn r5109)}{
+\section{Changes in version 1.8-0 (2025-01-09, svn r5111)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
       \eqn{\ge}{>=} 4.5.
 
       \item Compilation uses preprocessor options
-      \option{-DSTRICT_R_HEADERS} and \option{-DR_NO_REMAP}.
+      \option{-DSTRICT_R_HEADERS}, \option{-DR_NO_REMAP}, and
+      \option{-DR_NO_REMAP_RMATH}.
 
       \item Warnings surfaced by \option{-Wconversion} (but not those
       originating in SuiteSparse) are squashed.

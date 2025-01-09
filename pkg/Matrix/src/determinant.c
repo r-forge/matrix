@@ -2,7 +2,7 @@
 
 #include "cholmod-etc.h"
 #include "Mdefines.h"
-#include <Rmath.h> /* logspace_add, logspace_sub */
+#include <Rmath.h> /* Rf_logspace_add, Rf_logspace_sub */
 
 static
 SEXP det(double modulus, int logarithm, int sign)
