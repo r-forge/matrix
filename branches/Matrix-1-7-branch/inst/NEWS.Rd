@@ -4,6 +4,22 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
+\section{Changes in version 1.7-2 (2025-01-20, svn r5114)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} can be installed with parallel \command{bmake}.
+      Thanks to Sebastian Meyer for the report and patch in \MPR{6861}.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item Test in \file{tests/matprod.R} comparing
+      \code{t(x) \%*\% x} and \code{crossprod(x)} is amended to tolerate
+      small numerical differences seen under \samp{aarch64} Linux.
+    }
+  }
+}
+
 \section{Changes in version 1.7-1 (2024-10-17, svn r4948)}{
   \subsection{Installation}{
     \itemize{

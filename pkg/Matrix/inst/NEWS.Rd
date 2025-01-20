@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-01-09, svn r5111)}{
+\section{Changes in version 1.8-0 (2025-01-20, svn r5114)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -16,9 +16,6 @@
 
       \item Warnings surfaced by \option{-Wconversion} (but not those
       originating in SuiteSparse) are squashed.
-
-      \item \pkg{Matrix} can be installed with parallel \command{bmake}.
-      Thanks to Sebastian Meyer for the report and patch in \MPR{6861}.
     }
   }
   \subsection{Deprecated and Defunct}{
@@ -174,6 +171,22 @@
       \item \file{test-tools-1.R}: update \code{relErrV()}, and use it
       and \code{relErr()} unconditionally to improve strict
       reproducibility.
+    }
+  }
+}
+
+\section{Changes in version 1.7-2 (2025-01-20, svn r5114)}{
+  \subsection{Installation}{
+    \itemize{
+      \item \pkg{Matrix} can be installed with parallel \command{bmake}.
+      Thanks to Sebastian Meyer for the report and patch in \MPR{6861}.
+    }
+  }
+  \subsection{Misc}{
+    \itemize{
+      \item Test in \file{tests/matprod.R} comparing
+      \code{t(x) \%*\% x} and \code{crossprod(x)} is amended to tolerate
+      small numerical differences seen under \samp{aarch64} Linux.
     }
   }
 }
