@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.7-2 (2025-01-20, svn r5114)}{
+\section{Changes in version 1.7-2 (2025-01-20, svn r5115)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} can be installed with parallel \command{bmake}.
