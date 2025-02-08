@@ -1,7 +1,7 @@
 ## METHODS FOR GENERIC: isDiagonal
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-for (.cl in c("matrix", "denseMatrix"))
+for (.cl in c("matrix", "table", "denseMatrix")) # base :: table()
 setMethod("isDiagonal", c(object = .cl),
           function(object, ...)
               .Call(R_dense_is_diagonal, object))

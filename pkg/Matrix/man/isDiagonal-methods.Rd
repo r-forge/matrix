@@ -16,6 +16,7 @@
 \alias{isDiagonal,diagonalMatrix-method}
 \alias{isDiagonal,indMatrix-method}
 \alias{isDiagonal,matrix-method}
+\alias{isDiagonal,table-method}
 %
 \description{
   \code{isDiagonal} tests whether its argument
@@ -23,7 +24,8 @@
   \code{\link{isSymmetric}}, it is generically
   from \pkg{Matrix} rather than \pkg{base}.  Hence \pkg{Matrix}
   defines methods for traditional matrices of implicit \link{class}
-  \code{"\link{matrix}"} in addition to matrices inheriting from
+  \code{"\link{matrix}"} or explicit class \code{"\link{table}"}
+  in addition to matrices inheriting from
   virtual class \code{"\linkS4class{Matrix}"}.
 
   By our definition, diagonal matrices are \emph{square},
@@ -46,6 +48,9 @@ isDiagonal(object, \dots)
 }
 \examples{
 isDiagonal(matrix(c(2,0,0,1), 2,2)) # TRUE
+Np <- rpois(100, 1)
+(tab <- table(Np, Np+1L))
+isDiagonal(tab) # TRUE
 
 ## Look at implementations:
 showMethods("isDiagonal", includeDefs = TRUE)

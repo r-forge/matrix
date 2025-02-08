@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-01-20, svn r5115)}{
+\section{Changes in version 1.8-0 (2025-02-08, svn r5116)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -138,6 +138,8 @@
       implementation of the scaling and squaring algorithm for
       non-Hermitian \code{x}.  The result for Hermitian \code{x} is now
       formally positive definite.
+
+      \item \code{isDiagonal()} now also works for \code{table(X, Y)} tables.
     }
   }
   \subsection{Bug Fixes}{
