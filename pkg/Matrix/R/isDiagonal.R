@@ -1,10 +1,15 @@
 ## METHODS FOR GENERIC: isDiagonal
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-for (.cl in c("matrix", "table", "denseMatrix")) # base :: table()
+for (.cl in c("matrix", "denseMatrix"))
 setMethod("isDiagonal", c(object = .cl),
           function(object, ...)
               .Call(R_dense_is_diagonal, object))
+setMethod("isDiagonal", "table", function(object, ...) {
+    if(length(dim(object)) != 2L) return(FALSE)
+    .Call(R_dense_is_diagonal, object)
+})
+
 
 for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
 setMethod("isDiagonal", c(object = .cl),

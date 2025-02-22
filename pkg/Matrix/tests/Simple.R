@@ -1599,8 +1599,10 @@ y <- new("ngTMatrix", Dim = rep(as.integer(0x1p+30), 2L))
 stopifnot(identical(length(y), 0x1p+60)) # big but representable
                                          # ==> no attribute
 
-
-
+## non-2D tables are *not* diagonal matrices
+stopifnot(isFALSE(isDiagonal(table(1))),
+          isFALSE(isDiagonal(table(1,1,1))),
+          isFALSE(isDiagonal(table(1:7))))
 
 
 
