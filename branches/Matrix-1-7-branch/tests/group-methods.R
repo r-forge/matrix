@@ -336,7 +336,7 @@ showProc.time()
 cl <- sapply(ls(), function(.) class(get(.)))
 Mcl <- cl[vapply(cl, extends, "Matrix",       FUN.VALUE=NA) |
           vapply(cl, extends, "sparseVector", FUN.VALUE=NA)]
-table(Mcl)
+table(unlist(Mcl))
 ## choose *one* of each class:
 ## M.objs <- names(Mcl[!duplicated(Mcl)])
 ## choose all
@@ -344,6 +344,7 @@ M.objs <- names(Mcl) # == the ls() from above
 Mat.objs <- M.objs[vapply(M.objs, function(nm) is(get(nm), "Matrix"), NA)]
 MatDims <- t(vapply(Mat.objs, function(nm) dim(get(nm)), 0:1))
 ## Nice summary info :
+Mcl <- sapply(Mcl, as.vector) # dropping "package" attributes
 noquote(cbind(Mcl[Mat.objs], format(MatDims)))
 
 ## dtCMatrix, uplo="L" :
@@ -607,5 +608,16 @@ stopifnot(all.equal(p4,  p4. , tolerance = 1e-15),
 all.equal(p4,  p4. , tolerance = 0)
 all.equal(p4., p4.., tolerance = 0)
 .Machine[["sizeof.longdouble"]]
+
+## <Ops>  <matrix> o <sparseVector>  stopped working
+(M73p <- L7[1:3,] + na.ddv) # 3 x 7 sparse Matrix of class "dgCMatrix"
+m73 <- as.matrix(L7[1:3,])
+(m73p <- m73 + na.ddv)
+stopifnot(is(m73p, "sparseMatrix"),
+          identical(m73p, na.ddv + m73),
+          identical(m73p, M73p))
+## badly failed, returning sparseVector  in Matrix 1.7.{0,1,2}
+
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
