@@ -5,11 +5,13 @@
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
 
-\section{Changes in version 1.7-3 (2025-02-23, svn r5118)}{
+\section{Changes in version 1.7-3 (2025-02-27, svn r5119)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{<matrix>} \code{o} \code{<sparseVector>} binary
       \code{"Ops"} work again, returning a matrix (of \code{"Matrix"}).
+
+      \item \code{- new("lgeMatrix")} and more \code{ - <Matrix>} now work.
     }
   }
 }

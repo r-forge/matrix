@@ -141,6 +141,9 @@ setMethod("-", c(e1 = "denseMatrix", e2 = "missing"),
                   e1@factors <- list()
               e1
           })
+## with these exceptions:
+setMethod("-", c(e1 = "ndenseMatrix", e2 = "missing"), function(e1, e2) -.M2kind(e1, "d"))
+setMethod("-", c(e1 = "ldenseMatrix", e2 = "missing"), function(e1, e2) -.M2kind(e1, "d"))
 
 setMethod("-", c(e1 = "diagonalMatrix", e2 = "missing"),
           function(e1, e2) {
@@ -1655,10 +1658,9 @@ setMethod("-", c(e1 = "sparseMatrix", e2 = "missing"),
               e1
           })
 ## with the following exceptions:
-setMethod("-", c(e1 = "nsparseMatrix", e2 = "missing"),
-          function(e1, e2) -.M2kind(e1, "d"))
-setMethod("-", c(e1 = "indMatrix", e2 = "missing"),
-          function(e1, e2) -as(e1, "dsparseMatrix"))
+setMethod("-", c(e1 = "nsparseMatrix", e2 = "missing"), function(e1, e2) -.M2kind(e1, "d"))
+setMethod("-", c(e1 = "lsparseMatrix", e2 = "missing"), function(e1, e2) -.M2kind(e1, "d"))
+setMethod("-", c(e1 = "indMatrix", e2 = "missing"), function(e1, e2) -as(e1, "dsparseMatrix"))
 
 ## Group method  "Arith"
 
