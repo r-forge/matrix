@@ -10,7 +10,7 @@ setMethod("norm", c(x = "denseMatrix", type = "character"),
               if (identical(type, "2"))
                   return(base::norm(.M2m(x), type = "2"))
               x <- .M2kind(x, ",")
-              switch(EXPR = substr(.M.class(x), 2L, 3L),
+              switch(substr(.M.class(x), 2L, 3L),
                      "ge" = .Call(geMatrix_norm, x, type),
                      "sy" = .Call(syMatrix_norm, x, type),
                      "sp" = .Call(spMatrix_norm, x, type),
@@ -22,7 +22,7 @@ setMethod("norm", c(x = "sparseMatrix", type = "character"),
           function(x, type, ...) {
               if (any(x@Dim == 0L))
                   return(0)
-              switch(EXPR = type,
+              switch(type,
                      "2" =
                          base::norm(.M2m(x), type = "2"),
                      "M" =, "m" =
@@ -51,7 +51,7 @@ setMethod("norm", c(x = "diagonalMatrix", type = "character"),
                   if (.M.kind(x) == "n" && anyNA(y))
                       y <- y | is.na(y)
               }
-              switch(EXPR = type,
+              switch(type,
                      "2" =,
                      "M" =, "m" =,
                      "O" =, "o" =, "1" =,
@@ -73,7 +73,7 @@ setMethod("norm", c(x = "indMatrix", type = "character"),
               d <- x@Dim
               if ((m <- d[1L]) == 0L || (n <- d[2L]) == 0L)
                   return(0)
-              switch(EXPR = type,
+              switch(type,
                      "2" =
                          sqrt(max(tabulate(x@perm, if (x@margin == 1L) n else m))),
                      "M" =, "m" =
@@ -93,7 +93,7 @@ setMethod("norm", c(x = "pMatrix", type = "character"),
           function(x, type, ...) {
               if ((n <- x@Dim[1L]) == 0L)
                   return(0)
-              switch(EXPR = type,
+              switch(type,
                      "2" =,
                      "M" =, "m" =,
                      "O" =, "o" =, "1" =,

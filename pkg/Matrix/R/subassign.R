@@ -340,7 +340,7 @@ setMethod("[<-",
             i <- i[ - which(i0, arr.ind = TRUE)[,"row"], ]
         ## now have integer i >= 1
         m <- nrow(i)
-        ## mod.x <- .type.kind[.M.kind(x)]
+        ## mod.x <- .type.kind[[.M.kind(x)]]
         if(length(value) > 0 && m %% length(value) != 0)
             warning("number of items to replace is not a multiple of replacement length")
         ## recycle:
@@ -1338,7 +1338,7 @@ replTmat <- function (x, i, j, ..., value) {
 	return(x)
     if(length(value) == 0)
 	stop("nothing to replace with")
-    ## mod.x <- .type.kind[.M.kind(x)]
+    ## mod.x <- .type.kind[[.M.kind(x)]]
     if(length(value) != m) { ## use recycling rules
 	if(m %% length(value) != 0)
 	    warning("number of items to replace is not a multiple of replacement length")

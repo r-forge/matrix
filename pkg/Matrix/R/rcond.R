@@ -17,7 +17,7 @@ setMethod("rcond", c(x = "ANY", norm = "missing"),
 setMethod("rcond", c(x = "denseMatrix", norm = "character"),
           function(x, norm, exact = FALSE, inverse = solve(x),
                    warn = TRUE, ...) {
-              switch(EXPR = norm,
+              switch(norm,
                      "2" =,
                      "M" =, "m" =,
                      "F" =, "f" =, "E" =, "e" =
@@ -33,7 +33,7 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                   return(Inf)
               x <- .M2kind(x, ",")
               if (exact)
-              switch(EXPR = norm,
+              switch(norm,
                      "2" =,
                          {
                              s <- svd(x, nu = 0L, nv = 0L)[["d"]]
@@ -45,7 +45,7 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
                      "F" =, "f" =, "E" =, "e" =
                          1/(norm(x, type = norm) * norm(inverse, type = norm)))
               else
-              switch(EXPR = substr(.M.class(x, 2L), 2L, 3L),
+              switch(substr(.M.class(x, 2L), 2L, 3L),
                      "ge" =
                          {
                              if (m == n) {
@@ -101,7 +101,7 @@ setMethod("rcond", c(x = "denseMatrix", norm = "character"),
 setMethod("rcond", c(x = "sparseMatrix", norm = "character"),
           function(x, norm, exact = FALSE, inverse = solve(x),
                    warn = TRUE, ...) {
-              switch(EXPR = norm,
+              switch(norm,
                      "2" =,
                      "M" =, "m" =,
                      "F" =, "f" =, "E" =, "e" =
@@ -117,7 +117,7 @@ setMethod("rcond", c(x = "sparseMatrix", norm = "character"),
                   return(Inf)
               x <- .M2kind(x, ",")
               if (exact)
-              switch(EXPR = norm,
+              switch(norm,
                      "2" =,
                          {
                              s <- svd(x, nu = 0L, nv = 0L)[["d"]]
@@ -149,7 +149,7 @@ setMethod("rcond", c(x = "diagonalMatrix", norm = "character"),
                   if (.M.kind(x) == "n" && anyNA(y))
                       y <- y | is.na(y)
               }
-              switch(EXPR = norm[1L],
+              switch(norm[1L],
                      "2" =,
                      "M" =, "m" =,
                      "O" =, "o" =, "1" =,
@@ -178,7 +178,7 @@ setMethod("rcond", c(x = "indMatrix", norm = "character"),
               if (m == n) {
                   if (anyDuplicated.default(x@perm))
                       return(0)
-                  switch(EXPR = norm,
+                  switch(norm,
                          "2" =,
                          "M" =, "m" =,
                          "O" =, "o" =, "1" =,
@@ -203,7 +203,7 @@ setMethod("rcond", c(x = "pMatrix", norm = "character"),
           function(x, norm, ...) {
               if ((n <- x@Dim[1L]) == 0L)
                   return(Inf)
-              switch(EXPR = norm,
+              switch(norm,
                      "2" =,
                      "M" =, "m" =,
                      "O" =, "o" =, "1" =,
