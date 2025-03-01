@@ -38,7 +38,8 @@ norm(x, type, \dots)
 	(maximum absolute column sum);}
       \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum
 	absolute row sum);}
-      \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the
+      \item{\code{"F"}, \code{"f"}, \code{"E"} or \code{"e"}}{specifies the
+	Frobenius norm (the
 	Euclidean norm of \code{x} treated as if it were a vector);}
       \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of
 	all the elements in \code{x}; and}
