@@ -109,6 +109,22 @@ Matrix.Version <- function() {
     wSD <- as.integer(Sys.getenv("R_MATRIX_WARN_SQRT_DEFAULT", NA))
     assign("warnSqrtDefault", wSD, envir = .MatrixEnv)
 
+    ## use_iMatrix:  should  Matrix(<integer>, ..), Diagonal(., x=<int>), .sparseDiagonal(*)
+    ##               newly return <iMatrix>
+    ## FALSE ... produce "dMatrix"; back compatibly, no warning --- for Matrix 1.8.0
+    ##   NA  ... produce "iMatrix"; with warning --- for Matrix 1.9.0 ?
+    ##  TRUE ... produce "iMatrix", no warning   --- (distant?) future default
+    wSD <- as.logical(Sys.getenv("R_MATRIX_USE_Matrix_i", FALSE))
+    assign("use_iMatrix", wSD, envir = .MatrixEnv)
+
+    ## Arith_logi2int:
+    ##   should  <lMatrix> o <nMatrix> etc newly return <iMatrix> instead of <dMatrix>
+    ## FALSE ... produce "dMatrix"; back compatibly, no warning --- for Matrix 1.8.0
+    ##   NA  ... produce "iMatrix"; with warning --- for Matrix 1.8.x ?
+    ##  TRUE ... produce "iMatrix", no warning   --- (distant) future default
+    wSD <- as.logical(Sys.getenv("R_MATRIX_ARITH_logi2int", FALSE))
+    assign("Arith_logi2int", wSD, envir = .MatrixEnv)
+
     NULL
 }
 

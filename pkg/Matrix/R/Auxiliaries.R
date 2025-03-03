@@ -40,17 +40,17 @@ as0 <- function(x, type = typeof(x))
                   name, cl1[1L], cl2[1L], "Matrix"),
          call. = FALSE, domain = NA)
 
+if(FALSE) {
 Matrix.verbose <- function()
     getOption("Matrix.verbose", .MatrixEnv[["verbose"]])
-
 Matrix.warn <- function()
     getOption("Matrix.warn", .MatrixEnv[["warn"]])
+}
 
-## MJ: or maybe a general one?
-if(FALSE) {
-Matrix.getOption <- function(x, default = .Matrix.Env[[x]])
+Matrix.getOption <- function(x, default = .MatrixEnv[[x]])
     getOption(paste0("Matrix.", x), default)
-} ## MJ
+Matrix.verbose <- function() Matrix.getOption("verbose")
+Matrix.warn    <- function() Matrix.getOption("warn")
 
 Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     if(Matrix.verbose() >= .M.level) {
@@ -63,6 +63,30 @@ Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
         m(..., call. = call., domain = domain)
     }
 }
+
+.Arith_logi2int <- function() as.logical(Matrix.getOption("Arith_logi2int")) # will become TRUE
+.use_iMat       <- function() as.logical(Matrix.getOption("use_iMatrix"))    # will become TRUE
+
+## Used in "Arith" group methods --> ./Ops.R
+.Arith.kind <- function(x,y, Generic) {
+    kx <- .M.kind(x) # "z", "d",  "i", "l", "n"
+    ky <- .M.kind(y)
+    ## use  range(letters) = (min(.), max(.)) = ("a", "z"):
+    if(max(kx, ky) == "z") return("z")
+    ## no "z" :
+    if(Generic == "/" || Generic == "^")
+        "d"
+    else { # Generic in {+ - * %% %/%}
+        ##  {d, i, l, n} remain
+        if(min(kx, ky) == "d")
+            "d"
+        else ## {i, l, n} :
+            if(kx == "i" && ky == "i") "i"
+        ## else have (i,l), (i,n), (l,l), (l,n), or (n,n)
+        else if(.Arith_logi2int()) "i" else "d"  # .Arith_..() will become TRUE
+    }
+}
+
 
 .tCRT <- function(x, trans = "T", lazy = TRUE)
     .Call(R_sparse_transpose, x, "T", lazy)
