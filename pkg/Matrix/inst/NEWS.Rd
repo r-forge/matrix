@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-02-22, svn r5117)}{
+\section{Changes in version 1.8-0 (2025-03-03, svn r5122)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -158,6 +158,14 @@
       \code{length(x)} is truncated towards zero and gets an attribute
       \code{off} such that the exact result of \code{length(x) + off} is
       the exact result of \code{prod(dim(x))}.
+
+      \item The meaning of option \code{checkDense} in \code{diagU2N()},
+      \code{diagN2U()}, \code{.diagU2N()} and \code{.diagN2U()} has been
+      swapped back such that checking for \code{"denseMatrix"} again only
+      happens when the option is true.  The defaults have been swapped to
+      \code{TRUE} for  \code{diagU2N()} and \code{diagN2U()} whereas the
+      default \code{checkDense = FALSE} remains for the faster low-level
+      versions \code{.diagU2N()} and \code{.diagN2U()}.
     }
   }
   \subsection{Misc}{
@@ -173,6 +181,17 @@
       \item \file{test-tools-1.R}: update \code{relErrV()}, and use it
       and \code{relErr()} unconditionally to improve strict
       reproducibility.
+    }
+  }
+}
+
+\section{Changes in version 1.7-3 (2025-02-27, svn r5119)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item \code{<matrix>} \code{o} \code{<sparseVector>} binary
+      \code{"Ops"} work again, returning a matrix (of \code{"Matrix"}).
+
+      \item \code{- new("lgeMatrix")} and more \code{ - <Matrix>} now work.
     }
   }
 }

@@ -17,25 +17,23 @@ anyFalse <- function(x)
 any0     <- function(x)
     if(is.atomic(x)) .Call(R_any0, x) else !is.na(a <- any(!x)) &&  a
 
-## NB: change to using 'typeof' when we define iMatrix
-as1 <- function(x, mode. = mode(x))
-    switch(mode.,
+as1 <- function(x, type = typeof(x))
+    switch(type,
            "logical" = TRUE,
            "integer" =   1L,
-           "double"  =     ,
-           "numeric" =    1,
+           "double"  =    1,
            "complex" = 1+0i,
-           stop(gettextf("invalid mode \"%s\"", mode.), domain = NA))
+           stop(gettextf("invalid type \"%s\"", type), domain = NA))
 
-## NB: change to using 'typeof' when we define iMatrix
-as0 <- function(x, mode. = mode(x))
-    switch(mode.,
+as0 <- function(x, type = typeof(x))
+    switch(type,
            "logical" = FALSE,
            "integer" =    0L,
-           "double"  =      ,
-           "numeric" =     0,
+           "double"  =     0,
            "complex" =  0+0i,
-           stop(gettextf("invalid mode \"%s\"", mode.), domain = NA))
+           stop(gettextf("invalid type \"%s\"", type), domain = NA))
+
+
 
 .bail.out.2 <- function(name, cl1, cl2)
     stop(gettextf("%s(<%s>, <%s>) is not yet implemented; ask maintainer(\"%s\") to implement the missing method",
@@ -295,14 +293,14 @@ as_CspClass <- function(x, cl, cld = getClassDef(cl)) {
 ## as(<[Mm]atrix>, <non-unit triangular CsparseMatrix>)
 asCspN <- function(x) .Call(R_sparse_diag_U2N, as(x, "CsparseMatrix"))
 
-diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(extends(cl, "triangularMatrix") && x@diag == "U")
+diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = TRUE) {
+    if("diag" %in% names(cl@slots) && x@diag == "U") # triangular _and_ diagonal
         .diagU2N(x, cl = cl, checkDense = checkDense)
     else x
 }
 
 .diagU2N <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(!checkDense && extends(cl, "denseMatrix"))
+    if(checkDense && extends(cl, "denseMatrix"))
         x <- as(x, "CsparseMatrix")
     ..diagU2N(x)
 }
@@ -312,15 +310,15 @@ diagU2N <- function (x, cl = getClassDef(class(x)), checkDense = FALSE) {
     x
 }
 
-diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(extends(cl, "triangularMatrix") && x@diag == "N")
+diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = TRUE) {
+    if("diag" %in% names(cl@slots) && x@diag == "N") # triangular _and_ diagonal
         .diagN2U(x, cl = cl, checkDense = checkDense)
     else x
 }
 
 .diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
-    if(!checkDense & (isDense <- extends(cl, "denseMatrix")))
-        ..diagN2U(as(x, "CsparseMatrix"), sparse = TRUE)
+    if(checkDense & (isDense <- extends(cl, "denseMatrix")))
+         ..diagN2U(as(x, "CsparseMatrix"), sparse = TRUE)
     else ..diagN2U(x, sparse = !isDense)
 }
 
