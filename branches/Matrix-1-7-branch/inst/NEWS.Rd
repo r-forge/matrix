@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
 
-\section{Changes in version 1.7-3 (2025-02-27, svn r5119)}{
+\section{Changes in version 1.7-3 (2025-03-04, svn r5125)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{<matrix>} \code{o} \code{<sparseVector>} binary
