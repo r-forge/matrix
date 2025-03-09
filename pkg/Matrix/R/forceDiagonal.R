@@ -2,18 +2,17 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 setMethod("forceDiagonal", c(x = "matrix"),
-          function(x, diag = "N", ...) {
+          function(x, diag = NULL, ...) {
               d <- dim(x)
               if (d[1L] != d[2L])
                   stop("matrix is not square")
-              dn <- dimnames(x)
-              r <- new(paste0(.M.kind(x), "diMatrix"))
-              r@Dim <- d
-              if (!is.null(dn))
-              r@Dimnames <- dn
-              if (diag == "N")
-                  r@x <- diag(x, names = FALSE)
-              else r@diag <- "U"
+              diax <- diag(x, names = FALSE)
+              if(is.null(diag))
+                  diag <- if(!anyNA(diax) && all(diax == as1(x[0L]))) "U" else "N"
+              r <- new(paste0(.M.kind(x), "diMatrix"), Dim = d,
+                       x = if (diag == "N") diax else x[0L], diag = diag)
+              if(!is.null(dn <- dimnames(x)))
+                  r@Dimnames <- dn
               r
           })
 
