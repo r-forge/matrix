@@ -4,8 +4,9 @@
 SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 {
 	SEXP r;
-	int i, j, n = Rf_asInteger(s_n), packed = Rf_asLogical(s_packed),
-		upper = Rf_asLogical(s_upper), diag = Rf_asLogical(s_diag);
+	int i, j, n = Rf_asInteger(s_n);
+	Rboolean packed = Rf_asRboolean(s_packed), upper = Rf_asRboolean(s_upper),
+	    diag = Rf_asRboolean(s_diag);
 	int_fast64_t
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn,
@@ -91,8 +92,10 @@ SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 {
 	SEXP r;
-	int j, n = Rf_asInteger(s_n), packed = Rf_asLogical(s_packed),
-		upper = Rf_asLogical(s_upper);
+	int j, n = Rf_asInteger(s_n);
+	Rboolean
+	    packed = Rf_asRboolean(s_packed),
+	    upper  = Rf_asRboolean(s_upper);
 	int_fast64_t
 		nn = (int_fast64_t) n * n,
 		nx = (packed) ? n + (nn - n) / 2 : nn;
@@ -224,6 +227,14 @@ SEXP R_all0(SEXP x) {
 			if (ISNAN(xx[i]) || xx[i] != 0.) return FALSE_;
 		return TRUE_;
 	}
+	case CPLXSXP:
+	{
+		Rcomplex *xx = COMPLEX(x);
+		for (i = 0; i < n; i++)
+			if (ISNAN(xx[i].r) || xx[i].r != 0. ||
+			    ISNAN(xx[i].i) || xx[i].i != 0.) return FALSE_;
+		return TRUE_;
+	}
 	case RAWSXP:
 	{
 		unsigned char *xx = RAW(x);
@@ -267,6 +278,12 @@ SEXP R_any0(SEXP x) {
 		for (i = 0; i < n; i++) if (xx[i] == 0.) return TRUE_;
 		return FALSE_;
 	}
+	case CPLXSXP:
+	{
+		Rcomplex *xx = COMPLEX(x);
+		for (i = 0; i < n; i++) if (xx[i].r == 0. && xx[i].i == 0.) return TRUE_;
+		return FALSE_;
+	}
 	case RAWSXP:
 	{
 		unsigned char *xx = RAW(x);
@@ -281,17 +298,17 @@ SEXP R_any0(SEXP x) {
 #undef TRUE_
 #undef FALSE_
 
-// Almost "Cut n Paste" from ...R../src/main/array.c  do_matrix() :
-// used in ../R/Matrix.R as
-//
-// .External(Mmatrix,
-//		 data, nrow, ncol, byrow, dimnames,
-//		 missing(nrow), missing(ncol))
+/* used in ../R/construct.R as
+
+    data <- .External(Mmatrix,
+                     data, nrow, ncol, byrow, dimnames, mnrow, mncol)
+
+Almost "Cut n Paste" from ...R../src/main/array.c  do_matrix()
+*/
 SEXP Mmatrix(SEXP args)
 {
 	SEXP vals, ans, snr, snc, dimnames;
-	int nr = 1, nc = 1, byrow, miss_nr, miss_nc;
-	R_xlen_t lendat;
+	int nr = 1, nc = 1;
 
 	args = CDR(args); /* skip 'name' */
 	vals = CAR(args); args = CDR(args);
@@ -309,16 +326,14 @@ SEXP Mmatrix(SEXP args)
 	default:
 		Rf_error(_("'data' must be of a vector type"));
 	}
-	lendat = XLENGTH(vals);
+	R_xlen_t lendat = XLENGTH(vals);
 	snr = CAR(args); args = CDR(args);
 	snc = CAR(args); args = CDR(args);
-	byrow = Rf_asLogical(CAR(args)); args = CDR(args);
-	if (byrow == NA_INTEGER)
-		Rf_error(_("invalid '%s' argument"), "byrow");
+	Rboolean byrow = Rf_asRboolean(CAR(args)); args = CDR(args);
 	dimnames = CAR(args);
 	args = CDR(args);
-	miss_nr = Rf_asLogical(CAR(args)); args = CDR(args);
-	miss_nc = Rf_asLogical(CAR(args));
+	Rboolean miss_nr = Rf_asRboolean(CAR(args)); args = CDR(args);
+	Rboolean miss_nc = Rf_asRboolean(CAR(args));
 
 	if (!miss_nr) {
 		if (!Rf_isNumeric(snr)) Rf_error(_("non-numeric matrix extent"));
@@ -431,8 +446,7 @@ SEXP Mmatrix(SEXP args)
 static
 int *expand_cmprPt(int ncol, const int mp[], int mj[])
 {
-	int j;
-	for (j = 0; j < ncol; j++) {
+	for (int j = 0; j < ncol; j++) {
 		int j2 = mp[j+1], jj;
 		for (jj = mp[j]; jj < j2; jj++)
 			mj[jj] = j;
@@ -446,7 +460,7 @@ int *expand_cmprPt(int ncol, const int mp[], int mj[])
  */
 SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 {
-    int col = Rf_asLogical(colP); /* 1 if "C"olumn compressed;  0 if "R"ow */
+    Rboolean col = Rf_asRboolean(colP); /* TRUE iff "C"olumn compressed;  FALSE if "R"ow */
     SEXP ans, indSym = col ? Matrix_iSym : Matrix_jSym;
     SEXP indP = PROTECT(GET_SLOT(x, indSym)),
 	 pP   = PROTECT(GET_SLOT(x, Matrix_pSym));
