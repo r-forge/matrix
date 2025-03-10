@@ -17,9 +17,10 @@
   \code{\linkS4class{CsparseMatrix}}).
 }
 \usage{
-Diagonal(n, x = NULL, names = FALSE)
+Diagonal(n, x = NULL, names = FALSE, int2dbl = )
 
-.sparseDiagonal(n, x = NULL, uplo = "U", shape = "t", unitri = TRUE, kind, cols)
+.sparseDiagonal(n, x = NULL, uplo = "U", shape = "t", unitri = TRUE, kind, cols,
+                int2dbl = )
     .trDiagonal(n, x = NULL, uplo = "U", unitri = TRUE, kind)
    .symDiagonal(n, x = NULL, uplo = "U", kind)
 }
@@ -60,6 +61,11 @@ Diagonal(n, x = NULL, names = FALSE)
     then the result is (mathematically) \code{D[, cols+1]} rather
     than \code{D}, where \code{D = Diagonal(n, x)}, and it is always
     \dQuote{general} (i.e., \code{shape} is ignored).}
+  \item{int2dbl}{\code{\link{logical}} indicating if integer matrices
+    (\code{\linkS4class{iMatrix}}) should be coerced to double
+    (\code{\linkS4class{dMatrix}}) for back compatibility.  It is planned
+    that the this will become \code{FALSE}, at first by default;
+    see \code{\link{Matrix}}'s \code{int2dbl} for more details.}
 }
 \value{
   \code{Diagonal()} returns an object inheriting from virtual class

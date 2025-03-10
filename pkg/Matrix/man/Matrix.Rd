@@ -6,16 +6,22 @@
 %
 \alias{Matrix}
 \description{
-  Construct a Matrix of a class that inherits from \code{Matrix}.
+  Construct a Matrix of a class inheriting from \code{Matrix},
+  i.e., a \dQuote{\pkg{Matrix}-package \code{Matrix} object}, using a
+  syntax known from base \R's \code{\link{matrix}()}.
 }
 \usage{
 Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
-       sparse = NULL, doDiag = TRUE, forceCheck = FALSE)
+       sparse = NULL, doDiag = TRUE, forceCheck = FALSE,
+       int2dbl = !as.logical(getOption("Matrix.use_iMatrix",
+                                       .MatrixEnv[["use_iMatrix"]])))
+% future default: int2dbl = FALSE	%
 }
 \arguments{
-  \item{data}{an optional numeric data vector or matrix.}
-  \item{nrow}{when \code{data} is not a matrix, the desired number of rows}
-  \item{ncol}{when \code{data} is not a matrix, the desired number of columns}
+  \item{data}{an optional \dQuote{numeric-alike} data vector,
+    \code{\link{matrix}} (or also \code{"\linkS4class{Matrix}"}).}
+  \item{nrow, ncol}{when \code{data} is not a matrix, the desired number of
+    rows and columns, respectively.}
   \item{byrow}{logical.  If \code{FALSE} (the default) the matrix is
     filled by columns, otherwise the matrix is filled by rows.}
   \item{dimnames}{a \code{\link{dimnames}} attribute for the matrix: a
@@ -38,9 +44,16 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
   \item{forceCheck}{logical indicating if the checks for structure
     should even happen when \code{data} is already a \code{"Matrix"}
     object.}
+  \item{int2dbl}{optional \code{\link{logical}} argument (new in
+    \pkg{Matrix} 1.8.0), determining if \code{\link{integer}} \code{data}
+    should be treated as \code{\link{double}}, back-compatibly to the pre-1.8.0 
+    behaviour, but not desirable any longer with \code{"\linkS4class{iMatrix}"}
+    (integer valued) Matrix classes available now.
+    While the default currently depends on the \code{\link{options}("Matrix.use_Matrix_i")}
+    setting, the default will become \code{FALSE} in the future.}
 }
 \value{
-  Returns matrix of a class that inherits from \code{"Matrix"}.
+  Returns matrix of a class that inherits from \code{"\linkS4class{Matrix}"}.
   Only if \code{data} is not a \code{\link{matrix}} and does not already inherit
   from class \code{\linkS4class{Matrix}} are the arguments
   \code{nrow}, \code{ncol} and \code{byrow} made use of.
@@ -48,10 +61,13 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
 \details{
   If either of \code{nrow} or \code{ncol} is not given, an attempt is
   made to infer it from the length of \code{data} and the other
-  parameter.
+  parameter (analogously to how \code{\link{matrix}()} works).
   Further, \code{Matrix()} makes efforts to keep \code{\link{logical}}
   matrices logical, i.e., inheriting from class \code{\linkS4class{lMatrix}},
-  and to determine specially structured matrices such as symmetric,
+  and analogously for \code{integer} or \code{complex} \code{data}.
+  \code{\link{raw}} \code{data} is currently coerced to
+  \code{\link{integer}} and treated as such.
+  \code{Matrix()} also determines specially structured matrices such as symmetric,
   triangular or diagonal ones.  Note that a \emph{symmetric} matrix also
   needs symmetric \code{\link{dimnames}}, e.g., by specifying
   \code{dimnames = list(NULL,NULL)}, see the examples.
@@ -64,7 +80,7 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
   Although it is sometime possible to mix unclassed matrices (created
   with \code{matrix}) with ones of class \code{"Matrix"}, it is much
   safer to always use carefully constructed ones of class
-  \code{"Matrix"}.
+  \code{"\linkS4class{Matrix}"}.
 }
 \seealso{
   The classes \code{\linkS4class{Matrix}},
@@ -79,7 +95,7 @@ Matrix(data=NA, nrow=1, ncol=1, byrow=FALSE, dimnames=NULL,
   \code{\link{Diagonal}}.
 }
 \examples{
-\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+\dontshow{ % for R_DEFAULT_PACKAGES=NULL %
 library(utils, pos = "package:base", verbose = FALSE)
 }
 Matrix(0, 3, 2)             # 3 by 2 matrix of zeros -> sparse

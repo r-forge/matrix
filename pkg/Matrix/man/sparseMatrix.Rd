@@ -20,7 +20,7 @@
 sparseMatrix(i, j, p, x, dims, dimnames,
              symmetric = FALSE, triangular = FALSE, index1 = TRUE,
              repr = c("C", "R", "T"), giveCsparse,
-             check = TRUE, use.last.ij = FALSE)
+             check = TRUE, use.last.ij = FALSE, int2dbl = )
 }
 \arguments{
   \item{i,j}{integer vectors of equal length specifying the positions
@@ -72,6 +72,11 @@ sparseMatrix(i, j, p, x, dims, dimnames,
     (duplicated) pairs \eqn{(i_k,j_k)}, only the last pair should be
     used.  \code{FALSE} (the default) is consistent with the definiton
     of class \code{\linkS4class{TsparseMatrix}}.}
+  \item{int2dbl}{\code{\link{logical}} indicating if integer matrices
+    (\code{\linkS4class{iMatrix}}) should be coerced to double
+    (\code{\linkS4class{dMatrix}}) for back compatibility.  It is planned
+    that the this will become \code{FALSE}, at first by default;
+    see \code{\link{Matrix}}'s \code{int2dbl} for more details.}
 }
 \value{
   A sparse matrix, by default in compressed sparse column format and

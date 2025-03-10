@@ -1,6 +1,9 @@
 Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                    dimnames = NULL, sparse = NULL,
-                   doDiag = TRUE, forceCheck = FALSE)
+                   doDiag = TRUE, forceCheck = FALSE
+                 , int2dbl = # << to become FALSE
+                       !as.logical(getOption("Matrix.use_iMatrix", .MatrixEnv[["use_iMatrix"]]))
+                   )
 {
     i.M <- i.sM <- i.dM <- i.sV <- i.m <- FALSE
     mnrow <- missing(nrow)
@@ -32,8 +35,11 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
             else
                 data <- as.vector(data)
         }
-        mode. <- mode(data)
-        kind <- switch(mode., numeric = "d", logical = "l",
+        type <- typeof(data)
+        I2d <- int2dbl && type == "integer"
+        if(is.raw(data)) type <- storage.mode(data) <- "integer"
+        else if(I2d) type <- "numeric"
+        kind <- switch(type, double =, numeric = "d", logical = "l", complex = "z", integer = "i",
                        stop("invalid 'data'"))
     }
     if(i.M || i.m) {
@@ -64,8 +70,7 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                            as(data, "CsparseMatrix")
                        else as(data, "unpackedMatrix"))
         }
-    } else {
-        ## 'data' is a numeric or logical vector or non-matrix array
+    } else { ## 'data' is a complex, numeric, integer, logical, raw _vector_ or non-matrix array
         ## without a 'class' attribute
         if(length(data) == 1L && !is.na(data) && data == 0 &&
            (is.null(sparse) || sparse)) {
@@ -94,7 +99,7 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
                 return(new(paste0(kind, "diMatrix"),
                            Dim = c(nrow, ncol),
                            Dimnames = dimnames,
-                           x = vector(mode., nrow)))
+                           x = vector(type, nrow)))
             data <- new(paste0(kind, if(square) "s" else "g", "CMatrix"),
                         Dim = c(nrow, ncol),
                         Dimnames = dimnames,
@@ -102,6 +107,7 @@ Matrix <- function(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
             i.M <- i.sM <- sparse <- TRUE
         } else {
             ## usual case: vector|array->matrix
+            if(I2d) storage.mode(data) <- "double"
             data <- .External(Mmatrix,
                               data, nrow, ncol, byrow, dimnames, mnrow, mncol)
             if(is.null(sparse))
@@ -140,7 +146,10 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
                          repr = c("C", "R", "T"),
                          giveCsparse,
                          check = TRUE,
-                         use.last.ij = FALSE)
+                         use.last.ij = FALSE
+                       , int2dbl = # << to become FALSE
+                             !as.logical(getOption("Matrix.use_iMatrix", .MatrixEnv[["use_iMatrix"]]))
+                         )
 {
     if((m.i <- missing(i)) + (m.j <- missing(j)) + (m.p <- missing(p)) != 1L)
         stop("exactly one of 'i', 'j', and 'p' must be missing from call")
@@ -205,7 +214,9 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
             rep.int(max(rij), 2L) + 1L
         else rij[2L, ] + 1L
 
-    kind <- if(m.x <- missing(x)) "n" else if(is.integer(x)) "d" else .M.kind(x)
+    kind <- if(m.x <- missing(x)) "n"
+            else if(is.integer(x)) { if(int2dbl) "d" else "i" }
+            else .M.kind(x)
     shape <-
         if(symmetric) {
             if(dims[1L] != dims[2L])
@@ -261,14 +272,23 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
 }
 
 spMatrix <- function(nrow, ncol,
-                     i = integer(0L), j = integer(0L), x = double(0L))
-    new(paste0(if(is.integer(x)) "d" else .M.kind(x), "gTMatrix"),
+                     i = integer(0L), j = integer(0L), x = double(0L)) {
+    if(is.integer(x))
+        int2dbl <- # << to become FALSE
+            !as.logical(getOption("Matrix.use_iMatrix", .MatrixEnv[["use_iMatrix"]]))
+    new(paste0(if(is.integer(x)) { if(int2dbl) "d" else "i" }
+               else .M.kind(x), "gTMatrix"),
         Dim = c(as.integer(nrow), as.integer(ncol)),
         i = as.integer(i) - 1L,
         j = as.integer(j) - 1L,
         x = if(is.integer(x)) as.double(x) else x)
+}
 
-Diagonal <- function(n, x = NULL, names = FALSE)
+Diagonal <- function(n, x = NULL, names = FALSE
+                   , int2dbl = # << to become FALSE
+                         !as.logical(getOption("Matrix.use_iMatrix",
+                                               .MatrixEnv[["use_iMatrix"]]))
+                     )
 {
     nx <- length(x)
     if(missing(n))
@@ -278,6 +298,8 @@ Diagonal <- function(n, x = NULL, names = FALSE)
     if(is.double(n) && n >= .Machine$integer.max + 1)
         stop("dimensions cannot exceed 2^31-1")
     n <- as.integer(n) # discarding attributes
+### FIXME ("API" break): enhance below by
+### if(!length(x)) .. and then treat numeric(), logical(), .. *similarly*, notably return diag = "U" !!!!
     if(is.null(x)) {
         r <- new("ddiMatrix")
         r@diag <- "U"
@@ -295,8 +317,12 @@ Diagonal <- function(n, x = NULL, names = FALSE)
     r <- new(switch(typeof(x),
                     ## discarding attributes, incl. 'dim' and 'names'
                     logical = { x <- as.logical(x); "ldiMatrix" },
-                    integer =,
-                    double = { x <- as.double(x); "ddiMatrix" },
+                    integer = if(int2dbl) { # back compatible:
+                                  x <- as.double(x);  "ddiMatrix"
+                              } else {
+                                  x <- as.integer(x); "idiMatrix" },
+                    double =  { x <- as.double(x);  "ddiMatrix" },
+                    complex = { x <- as.complex(x); "zdiMatrix" },
                     stop(gettextf("'x' has unsupported type \"%s\"", typeof(x)),
                          domain = NA)))
     if(n == 0L)
@@ -323,7 +349,11 @@ Diagonal <- function(n, x = NULL, names = FALSE)
 }
 
 .sparseDiagonal <- function(n, x = NULL, uplo = "U", shape = "t",
-                            unitri = TRUE, kind, cols)
+                            unitri = TRUE, kind, cols
+                          , int2dbl = # << to become FALSE
+                                !as.logical(getOption("Matrix.use_iMatrix",
+                                                      .MatrixEnv[["use_iMatrix"]]))
+                            )
 {
     if(missing(n))
         n <- length(x)
@@ -340,25 +370,27 @@ Diagonal <- function(n, x = NULL, names = FALSE)
 
     if(!((m.kind <- missing(kind)) ||
          (is.character(kind) && length(kind) == 1L && !is.na(kind) &&
-          any(kind == c("d", "l", "n")))))
-        stop("'kind' must be one of \"d\", \"l\", \"n\"")
-
+          any(kind == c("d", "l", "n", "i", "z")))))
+        stop("'kind' must be one of \"d\", \"l\", \"n\", \"i\", \"z\"")
     if(m.kind || kind != "n") {
         if(is.null(x))
-           x <- if(m.kind) { kind <- "d"; 1 } else switch(kind, d = 1, l = TRUE)
+           x <- if(m.kind) { kind <- "d"; 1 } else switch(kind, d = 1, l =, n = TRUE, i = 1L, z = 1 + 0i)
         else if(is.object(x))
             stop(gettextf("'x' has unsupported class \"%s\"",
                           class(x)[1L]),
                  domain = NA)
         else {
-            kind. <- switch(typeof(x),
-                            ## discarding attributes, incl. 'dim' in array case
-                            logical = { x <- as.logical(x); "l" },
-                            integer =,
-                            double = { x <- as.double(x); "d" },
-                            stop(gettextf("'x' has unsupported type \"%s\"",
-                                          typeof(x)),
-                                 domain = NA))
+            kind. <- switch(
+                typeof(x), # discarding attributes, incl. 'dim' in array case --> as.<type>() :
+                logical = { x <- as.logical(x); "l" },
+                integer = if(int2dbl) { # back compatible:
+                            x <- as.double(x);  "d"
+                          } else {
+                            x <- as.integer(x); "i" },
+                double =  { x <- as.double(x);  "d" },
+                complex = { x <- as.complex(x); "z" },
+                stop(gettextf("'x' has unsupported type \"%s\"", typeof(x)),
+                     domain = NA))
             if(m.kind)
                 kind <- kind.
             else if(kind != kind.) {
@@ -415,13 +447,15 @@ Diagonal <- function(n, x = NULL, names = FALSE)
     r
 }
 
+## these have *no* `int2dbl` argument -- use options(Matrix.use_iMatrix = TRUE|FALSE)  !
 .trDiagonal <- function(n, x = NULL, uplo = "U", unitri = TRUE, kind)
     .sparseDiagonal(n, x, uplo, shape = "t", unitri = unitri, kind = kind)
 
 .symDiagonal <- function(n, x = NULL, uplo = "U", kind)
     .sparseDiagonal(n, x, uplo, shape = "s", kind = kind)
 
-.bdiag <- function(lst)
+.bdiag <- function(lst, int2dbl = # << to become FALSE
+    !as.logical(getOption("Matrix.use_iMatrix", .MatrixEnv[["use_iMatrix"]])))
 {
     if(!is.list(lst))
         stop("'lst' must be a list")
@@ -434,15 +468,23 @@ Diagonal <- function(n, x = NULL, names = FALSE)
     lst <- unname(lapply(lst, function(x) .M2T(asCspN(x))))
 
     cl <- vapply(lst, class, "")
-    kind  <- substr(cl, 1L, 1L) # "n", "l", or "d"
+    kind  <- substr(cl, 1L, 1L) # "n", "l", "d", "z" or "i"
     shape <- substr(cl, 2L, 2L) # "g", "s", or "t"
 
-    if(!(any(kind == (kind. <- "d")) || any(kind == (kind. <- "l"))))
-        kind. <- "n"
-    else if(any(z <- kind == "n"))
-        lst[z] <- lapply(lst[z], .sparse2kind, kind.)
+    if(any(i.knd <- kind == "i") && int2dbl)
+        kind[i.knd] <- "d"
 
-    shape. <-
+    ## kind. := kind of result
+    if(any(kind == "z"))
+        kind. <- "z"
+    else if(!(any(kind == (kind. <- "d")) ||
+              any(kind == (kind. <- "i")) ||
+              any(kind == (kind. <- "l"))))
+        kind. <- "n"
+    else if(any(z <- kind == "n")) # must get an 'x' slot
+        lst[z] <- lapply(lst[z], .M2kind, kind.)
+
+    shape. <- ## := shape of result
         if(all(symmetric <- shape == "s"))
             "s"
         else if(all(shape == "t"))
@@ -483,22 +525,27 @@ Diagonal <- function(n, x = NULL, names = FALSE)
     r
 }
 
-bdiag <- function(...)
+bdiag <- function(..., int2dbl = # << to become FALSE
+   !as.logical(getOption("Matrix.use_iMatrix", .MatrixEnv[["use_iMatrix"]])))
 {
-    if((n <- ...length()) == 0L)
+    if(!(n <- ...length()))
         new("dgCMatrix")
     else if(n > 1L)
-        .M2C(.bdiag(list(...)))
+        .M2C(.bdiag(list(...), int2dbl=int2dbl))
     else if(!is.list(x <- ..1))
         as(x, "CsparseMatrix")
     else if(length(x) == 1L)
         as(x[[1L]], "CsparseMatrix")
-    else .M2C(.bdiag(x))
+    else .M2C(.bdiag(x, int2dbl=int2dbl))
 }
 
 bandSparse <- function(n, m = n, k, diagonals,
                        symmetric = FALSE,
-                       repr = "C", giveCsparse = (repr == "C"))
+                       repr = "C", giveCsparse = (repr == "C")
+                     , int2dbl = # << to become FALSE
+                           !as.logical(getOption("Matrix.use_iMatrix",
+                                                 .MatrixEnv[["use_iMatrix"]]))
+                       )
 {
     ## Purpose: Compute a band-matrix by speciyfying its (sub-)diagonal(s)
     ## ----------------------------------------------------------------------
@@ -582,7 +629,7 @@ bandSparse <- function(n, m = n, k, diagonals,
         UpLo <- if(min(k) >= 0) "U" else "L"
         T <-
             if(use.x) {
-                if(is.integer(x))
+                if(is.integer(x) && int2dbl)
                     x <- as.double(x)
                 cc <- paste0(.M.kind(x), "sTMatrix")
                 new(cc, i= i-1L, j= j-1L, x = x, Dim= dims, uplo=UpLo)
@@ -591,9 +638,12 @@ bandSparse <- function(n, m = n, k, diagonals,
                stop("invalid 'repr'; must be \"C\", \"T\", or \"R\""))
     }
     else { ## not symmetric, possibly triangular
-        if(use.x)
-            sparseMatrix(i=i, j=j, x=x, dims=dims, triangular=tri, repr=repr)
-        else
+        if(use.x) {
+            if(is.integer(x)) # need int2dbl
+                sparseMatrix(i=i, j=j, x=x, dims=dims, triangular=tri, repr=repr, int2dbl=int2dbl)
+            else
+                sparseMatrix(i=i, j=j, x=x, dims=dims, triangular=tri, repr=repr)
+        }else
             sparseMatrix(i=i, j=j,	dims=dims, triangular=tri, repr=repr)
     }
 }
@@ -711,7 +761,7 @@ spV2M <- function(x, nrow, ncol, byrow = FALSE,
 .sparseV2Mat <- function(from)
     spV2M(from, nrow = from@length, ncol = 1L, check = FALSE)
 
-sp2vec <- function(x, mode = .type.kind[.M.kind(x)])
+sp2vec <- function(x, mode = .type.kind[[.M.kind(x)]])
 {
     ## sparseVector  ->  vector
     has.x <- .hasSlot(x, "x")## has "x" slot

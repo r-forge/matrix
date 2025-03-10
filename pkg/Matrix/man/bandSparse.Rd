@@ -12,7 +12,7 @@
 }
 \usage{
 bandSparse(n, m = n, k, diagonals, symmetric = FALSE,
-           repr = "C", giveCsparse = (repr == "C"))
+           repr = "C", giveCsparse = (repr == "C"), int2dbl = )
 }
 \arguments{
   \item{n,m}{the matrix dimension \eqn{(n,m) = (nrow, ncol)}.}
@@ -44,6 +44,11 @@ bandSparse(n, m = n, k, diagonals, symmetric = FALSE,
     \code{\linkS4class{TsparseMatrix}}, where the default was \code{TRUE},
     and now is determined from \code{repr}; very often Csparse matrices are
     more efficient subsequently, but not always.}
+  \item{int2dbl}{\code{\link{logical}} indicating if integer matrices
+    (\code{\linkS4class{iMatrix}}) should be coerced to double
+    (\code{\linkS4class{dMatrix}}) for back compatibility.  It is planned
+    that the this will become \code{FALSE}, at first by default;
+    see \code{\link{Matrix}}'s \code{int2dbl} for more details.}
 }
 % \details{  __needed ?__
 %

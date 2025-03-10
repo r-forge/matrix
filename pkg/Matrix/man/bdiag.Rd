@@ -10,12 +10,17 @@
   Build a block diagonal matrix given several building block matrices.
 }
 \usage{
-bdiag(\dots)
-.bdiag(lst)
+bdiag(\dots, int2dbl = )
+.bdiag(lst, int2dbl = )
 }
 \arguments{
   \item{\dots}{individual matrices or a \code{\link{list}} of matrices.}
   \item{lst}{non-empty \code{\link{list}} of matrices.}
+  \item{int2dbl}{\code{\link{logical}} indicating if integer matrices
+    (\code{\linkS4class{iMatrix}}) should be coerced to double
+    (\code{\linkS4class{dMatrix}}) for back compatibility.  It is planned
+    that the this will become \code{FALSE}, at first by default;
+    see \code{\link{Matrix}}'s \code{int2dbl} for more details.}
 }
 \details{
   For non-trivial argument list, \code{bdiag()} calls \code{.bdiag()}.
@@ -54,7 +59,7 @@ bdiag(\dots)
   which return traditional matrices.
 }
 \examples{
-\dontshow{ % for R_DEFAULT_PACKAGES=NULL
+\dontshow{%% for R_DEFAULT_PACKAGES=NULL
 library(stats, pos = "package:base", verbose = FALSE)
 }
 bdiag(matrix(1:4, 2), diag(3))
@@ -63,14 +68,15 @@ bdiag(Diagonal(2), matrix(1:3, 3,4), diag(3:2))
 
 mlist <- list(1, 2:3, diag(x=5:3), 27, cbind(1,3:6), 100:101)
 bdiag(mlist)
-stopifnot(identical(bdiag(mlist), % <- used to fail in earlier versions
+stopifnot(identical(bdiag(mlist), %% <- used to fail in earlier versions
                     bdiag(lapply(mlist, as.matrix))))
 
-ml <- c(as(matrix((1:24)\%\% 11 == 0, 6,4),"nMatrix"),
+ml <- c(as(matrix((1:24)\%\% 11 == 0, 6,4),"nMatrix"), %
         rep(list(Diagonal(2, x=TRUE)), 3))
-mln <- c(ml, Diagonal(x = 1:3))
-stopifnot(is(bdiag(ml), "lsparseMatrix"),% failed in Matrix <= 1.0-2
-          is(bdiag(mln),"dsparseMatrix") )
+mln <- c(ml, Diagonal(x = 1:3, int2dbl = FALSE))
+sapply(mln, class) # "ngCMatrix" "ldi*" .. "idiMatrix"
+stopifnot(is(bdiag(ml), "lsparseMatrix"), %% failed in Matrix <= 1.0-2
+          is(bdiag(mln, int2dbl = FALSE),"isparseMatrix") )
 
 ## random (diagonal-)block-triangular matrices:
 rblockTri <- function(nb, max.ni, lambda = 3) {
