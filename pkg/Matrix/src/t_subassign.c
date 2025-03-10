@@ -98,8 +98,8 @@
 #elif defined (_CPLX_x)
 
 # define Type_x Rcomplex
-# define Type_x_0_init(_VAR_) Rcomplex _VAR_;  _VAR_.r = _VAR_.i = 0.
-# define Type_x_1_init(_VAR_) Rcomplex _VAR_;  _VAR_.r = 1.; _VAR_.i = 0.
+# define Type_x_0_init(_VAR_) Rcomplex _VAR_ = { .r = 0., .i = 0. };
+# define Type_x_1_init(_VAR_) Rcomplex _VAR_ = { .r = 1., .i = 0. };
 # define STYP_x COMPLEX
 # define SXP_x  CPLXSXP
 

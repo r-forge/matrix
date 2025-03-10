@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2024-12-02 r87417) -- "Unsuffered Consequences"
-Copyright (C) 2024 The R Foundation for Statistical Computing
-Platform: aarch64-apple-darwin23.6.0
+R Under development (unstable) (2025-03-01 r87858) -- "Unsuffered Consequences"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -32,7 +32,7 @@ Loading required package: tools
 > dimnames(m2) <- list(LETTERS[1:3],
 +                      letters[1:4])
 > dimnames(m1) <- list(NULL,letters[1:4])
-> M  <- Matrix(m)
+> M  <- Matrix(m) # in the future  ->  igeMatrix
 > M1 <- Matrix(m1)
 > M2 <- Matrix(m2)
 > 

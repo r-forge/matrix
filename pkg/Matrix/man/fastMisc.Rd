@@ -100,7 +100,8 @@
 .updateCHMfactor(object, parent, mult = 0)
 }
 \arguments{
-  \item{from, x, a, b}{a \code{\linkS4class{Matrix}}, matrix, or vector.}
+  \item{from, x, a, b}{a \code{\linkS4class{Matrix}} (for \code{.M2*()} et al.),
+    matrix (for \code{.m2*()} et al.), or vector.}
   \item{kind}{a string (\code{"."}, \code{","}, \code{"n"}, \code{"l"},
     or \code{"d"}) specifying the \dQuote{kind} of the result.
     \code{"."} indicates that the kind of \code{from} should be preserved.

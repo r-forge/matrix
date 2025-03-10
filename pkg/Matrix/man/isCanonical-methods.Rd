@@ -43,7 +43,7 @@ isCanonical(object, \dots)
 }
 \seealso{\code{\link{forceCanonical}}.}
 \examples{
-## NA->TRUE for nonzero pattern
+## NA->TRUE for nonzero pattern dense ("ndenseMatrix")
 m1 <- m1. <- new("ngeMatrix", Dim = c(2L, 2L),
                  x = c(FALSE, NA, TRUE, NA))
 m1@x <- c(FALSE, TRUE, TRUE, TRUE)
@@ -76,6 +76,6 @@ v2@length <- im + 1; v2@i <- im
 nms <- paste0(rep(c("m", "v"), c(5L, 2L)), c(1:3, 1:2))
 obj <- mget(nms, inherits = FALSE)
 obj. <- mget(paste0(nms, "."), inherits = FALSE)
-stopifnot( all(vapply(obj , isCanonical, FALSE)),
-          !any(vapply(obj., isCanonical, FALSE)))
+stopifnot( all(vapply(obj , isCanonical, NA)),
+          !any(vapply(obj., isCanonical, NA)))
 }

@@ -1,5 +1,5 @@
 \name{isSymmetric-methods}
-\title{Test if a Matrix is Symmetric}
+\title{Test if a Matrix is Symmetric (Hermitian)}
 %
 \docType{methods}
 \keyword{array}
@@ -20,6 +20,8 @@
 Tests whether its argument is a symmetric square matrix, by default
 tolerating some numerical fuzz and requiring symmetric \code{dimnames}
 in addition to symmetry in the mathematical sense.
+A \code{\link{complex}} matrix \code{Z}, i.e., inheriting from \code{\linkS4class{zMatrix}},
+must be \dQuote{Hermitian} for \code{isSymmetric(Z)} to be true.
 
 \code{isSymmetric} is a generic function in \pkg{base}, which has a
 \link[=isSymmetric]{method} for traditional matrices of implicit class
@@ -46,6 +48,7 @@ for subclasses of virtual class \code{\linkS4class{Matrix}}.
   indicating either the conjugate transpose or transpose,
   i.e., whether to test for Hermitian or symmetric \code{object}.
   It matters only in the complex case.  The default is \code{"C"},
+  i.e., Hermitian,
   for consistency with \code{\link{isSymmetric.matrix}}.}
 \item{checkDN}{a logical indicating whether symmetry of the
   \code{Dimnames} slot of \code{object} should be checked.}

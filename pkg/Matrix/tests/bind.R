@@ -14,7 +14,7 @@ m1 <- m2 <- m <- matrix(1:12, 3,4)
 dimnames(m2) <- list(LETTERS[1:3],
                      letters[1:4])
 dimnames(m1) <- list(NULL,letters[1:4])
-M  <- Matrix(m)
+M  <- Matrix(m) # in the future  ->  igeMatrix
 M1 <- Matrix(m1)
 M2 <- Matrix(m2)
 
