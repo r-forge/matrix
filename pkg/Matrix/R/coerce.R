@@ -223,6 +223,19 @@ function(from, kind = ".") {
     to
 }
 
+.v2kind <-
+function(from, kind) { # coerce simple vector _if_ needed
+    if (kind == .kind.type[[typeof(from)]])
+        from
+    else switch(kind,
+                "d" = as.numeric(from),
+                "l" = as.logical(from),
+                "i" = as.integer(from),
+                "z" = as.complex(from),
+                stop("invalid 'kind': ", kind))
+}
+
+
 .V2v <-
 function(from) {
     if (.M.kind(from) != "n") {
