@@ -149,12 +149,13 @@ setMethod("%*%", c(x = "diagonalMatrix", y = "diagonalMatrix"),
                       if(.M.kind(y) == "n" && anyNA(yii))
                           yii <- yii | is.na(yii)
                   }
+                  asN <- if(is.double(r@x)) as.double else if(is.complex(r@x)) as.complex else as.double
                   r@x <-
                       if(xu)
-                          as.double(yii)
+                          asN(yii)
                       else if(yu)
-                          as.double(xii)
-                      else as.double(xii * yii)
+                          asN(xii)
+                      else asN(xii * yii)
               }
               r
           })
@@ -1010,7 +1011,8 @@ setMethod("crossprod", c(x = .cl, y = "TsparseMatrix"),
 setMethod("crossprod", c(x = "diagonalMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...) {
               boolArith <- !is.na(boolArith) && boolArith
-              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
+              if(!boolArith) is.z <- .M.kind(x) == "z"
+              r <- new(if(boolArith) "ndiMatrix" else if(is.z) "zdiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames[c(2L, 2L)]
               if(x@diag != "N")
@@ -1023,7 +1025,7 @@ setMethod("crossprod", c(x = "diagonalMatrix", y = "missing"),
                       else {
                           if(.M.kind(x) == "n" && anyNA(xii))
                               xii <- xii | is.na(xii)
-                          as.double(xii * xii)
+                          (if(is.z) as.complex else as.double)(xii * xii)
                       }
               }
               r
@@ -1391,7 +1393,8 @@ setMethod("tcrossprod", c(x = .cl, y = "TsparseMatrix"),
 setMethod("tcrossprod", c(x = "diagonalMatrix", y = "missing"),
           function(x, y = NULL, boolArith = NA, ...) {
               boolArith <- !is.na(boolArith) && boolArith
-              r <- new(if(boolArith) "ndiMatrix" else "ddiMatrix")
+              if(!boolArith) is.z <- .M.kind(x) == "z"
+              r <- new(if(boolArith) "ndiMatrix" else if(is.z) "zdiMatrix" else "ddiMatrix")
               r@Dim <- x@Dim
               r@Dimnames <- x@Dimnames[c(1L, 1L)]
               if(x@diag != "N")
@@ -1404,7 +1407,7 @@ setMethod("tcrossprod", c(x = "diagonalMatrix", y = "missing"),
                       else {
                           if(.M.kind(x) == "n" && anyNA(xii))
                               xii <- xii | is.na(xii)
-                          as.double(xii * xii)
+                          (if(is.z) as.complex else as.double)(xii * xii)
                       }
               }
               r

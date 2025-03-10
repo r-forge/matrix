@@ -130,7 +130,7 @@ formatSparseM <- function(x,
                           align = c("fancy", "right"),
                           m = as(x, "matrix"),
                           asLogical = NULL,
-                          uniDiag = NULL,
+                          uniDiag = FALSE,
                           digits = NULL,
                           cx,
                           iN0,
@@ -143,7 +143,8 @@ formatSparseM <- function(x,
             (extends(cld, "matrix") && is.logical(x))
                                         # has NA and (non-)structural FALSE
     }
-    if(missing(cx))
+    uniDz <- (uniDiag && is.complex(m)) # do *not* use cx (etc)
+    if(missing(cx) && !uniDz)
         cx <- .formatSparseSimple(m, asLogical=asLogical, digits=digits, dn=dn)
     if(is.null(d <- dim(cx))) {# e.g. in 1 x 1 case
         d <- dim(cx) <- dim(m)
@@ -152,6 +153,7 @@ formatSparseM <- function(x,
     if(missing(iN0))
         iN0 <- 1L + .Call(m_encodeInd, non0ind(x, cld), di = d, FALSE, FALSE)
     ## ne <- length(iN0)
+
     if(asLogical) {
         cx[m] <- "|"
         if(!extends(cld, "sparseMatrix"))
@@ -176,7 +178,7 @@ formatSparseM <- function(x,
             cx[iN0[F.]] <- ":" # non-structural FALSE (or "o", "," , "-" or "f")?
         }
     }
-    else if(match.arg(align) == "fancy" && !is.integer(m)) {
+    else if(match.arg(align) == "fancy" && !uniDz && !is.integer(m)) {
         fi <- apply(m, 2, format.info) ## fi[3,] == 0  <==> not expo.
 
         ## now 'format' the zero.print by padding it with ' ' on the right:
@@ -200,13 +202,13 @@ formatSparseM <- function(x,
         else
             zero.print <- rep.int(zero.print, length(cols))
     } ## else "right" : nothing to do
-    if(!asLogical && isTRUE(uniDiag)) { ## use "I" in diagonal -- pad correctly
+    if(!asLogical && uniDiag) { ## use "I" in diagonal -- pad correctly
         if(any(diag(x) != 1))
             stop("uniDiag=TRUE, but not all diagonal entries are 1")
         D <- diag(cx) # use
         if(any((ir <- regexpr("1", D)) < 0)) {
             warning("uniDiag=TRUE, not all entries in diagonal coded as 1")
-        } else {
+        } else if(!uniDz) {
             ir <- as.vector(ir)
             nD <- nchar(D, "bytes")
             ## replace "1..." by "I  " (I plus blanks)
