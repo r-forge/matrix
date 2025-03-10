@@ -187,7 +187,7 @@ non0ind <- function(x, cld = getClassDef(class(x)),
 ##' Decode "encoded" (i,j) indices back to  cbind(i,j)
 ##' This is the inverse of encodeInd(.)
 ##'
-##' @title Decode "Encoded" (i,j) Indices
+##' @title Decode "Encoded" (i,j) 0-origin Indices
 ##' @param code integer in 0:((n x m - 1)  <==> encodeInd(.) result
 ##' @param nr the number of rows
 ##' @return
@@ -347,10 +347,14 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = TRUE) {
 }
 
 ..diagN2U <- function(x, sparse) {
-    if(sparse && x@Dim[1L] > 0L)
-        x <- switch(x@uplo,
-                    U = .Call(R_sparse_band, x, 1L, NULL),
-                    L = .Call(R_sparse_band, x, NULL, -1L))
+    if(x@Dim[1L] > 0L) {
+            if(sparse && .M.shape(x) == "t") # x is  sparse & triangular ( => has x@uplo )
+                x <- switch(x@uplo,
+                            U = .Call(R_sparse_band, x, 1L, NULL),
+                            L = .Call(R_sparse_band, x, NULL, -1L))
+            else if(.isDiagonal(x))
+                x@x <- x@x[0L] # empty 'x'
+    }
     x@diag <- "U"
     x
 }

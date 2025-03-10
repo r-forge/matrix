@@ -64,20 +64,28 @@ library(stats, pos = "package:base", verbose = FALSE)
 }
 D  <- Diagonal(7)
 Dn <- diagU2N(D)
-stopifnot(D @diag == "U", identical(D @x, numeric()),
-          Dn@diag == "N", identical(Dn@x, rep(1, 7)))
+(iD <- Diagonal(7, 1L, int2dbl = FALSE))
+iDn <- diagU2N(iD)
+stopifnot(D @diag == "U", identical( D @x, numeric()),
+          Dn@diag == "N", identical( Dn@x, rep(1,  7))
+        ,iDn@diag == "N", identical(iDn@x, rep(1L, 7))
+        , identical( D, diagN2U( Dn))
+        , identical(iD, diagN2U(iDn))
+          )
 
-(T <- D + triu(Matrix(rpois(49, 1/4), 7, 7), k = 1))
+set.seed(64); (Tr <- Matrix(rpois(49, 1/4), 7, 7)) # sparse enough
+(T <- D + triu(Tr, k = 1)) # sparse triangular
 (uT <- diagN2U(T)) # "unitriangular"
 (t.u <- diagN2U(10*T))# changes the diagonal!
-stopifnot(all(T == uT), diag(t.u) == 1,
+stopifnot(all(T == uT), diag(t.u) == 1, T@x == 1,
           identical(T, diagU2N(uT)))
 T[upper.tri(T)] <- 5 # still "dtC"
 T <- diagN2U(as(T,"triangularMatrix"))
+inherits(T, "sparseMatrix") # TRUE
 ## checkDense = T / F  :
 dT <- as(T, "denseMatrix") # (unitriangular)
-dT.n <-  diagU2N(dT, checkDense = TRUE)  # default
-sT.n <- .diagU2N(dT, checkDense = FALSE) # default
+sT.n <-  diagU2N(dT, checkDense = TRUE)  # default
+dT.n <- .diagU2N(dT, checkDense = FALSE) # default
 stopifnot(is(dT.n, "denseMatrix"), is(sT.n, "sparseMatrix"),
           dT@diag == "U", dT.n@diag == "N", sT.n@diag == "N",
           all(dT == dT.n), all(dT == sT.n))
