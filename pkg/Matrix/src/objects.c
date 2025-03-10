@@ -88,7 +88,8 @@ const char *Matrix_superclass(const char *class, int mode)
 			}
 	} else if (class[1] == 'p') {
 		if (mode & 4) {
-			if (class[0] == 'z')
+		    switch(class[0]) {
+		    case 'z' :
 			switch (class[2]) {
 			case 'C': return "zsCMatrix";
 			case 'R': return "zsRMatrix";
@@ -96,7 +97,15 @@ const char *Matrix_superclass(const char *class, int mode)
 			case 'o': return "zsyMatrix";
 			case 'p': return "zspMatrix";
 			}
-			else
+		    case 'i' :
+			switch (class[2]) {
+			case 'C': return "isCMatrix";
+			case 'R': return "isRMatrix";
+			case 'T': return "isTMatrix";
+			case 'o': return "isyMatrix";
+			case 'p': return "ispMatrix";
+			}
+		    default :
 			switch (class[2]) {
 			case 'C': return "dsCMatrix";
 			case 'R': return "dsRMatrix";
@@ -104,6 +113,7 @@ const char *Matrix_superclass(const char *class, int mode)
 			case 'o': return "dsyMatrix";
 			case 'p': return "dspMatrix";
 			}
+		    }
 		}
 	}
 	return class;
