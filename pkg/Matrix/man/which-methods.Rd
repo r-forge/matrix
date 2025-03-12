@@ -30,3 +30,11 @@ which(x, arr.ind = FALSE, useNames = TRUE)
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+%% \item{which}{\code{signature(x = "lsparseMatrix")} and many other
+%%   subclasses of \code{"lMatrix"}: as the \pkg{base} function
+%%   \code{\link{which}(x, arr.ind)} returns the indices of the
+%%   \code{\link{TRUE}} entries in \code{x}; if \code{arr.ind} is true,
+%%   as a 2-column matrix of row and column indices. Since \pkg{Matrix}
+%%   version 1.2-9, if \code{useNames} is true, as by default, with
+%%   \code{\link{dimnames}}, the same as \code{base::which}.}

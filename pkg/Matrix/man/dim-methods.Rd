@@ -49,3 +49,27 @@
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+%% \item{dim}{\code{signature(x = "Matrix")}: extract matrix dimensions
+%%   \code{\link{dim}}.}
+
+%% \item{dim<-}{\code{signature(x = "Matrix", value = "ANY")}: where
+%%   \code{value} is integer of length 2.  Allows to \emph{reshape}
+%%   Matrix objects, but only when \code{prod(value) == prod(dim(x))}.}
+
+%% \item{length}{\code{signature(x = "Matrix")}: simply defined as
+%%   \code{prod(dim(x))} (and hence of mode \code{"double"}).}
+
+%% \item{dim<-}{\code{signature(x = "sparseMatrix", value = "ANY")}:
+%%   allows to \emph{reshape} a sparse matrix to a sparse matrix with
+%%   the same entries but different dimensions. \code{value} must be of
+%%   length two and fulfill \code{prod(value) == prod(dim(x))}.}
+
+\examples{
+(M <- Matrix(c(0, 1, 0, 0), 6, 4))
+dim(M)
+## can reshape it even :
+dim(M) <- c(2, 12)
+M
+stopifnot(identical(M, Matrix(c(0, 1, 0, 0), 2, 12)))
+}

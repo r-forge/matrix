@@ -1,5 +1,5 @@
 \name{lMatrix-class}
-\title{Virtual Class "lMatrix" of Logical Matrices}
+\title{Virtual Class \sQuote{lMatrix} of Logical Matrices}
 %
 \docType{class}
 \keyword{array}
@@ -9,11 +9,60 @@
 \alias{ldenseMatrix-class}
 \alias{lsparseMatrix-class}
 %
-\description{TODO.}
-\examples{
-\dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(stats, pos = "package:base", verbose = FALSE)
+\description{
+  \code{lMatrix} is a virtual subclass of \code{\linkS4class{Matrix}}
+  representing logical matrices, whose entries are
+  \code{FALSE}, \code{TRUE}, or \code{NA}.  \code{ldenseMatrix} and
+  \code{lsparseMatrix} are virtual subclasses of \code{lMatrix}
+  representing its intersections with \code{\linkS4class{denseMatrix}}
+  and \code{\linkS4class{sparseMatrix}}.
+
+  \code{lMatrix} objects tend to arise as the return value of
+  \code{op(A)}, where \code{A} is a \code{Matrix} object and \code{op}
+  is a function that preserves matrix dimensions and returns
+  \code{FALSE}, \code{TRUE}, or \code{NA} by element
+  (e.g., \code{op(A) := A == 0} or \code{!A} or \code{A | B} for some
+  conformable \code{B}).
 }
+\section{Slots}{
+  \describe{
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
+      \code{\linkS4class{Matrix}}.}
+    \item{\code{x}}{a \link{logical} vector storing matrix entries.
+      Details such as \emph{which} entries are stored vary by storage
+      format.}
+  }
+}
+\section{Subclasses}{
+  The nonvirtual subclasses of \code{lMatrix} are listed below with
+  links to virtual superclasses defining their structure and storage
+  format.
+  \tabular{rrr}{
+    Nonvirtual subclass \tab Structure \tab Storage format\cr
+    \code{lgeMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{lsyMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{ltrMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{lspMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab   \code{\linkS4class{packedMatrix}}\cr
+    \code{ltpMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab   \code{\linkS4class{packedMatrix}}\cr
+    \code{lgCMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+    \code{lsCMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+    \code{ltCMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+    \code{lgRMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+    \code{lsRMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+    \code{ltRMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+    \code{lgTMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+    \code{lsTMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+    \code{ltTMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+    \code{ldiMatrix} \tab   \code{\linkS4class{diagonalMatrix}} \tab                \code{\var{unnamed}}
+  }
+}
+\seealso{
+  \dQuote{Sister} classes \code{\linkS4class{nMatrix}},
+  \code{\linkS4class{iMatrix}}, \code{\linkS4class{dMatrix}}, and
+  \code{\linkS4class{zMatrix}} representing boolean, integer, double,
+  and complex matrices.
+}
+\examples{
 showClass("ldenseMatrix")
 
 as(diag(3) > 0, "ldenseMatrix")

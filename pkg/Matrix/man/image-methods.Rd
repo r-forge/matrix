@@ -89,6 +89,10 @@
   All methods currently end up calling the method for the
   \code{\linkS4class{dgTMatrix}} class.
   Use \code{showMethods(image)} to list them all.
+
+%% \item{image}{\code{signature(object = "Matrix")}: draws an
+%%   \code{\link{image}} of the matrix entries, using
+%%   \code{\link[lattice]{levelplot}()} from package \pkg{lattice}.}
 }
 \value{
   as all \pkg{lattice} graphics functions, \code{image(<Matrix>)}

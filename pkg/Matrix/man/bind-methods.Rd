@@ -94,3 +94,11 @@ D <- Diagonal(2)
 stopifnot(validObject(M2), inherits(M2, "sparseMatrix"),
           dim(M2) == c(2,9))
 }
+
+%% \item{cbind2}{\code{(x = *, y = *)}: several methods for binding
+%%   matrices together, column-wise, see the basic \code{\link{cbind}}
+%%   and \code{\link{rbind}} functions.\cr
+%%   Note that the result will typically be sparse, even when one
+%%   argument is dense and larger than the sparse one.}
+%% \item{rbind2}{\code{(x = *, y = *)}: binding matrices together
+%%   row-wise, see \code{cbind2} above.}

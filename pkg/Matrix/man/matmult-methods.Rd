@@ -303,6 +303,13 @@
   \code{\linkS4class{CsparseMatrix}} coercions which may be quite
   inefficient for dense matrices.  Contributions for efficiency
   improvements are welcome.
+
+  %% In method selection for multiplication operations (i.e. \code{\%*\%}
+  %% and the two-argument form of \code{\link[base]{crossprod}})
+  %% the sparseMatrix class takes precedence in the sense that if one
+  %% operand is a sparse matrix and the other is any type of dense matrix
+  %% then the dense matrix is coerced to a \code{dgeMatrix} and the
+  %% appropriate sparse matrix method is used.
 }
 \value{
   A \code{\linkS4class{Matrix}} object, in the one argument case

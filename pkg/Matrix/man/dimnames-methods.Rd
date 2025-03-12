@@ -40,3 +40,9 @@
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+%% \item{dimnames}{\code{signature(x = "Matrix")}: extract
+%%   \code{\link{dimnames}}.}
+%% \item{dimnames<-}{\code{signature(x = "Matrix", value = "list")}: set
+%%   the \code{dimnames} to a \code{\link{list}} of length 2, see
+%%   \code{\link{dimnames<-}}.}

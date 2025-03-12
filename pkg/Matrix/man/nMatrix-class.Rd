@@ -1,5 +1,5 @@
 \name{nMatrix-class}
-\title{Virtual Class "nMatrix" of Nonzero Pattern Matrices}
+\title{Virtual Class \sQuote{nMatrix} of Boolean Matrices}
 %
 \docType{class}
 \keyword{array}
@@ -10,56 +10,71 @@
 \alias{nsparseMatrix-class}
 %
 \description{
-  The \code{nMatrix} class is the virtual \dQuote{mother} class of all
-  \emph{\bold{n}on-zero pattern} (or simply \emph{patter\bold{n}})
-  matrices in the \pkg{Matrix} package.
+  \code{nMatrix} is a virtual subclass of \code{\linkS4class{Matrix}}
+  representing boolean (or \dQuote{\bold{n}onzero pattern}) matrices,
+  whose entries are \code{FALSE} or \code{TRUE}.  \code{ndenseMatrix}
+  and \code{nsparseMatrix} are virtual subclasses of \code{nMatrix}
+  representing its intersections with \code{\linkS4class{denseMatrix}}
+  and \code{\linkS4class{sparseMatrix}}.
+
+  \code{nMatrix} objects tend to arise as the return value of
+  \code{op(A)}, where \code{A} is a \code{Matrix} object and \code{op}
+  is a function that preserves matrix dimensions and returns
+  \code{FALSE} or \code{TRUE} by element
+  (e.g., \code{op(A) := is.nan(A)}).
 }
-%\section{Objects from the Class}{A virtual Class: No objects may be
-%  created from it.
-%}
 \section{Slots}{
-  Common to \emph{all} matrix object in the package:
   \describe{
-    \item{\code{Dim}:}{Object of class \code{"integer"} - the dimensions
-     of the matrix - must be an integer vector with exactly two
-     non-negative values.}
-    \item{\code{Dimnames}:}{list of length two; each component
-      containing NULL or a \code{\link{character}} vector length
-      equal the corresponding \code{Dim} element.}
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
+      \code{\linkS4class{Matrix}}.}
+  }
+  Certain nonvirtual subclasses of \code{nMatrix} defined in package
+  \pkg{Matrix} (see \sQuote{Subclasses}) also have:
+  \describe{
+    \item{\code{x}}{a \link{logical} vector storing matrix entries.
+      Details such as \emph{which} entries are stored vary by storage
+      format.  \code{NA} elements are valid and mapped to \code{TRUE},
+      hence methods often must operate on not \code{x} but rather
+      \code{x | is.na(x)}.}
   }
 }
-\section{Methods}{
-  \describe{
-    \item{coerce}{\code{signature(from = "matrix", to = "nMatrix")}:
-      Note that these coercions (must) coerce \code{\link{NA}}s to
-      non-zero, hence conceptually \code{TRUE}.
-      This is particularly important when
-      \code{\linkS4class{sparseMatrix}} objects are coerced to
-      \code{"nMatrix"} and hence to \code{\linkS4class{nsparseMatrix}}.
-    }
+\section{Subclasses}{
+  The nonvirtual subclasses of \code{nMatrix} are listed below with
+  links to virtual superclasses defining their structure and storage
+  format.  Marked (\code{*}) classes have an \code{x} slot storing
+  matrix entries.  The details of the \code{x} slot vary by storage
+  format.  Unmarked classes do not have an \code{x} slot.  These use
+  sparse formats that store positions of nonzero entries instead of
+  entries themselves.
+  \tabular{rrr}{
+    Nonvirtual subclass \tab Structure \tab Storage format\cr
+    \code{* ngeMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{* nsyMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{* ntrMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{* nspMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab   \code{\linkS4class{packedMatrix}}\cr
+    \code{* ntpMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab   \code{\linkS4class{packedMatrix}}\cr
+      \code{ngCMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+      \code{nsCMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+      \code{ntCMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+      \code{ngRMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+      \code{nsRMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+      \code{ntRMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+      \code{ngTMatrix} \tab    \code{\linkS4class{generalMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+      \code{nsTMatrix} \tab  \code{\linkS4class{symmetricMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+      \code{ntTMatrix} \tab \code{\linkS4class{triangularMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+    \code{* ndiMatrix} \tab   \code{\linkS4class{diagonalMatrix}} \tab                \code{\var{unnamed}}\cr
+      \code{indMatrix} \tab      \code{\linkS4class{indexMatrix}} \tab                \code{\var{unnamed}}
   }
-
-  --- --- ---
-
-  Additional methods contain group methods, such as
-  \describe{
-    \item{Ops}{\code{signature(e1 = "nMatrix", e2 = "....")}, \dots}
-    \item{Arith}{\code{signature(e1 = "nMatrix", e2 = "....")}, \dots}
-    \item{Compare}{\code{signature(e1 = "nMatrix", e2 = "....")}, \dots}
-    \item{Logic}{\code{signature(e1 = "nMatrix", e2 = "....")}, \dots}
-
-    \item{Summary}{\code{signature(x = "nMatrix", "....")}, \dots}
-  }
+  Class \code{ndiMatrix} was not defined until \pkg{Matrix} version
+  1.6-2.
 }
 \seealso{
-  The classes \code{\linkS4class{lMatrix}},
-  \code{\linkS4class{nsparseMatrix}}, and the mother class,
-  \code{\linkS4class{Matrix}}.
+  \dQuote{Sister} classes \code{\linkS4class{lMatrix}},
+  \code{\linkS4class{iMatrix}}, \code{\linkS4class{dMatrix}}, and
+  \code{\linkS4class{zMatrix}} representing logical, integer, double,
+  and complex matrices.
 }
 \examples{
-\dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:base", verbose = FALSE)
-}
 getClass("nMatrix")
 
 L3 <- Matrix(upper.tri(diag(3)))

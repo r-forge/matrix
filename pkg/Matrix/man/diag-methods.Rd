@@ -42,3 +42,8 @@ diag(x) <- value
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+\examples{
+(M <- Matrix(c(0, 1, 0, 0), 6, 4))
+diag(M)
+}

@@ -1,5 +1,5 @@
 \name{packedMatrix-class}
-\title{Virtual Class \code{"packedMatrix"} of Packed Dense Matrices}
+\title{Virtual Class \sQuote{packedMatrix} of Packed Dense Format Matrices}
 %
 \docType{class}
 \keyword{array}
@@ -20,48 +20,62 @@
 \alias{ztpMatrix-class}
 %
 \description{
-  Class \code{"packedMatrix"} is the \emph{virtual} class of dense
-  symmetric or triangular matrices in "packed" format, storing only
-  the \code{choose(n+1,2) == n*(n+1)/2} elements of the upper or
-  lower triangle of an \code{n}-by-\code{n} matrix. It is used to
-  define common methods for efficient subsetting, transposing, etc.
-  of its \emph{proper} subclasses: currently \code{"[dln]spMatrix"}
-  (packed symmetric), \code{"[dln]tpMatrix"} (packed triangular),
-  and subclasses of these, such as
-  \code{"\linkS4class{dppMatrix}"}.
+  \code{packedMatrix} is a virtual subclass of
+  \code{\linkS4class{denseMatrix}} representing packed dense format
+  matrices, as defined by LAPACK:
+  \url{https://netlib.org/lapack/lug/node121.html}.  To represent an
+  \code{n}-by-\code{n} symmetric, Hermitian, or triangular matrix, this
+  format stores a vector of length \code{choose(n+1, 2) == n*(n+1)/2}
+  (the number of entries in the upper or lower triangle), of which
+  \code{n*(n+1)/2} or fewer elements are actually used (fewer if there
+  are additional formal constraints on the matrix structure).
 }
 \section{Slots}{
   \describe{
-    \item{\code{uplo}:}{\code{"character"}; either "U", for upper triangular, and "L", for lower.}
-    \item{\code{Dim}, \code{Dimnames}:}{as all \code{\linkS4class{Matrix}} objects.}
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
+      \code{\linkS4class{Matrix}}.  \code{Dim[1]} and \code{Dim[2]} must
+      be equal as the represented matrix is square.}
+    \item{\code{uplo}}{a character string, either \code{"U"} or
+      \code{"L"}, indicating that \code{x} stores upper or lower
+      triangular matrix entries.}
+    \item{\code{x}}{a vector of length \code{n*(n+1)/2},
+      \code{n=Dim[1]}, storing upper or lower triangular (depending on
+      \code{uplo}) matrix entries in column-major order.  Authors of
+      subclasses of \code{packedMatrix} may declare that only a subset
+      \code{k} of the elements of \code{x} is used to determine the
+      represented matrix \code{A}, defining implicitly a function
+      \code{F} such that \code{A = F(x[k])}.}
+    }
+}
+\section{Subclasses}{
+  The nonvirtual subclasses of \code{packedMatrix} are listed below
+  with links to virtual superclasses defining their data type and
+  structure.
+  \tabular{rrr}{
+    Nonvirtual subclass \tab Data type \tab Structure\cr
+    \code{nspMatrix} \tab \code{\linkS4class{nMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{lspMatrix} \tab \code{\linkS4class{lMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{ispMatrix} \tab \code{\linkS4class{iMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{dspMatrix} \tab \code{\linkS4class{dMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{zspMatrix} \tab \code{\linkS4class{zMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{dppMatrix} \tab \code{\linkS4class{dMatrix}} \tab     \code{\linkS4class{posdefMatrix}}\cr
+    \code{zppMatrix} \tab \code{\linkS4class{zMatrix}} \tab     \code{\linkS4class{posdefMatrix}}\cr
+    \code{ntpMatrix} \tab \code{\linkS4class{nMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{ltpMatrix} \tab \code{\linkS4class{lMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{itpMatrix} \tab \code{\linkS4class{iMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{dtpMatrix} \tab \code{\linkS4class{dMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{ztpMatrix} \tab \code{\linkS4class{zMatrix}} \tab \code{\linkS4class{triangularMatrix}}
   }
+  The subclasses of \code{iMatrix} and \code{zMatrix} were not defined
+  until \pkg{Matrix} version 1.8-0.  The other subclasses predate
+  \code{packedMatrix} itself, which was not defined until \pkg{Matrix}
+  version 1.4-1.
 }
-\section{Extends}{
-  Class \code{"\linkS4class{denseMatrix}"}, directly.
-  Class \code{"\linkS4class{Matrix}"}, by class \code{"denseMatrix"},
-  distance 2.
-}
-\section{Methods}{
-  \describe{
-    \item{pack}{\code{signature(x = "packedMatrix")}: ... }
-    \item{unpack}{\code{signature(x = "packedMatrix")}: ... }
-    \item{isSymmetric}{\code{signature(object = "packedMatrix")}: ... }
-    \item{isTriangular}{\code{signature(object = "packedMatrix")}: ... }
-    \item{isDiagonal}{\code{signature(object = "packedMatrix")}: ... }
-    \item{t}{\code{signature(x = "packedMatrix")}: ... }
-    \item{diag}{\code{signature(x = "packedMatrix")}: ... }
-    \item{diag<-}{\code{signature(x = "packedMatrix")}: ... }
-  }
-}
-%% \references{
-%% }
-\author{Mikael Jagan}
-%% \note{
-%% }
 \seealso{
-  \code{\link{pack}} and \code{\link{unpack}}; its virtual "complement"
-  \code{"\linkS4class{unpackedMatrix}"}; its proper subclasses
-  \code{"\linkS4class{dspMatrix}"}, \code{"\linkS4class{ltpMatrix}"}, etc.
+  \dQuote{Complementary} class \code{\linkS4class{unpackedMatrix}}
+  representing conventional (or \dQuote{unpacked}) dense format
+  matrices.  Generic function \code{\link{unpack}}, an alternative to
+  explicit coercion to \code{unpackedMatrix}.
 }
 \examples{
 showClass("packedMatrix")

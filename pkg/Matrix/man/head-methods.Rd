@@ -34,3 +34,8 @@ tail(x, \dots)
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+%% \item{head}{\code{signature(object = "Matrix")}: return only the
+%%   \emph{\dQuote{head}}, i.e., the first few rows.}
+%% \item{tail}{\code{signature(object = "Matrix")}: return only the
+%%   \emph{\dQuote{tail}}, i.e., the last few rows of the respective matrix.}

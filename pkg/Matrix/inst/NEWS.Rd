@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-03-03, svn r5122)}{
+\section{Changes in version 1.8-0 (2025-03-12, svn r5136)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}

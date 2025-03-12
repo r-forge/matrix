@@ -163,3 +163,28 @@
 \alias{coerce,vector,zsparseVector-method}
 %
 \description{TODO.}
+
+%% \item{as.matrix, as.array}{\code{signature(x = "Matrix")}: the same as
+%%   \code{as(x, "matrix")}; see also the note below.}
+%% \item{as.vector}{\code{signature(x = "Matrix", mode = "missing")}:
+%%   \code{as.vector(m)} should be identical to \code{as.vector(as(m,
+%% 	"matrix"))}, implemented more efficiently for some subclasses.}
+%% \item{as(x, "vector"), as(x, "numeric")}{etc, similarly.}
+%% \item{coerce}{\code{signature(from = "ANY", to = "Matrix")}: This
+%%   relies on a correct \code{\link{as.matrix}()} method for \code{from}.}
+
+%% \item{coerce}{\code{signature(from = "matrix", to = "nMatrix")}:
+%%   Note that these coercions (must) coerce \code{\link{NA}}s to
+%%   non-zero, hence conceptually \code{TRUE}.
+%%   This is particularly important when
+%%   \code{\linkS4class{sparseMatrix}} objects are coerced to
+%%   \code{"nMatrix"} and hence to \code{\linkS4class{nsparseMatrix}}.}
+
+%% \item{coerce}{\code{signature(from = "factor", to = "sparseMatrix")}:
+%%   Coercion of a factor to \code{"sparseMatrix"} produces the matrix
+%%   of indicator \bold{rows} stored as an object of class
+%%   \code{"dgCMatrix"}.  To obtain columns representing the interaction
+%%   of the factor and a numeric covariate, replace the \code{"x"} slot
+%%   of the result by the numeric covariate then take the transpose.
+%%   Missing values (\code{\link{NA}}) from the factor are translated
+%%   to columns of all \code{0}s.}

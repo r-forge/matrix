@@ -12,8 +12,6 @@
 \alias{dsparseVector-class}
 \alias{zsparseVector-class}
 %
-\alias{initialize,sparseVector-method}
-%
 \description{Sparse Vector Classes: The virtual mother class
   \code{"sparseVector"} has the five actual daughter classes
    \code{"dsparseVector"}, \code{"isparseVector"},
