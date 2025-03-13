@@ -46,7 +46,8 @@
       \code{unpackedMatrix} may declare that only a subset \code{k} of
       the elements of \code{x} is used to determine the represented
       matrix \code{A}, defining implicitly a function \code{F} such that
-      \code{A = F(x[k])}.}
+      \code{A = F(x[k])}; see \sQuote{Subclasses} for examples in
+      package \pkg{Matrix}.}
   }
 }
 \section{Subclasses}{
@@ -76,7 +77,44 @@
   The subclasses of \code{iMatrix} and \code{zMatrix} were not defined
   until \pkg{Matrix} version 1.8-0.  The other subclasses predate
   \code{unpackedMatrix} itself, which was not defined until \pkg{Matrix}
-  version 1.5-0.
+  version 1.5-0; previously, those subclasses were direct extensions of
+  \code{denseMatrix}.
+
+  The mapping from the \code{x} slot of length \code{m*n} to the
+  \code{m}-by-\code{n} represented matrix \code{A} is given by:
+\preformatted{
+                                                             A[i, j]                            
+                               |        i < j       |         i = j        |        i > j       
+                               |--------------------|----------------------|--------------------
+.geMatrix                      |      x[(j-1)*m+i]  |     x[(j-1)*m+i]     |      x[(j-1)*m+i]  
+.syMatrix, uplo="U"            |      x[(j-1)*m+i]  |     x[(j-1)*m+i]     |      x[(i-1)*m+j]  
+zsyMatrix, uplo="U", trans="C" |      x[(j-1)*m+i]  |  Re(x[(j-1)*m+i])+0i | Conj(x[(i-1)*m+j]) 
+.syMatrix, uplo="L"            |      x[(i-1)*m+j]  |     x[(j-1)*m+i]     |      x[(j-1)*m+i]  
+zsyMatrix, uplo="L", trans="C" | Conj(x[(i-1)*m+j]) |  Re(x[(j-1)*m+i])+0i |      x[(j-1)*m+i]  
+.trMatrix, uplo="U",  diag="N" |      x[(j-1)*m+i]  |     x[(j-1)*m+i]     |                 0  
+.trMatrix, uplo="U",  diag="U" |      x[(j-1)*m+i]  |                1     |                 0  
+.trMatrix, uplo="L",  diag="N" |                 0  |     x[(j-1)*m+i]     |      x[(j-1)*m+j]  
+.trMatrix, uplo="L",  diag="U" |                 0  |                1     |      x[(j-1)*m+j]  
+}
+
+  \code{uplo} is a slot of all \code{.syMatrix} and \code{.trMatrix}.
+  If \code{uplo="U"}, then the strictly upper triangular entries of
+  \code{A} are stored explicitly and the strictly lower triangular
+  entries are not.  If \code{uplo="L"}, then the reverse is true.
+
+  \code{trans} is a slot of all \code{zsyMatrix} indicating if \code{A}
+  is Hermitian (\code{trans="C"}) or symmetric (\code{trans="T"}).
+
+  \code{diag} is a slot of all \code{.trMatrix} indicating if \code{A}
+  is nonunit (\code{diag="N"}) or unit (\code{diag="U"}) triangular.
+  If \code{diag="U"}, then the diagonal entries of \code{A} (all ones)
+  are not stored explicitly.
+
+  \code{dpoMatrix} and \code{zpoMatrix} extend \code{dsyMatrix} and
+  \code{zsyMatrix}, implicitly contraining \code{x} so that \code{A}
+  is positive semidefinite.  This constraint is not strictly enforced
+  by validity methods, which test that \code{trans="C"} and that all
+  diagonal entries of \code{A} are nonnegative.
 }
 \seealso{
   \dQuote{Complementary} class \code{\linkS4class{packedMatrix}}
@@ -131,9 +169,8 @@ sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7))
 try(as(sy3, "dpoMatrix")) # -> error: not positive definite
 \dontshow{
 tr <- try(as(sy3, "dpoMatrix"), silent=TRUE)
-stopifnot(1 == grep("not a positive definite matrix",
-                    as.character(tr)),
-	  is(sp2, "dspMatrix"))
+stopifnot(1 == grep("not a positive definite matrix", as.character(tr)),
+          is(sp2, "dspMatrix"))
 }
 
 ## 4x4 example

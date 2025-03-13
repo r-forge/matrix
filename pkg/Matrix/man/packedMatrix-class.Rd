@@ -44,8 +44,9 @@
       subclasses of \code{packedMatrix} may declare that only a subset
       \code{k} of the elements of \code{x} is used to determine the
       represented matrix \code{A}, defining implicitly a function
-      \code{F} such that \code{A = F(x[k])}.}
-    }
+      \code{F} such that \code{A = F(x[k])}; see \sQuote{Subclasses} for
+      examples in package \pkg{Matrix}.}
+  }
 }
 \section{Subclasses}{
   The nonvirtual subclasses of \code{packedMatrix} are listed below
@@ -69,7 +70,43 @@
   The subclasses of \code{iMatrix} and \code{zMatrix} were not defined
   until \pkg{Matrix} version 1.8-0.  The other subclasses predate
   \code{packedMatrix} itself, which was not defined until \pkg{Matrix}
-  version 1.4-1.
+  version 1.4-1; previously, those subclasses were direct extensions of
+  \code{denseMatrix}.
+
+  The mapping from the \code{x} slot of length \code{n*(n+1)/2} to the
+  \code{n}-by-\code{n} represented matrix \code{A} is given by:
+\preformatted{
+                                                                        A[i, j]                                        
+                               |            i < j           |            i = j            |            i > j           
+-------------------------------|----------------------------|-----------------------------|----------------------------
+.spMatrix, uplo="U"            |      x[i+      j*(j-1)/2]  |    x[i+      j*(j-1)/2]     |      x[j+      i*(i-1)/2]  
+zspMatrix, uplo="U", trans="C" |      x[i+      j*(j-1)/2]  | Re(x[i+      j*(j-1)/2])+0i | Conj(x[j+      i*(i-1)/2]) 
+.spMatrix, uplo="L"            |      x[j+(2*n-i)*(i-1)/2]  |    x[i+(2*n-j)*(j-1)/2]     |      x[i+(2*n-j)*(j-1)/2]  
+zspMatrix, uplo="L", trans="C" | Conj(x[j+(2*n-i)*(i-1)/2]) | Re(x[i+(2*n-j)*(j-1)/2])+0i |      x[i+(2*n-j)*(j-1)/2]  
+.tpMatrix, uplo="U",  diag="N" |      x[i+      j*(j-1)/2]  |    x[i+      j*(j-1)/2]     |                         0  
+.tpMatrix, uplo="U",  diag="U" |      x[i+      j*(j-1)/2]  |                       1     |                         0  
+.tpMatrix, uplo="L",  diag="N" |                         0  |    x[i+(2*n-j)*(j-1)/2]     |      x[i+(2*n-j)*(j-1)/2]  
+.tpMatrix, uplo="L",  diag="U" |                         0  |                       1     |      x[i+(2*n-j)*(j-1)/2]  
+}
+
+  \code{uplo} is a slot of all \code{.spMatrix} and \code{.tpMatrix}.
+  If \code{uplo="U"}, then the strictly upper triangular entries of
+  \code{A} are stored explicitly and the strictly lower triangular
+  entries are not.  If \code{uplo="L"}, then the reverse is true.
+
+  \code{trans} is a slot of all \code{zsyMatrix} indicating if \code{A}
+  is Hermitian (\code{trans="C"}) or symmetric (\code{trans="T"}).
+
+  \code{diag} is a slot of all \code{.trMatrix} indicating if \code{A}
+  is nonunit (\code{diag="N"}) or unit (\code{diag="U"}) triangular.
+  If \code{diag="U"}, then the diagonal entries of \code{A} (all ones)
+  are not stored explicitly.
+
+  \code{dppMatrix} and \code{zppMatrix} extend \code{dspMatrix} and
+  \code{zspMatrix}, implicitly contraining \code{x} so that \code{A}
+  is positive semidefinite.  This constraint is not strictly enforced
+  by validity methods, which test that \code{trans="C"} and that all
+  diagonal entries of \code{A} are nonnegative.  
 }
 \seealso{
   \dQuote{Complementary} class \code{\linkS4class{unpackedMatrix}}
@@ -111,9 +148,8 @@ sy3 <- new("dsyMatrix", Dim = as.integer(c(2,2)), x = c(14, -1, 2, -7))
 try(as(sy3, "dpoMatrix")) # -> error: not positive definite
 \dontshow{
 tr <- try(as(sy3, "dpoMatrix"), silent=TRUE)
-stopifnot(1 == grep("not a positive definite matrix",
-                    as.character(tr)),
-	  is(sp2, "dspMatrix"))
+stopifnot(1 == grep("not a positive definite matrix", as.character(tr)),
+          is(sp2, "dspMatrix"))
 }
 
 ## 4x4 example
