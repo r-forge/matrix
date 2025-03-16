@@ -185,13 +185,23 @@
   }
 }
 
-\section{Changes in version 1.7-3 (2025-02-27, svn r5119)}{
+\section{Changes in version 1.7-4 (2025-03-16, svn r5138)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
+\section{Changes in version 1.7-3 (2025-03-05, svn r5126)}{
   \subsection{Bug Fixes}{
     \itemize{
       \item \code{<matrix>} \code{o} \code{<sparseVector>} binary
       \code{"Ops"} work again, returning a matrix (of \code{"Matrix"}).
 
       \item \code{- new("lgeMatrix")} and more \code{ - <Matrix>} now work.
+
+      \item Use \code{int} instead of \code{Rboolean} in 2x2 cases in \file{utils-R.c}.
     }
   }
 }
