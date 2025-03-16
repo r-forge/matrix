@@ -5,6 +5,14 @@
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
 
+\section{Changes in version 1.7-4 (2025-03-16, svn r5138)}{
+  \subsection{Bug Fixes}{
+    \itemize{
+      \item .
+    }
+  }
+}
+
 \section{Changes in version 1.7-3 (2025-03-05, svn r5126)}{
   \subsection{Bug Fixes}{
     \itemize{
