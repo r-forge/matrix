@@ -30,12 +30,12 @@
   \code{\linkS4class{denseMatrix}} representing conventional dense
   format matrices, as defined by LAPACK:
   \url{https://netlib.org/lapack/lug/node121.html}.  To represent an
-  \code{m}-by-\code{n} matrix, this format stores a vector of length
-  \code{m*n}, of which \code{m*n} \emph{or fewer} elements are actually
-  used (fewer if there are formal constraints on the matrix structure).
-  Within package \pkg{Matrix}, this format is called \dQuote{unpacked}
-  to emphasize that it is complementary to the packed format also
-  defined by LAPACK.
+  \code{m}-by-\code{n} matrix \code{A}, this format stores a vector of
+  length \code{m*n}, of which \code{m*n} \emph{or fewer} elements are
+  actually used (fewer if there are formal constraints on the structure
+  of \code{A}).  Within package \pkg{Matrix}, this format is called
+  \dQuote{unpacked} to emphasize that it is complementary to the packed
+  format also defined by LAPACK.
 }
 \section{Slots}{
   \describe{

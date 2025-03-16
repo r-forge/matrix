@@ -24,17 +24,18 @@
   \code{\linkS4class{denseMatrix}} representing packed dense format
   matrices, as defined by LAPACK:
   \url{https://netlib.org/lapack/lug/node121.html}.  To represent an
-  \code{n}-by-\code{n} symmetric, Hermitian, or triangular matrix, this
-  format stores a vector of length \code{choose(n+1, 2) == n*(n+1)/2}
-  (the number of entries in the upper or lower triangle), of which
-  \code{n*(n+1)/2} or fewer elements are actually used (fewer if there
-  are additional formal constraints on the matrix structure).
+  \code{n}-by-\code{n} symmetric, Hermitian, or triangular matrix
+  \code{A}, this format stores a vector of length
+  \code{choose(n+1, 2) == n*(n+1)/2} (the number of entries in the upper
+  or lower triangle), of which \code{n*(n+1)/2} or fewer elements are
+  actually used (fewer if there are additional formal constraints on the
+  structure of \code{A}).
 }
 \section{Slots}{
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
       \code{\linkS4class{Matrix}}.  \code{Dim[1]} and \code{Dim[2]} must
-      be equal as the represented matrix is square.}
+      be equal as the represented matrix is square by definition.}
     \item{\code{uplo}}{a character string, either \code{"U"} or
       \code{"L"}, indicating that \code{x} stores upper or lower
       triangular matrix entries.}
@@ -94,10 +95,10 @@ zspMatrix, uplo="L", trans="C" | Conj(x[j+(2*n-i)*(i-1)/2]) | Re(x[i+(2*n-j)*(j-
   \code{A} are stored explicitly and the strictly lower triangular
   entries are not.  If \code{uplo="L"}, then the reverse is true.
 
-  \code{trans} is a slot of all \code{zsyMatrix} indicating if \code{A}
+  \code{trans} is a slot of all \code{zspMatrix} indicating if \code{A}
   is Hermitian (\code{trans="C"}) or symmetric (\code{trans="T"}).
 
-  \code{diag} is a slot of all \code{.trMatrix} indicating if \code{A}
+  \code{diag} is a slot of all \code{.tpMatrix} indicating if \code{A}
   is nonunit (\code{diag="N"}) or unit (\code{diag="U"}) triangular.
   If \code{diag="U"}, then the diagonal entries of \code{A} (all ones)
   are not stored explicitly.
