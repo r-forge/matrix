@@ -14,8 +14,14 @@ function(from)
 
 .M2sym <-
 function(from, uplo = NULL, trans = "C", ...) {
-    if (!isSymmetric(from, trans = trans, ...))
-        stop("matrix is not symmetric; consider forceSymmetric(.)")
+    if (!isSymmetric(from, trans = trans, ...)) {
+        if(missing(trans)) { # tried "C" above, now try the other one
+            trans <- "T"
+            if (!isSymmetric(from, trans = "T", ...))
+                stop("matrix is not symmetric (both trans); consider forceSymmetric(.)")
+            ## else  trans = "T" is ok -> continue
+        }
+    }
     if (is.null(uplo))
         forceSymmetric(from, trans = trans)
     else forceSymmetric(from, uplo = uplo, trans = trans)
@@ -23,7 +29,10 @@ function(from, uplo = NULL, trans = "C", ...) {
 ..M2sym <- # for setAs()
 function(from) {
     if (!isSymmetric(from))
-        stop("matrix is not symmetric; consider forceSymmetric(.)")
+        if(isSymmetric(from, trans = "T"))
+            forceSymmetric(from, trans = "T")
+        else
+            stop("matrix is not symmetric; consider forceSymmetric(.)")
     forceSymmetric(from)
 }
 
@@ -606,7 +615,7 @@ setAs(      "matrix", "triangularMatrix", ..M2tri)
 setAs("diagonalMatrix", "symmetricMatrix",
       function(from) {
           if (!isSymmetricDN(from@Dimnames))
-              stop("matrix is not symmetric; consider forceSymmetric(.)")
+              stop("matrix is not symmetric (dimnames); consider forceSymmetric(.)")
           .diag2sparse(from, ".", "s", "C")
       })
 setAs("diagonalMatrix", "triangularMatrix",
@@ -641,7 +650,7 @@ setAs("generalMatrix", "packedMatrix",
                   .Call(R_dense_as_packed, from, attr(it, "kind"), NULL, "N")
               else .sparse2dense(forceTriangular(from, uplo = attr(it, "kind"), diag = "N"), packed = TRUE)
           }
-          else stop("matrix is not symmetric or triangular")
+          else stop(gettext("matrix is not symmetric (trans = '%s') or triangular", trans), domain = NA)
       })
 setAs("indMatrix", "packedMatrix",
       function(from)
