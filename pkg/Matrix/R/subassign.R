@@ -956,14 +956,17 @@ replTmat <- function (x, i, j, ..., value) {
 	## Now: have  M[i] <- v	 with vector logical or "integer" i :
 	## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
 
-	if(!is(x,"generalMatrix")) {
-	    cl <- class(x)
+	x <- aggregateT(x)
+        clx <- class(x)
+        shx <- .M.shape(x)
+        if(shx == "t") { # triangular
+            if(x@diag == "U") x <- .diagU2N(x, cl = clx, checkDense = FALSE)
+        } else if(shx != "g") { # not general or triangular
 	    x <- .M2gen(x)
 	    Matrix.message("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
-		       cl," to ",class(x))
+                           clx," to ", (clx <- class(x)))
 	}
 	nr <- di[1]
-    x <- aggregateT(x)
 	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE, FALSE)
 
         n <- prod(di)
@@ -981,7 +984,6 @@ replTmat <- function (x, i, j, ..., value) {
 	    int2i(as.integer(i), n) - 1L ## 0-based indices [to match m_encodeInd2()]
 	}
 
-        clx <- class(x)
         clDx <- getClassDef(clx) # extends(), is() etc all use the class definition
         has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
 	if(!has.x && # <==> "n.TMatrix"
