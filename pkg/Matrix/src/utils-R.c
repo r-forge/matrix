@@ -1,6 +1,7 @@
 #include "Mdefines.h"
 #include "M5.h"
 
+// ../R/Auxiliaries.R  -- indTri(n, packed = FALSE, upper = TRUE, diag = FALSE)
 SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 {
 	SEXP r;
@@ -89,6 +90,7 @@ SEXP R_index_triangle(SEXP s_n, SEXP s_packed, SEXP s_upper, SEXP s_diag)
 	return r;
 }
 
+// ../R/Auxiliaries.R  -- indDiag(n, packed = FALSE, upper = TRUE)
 SEXP R_index_diagonal(SEXP s_n, SEXP s_packed, SEXP s_upper)
 {
 	SEXP r;
@@ -454,9 +456,10 @@ int *expand_cmprPt(int ncol, const int mp[], int mj[])
 	return mj;
 }
 
-/** Return a 2 column matrix  '' cbind(i, j) ''  of 0-origin index vectors (i,j)
- *  which entirely correspond to the (i,j) slots of
- *  as(x, "TsparseMatrix") :
+/** From a [CR]sparseMatrix, return a 2 column matrix  `cbind(i, j)` of 0-origin index vectors
+ *  (i,j) which entirely correspond to the (i,j) slots of as(x, "TsparseMatrix") :
+ * @param x a Csparse- or RsparseMatrix
+ * @param col TRUE     /  FALSE
  */
 SEXP compressed_non_0_ij(SEXP x, SEXP colP)
 {

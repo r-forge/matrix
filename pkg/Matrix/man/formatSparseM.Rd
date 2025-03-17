@@ -23,7 +23,7 @@
 }
 \usage{
 formatSparseM(x, zero.print = ".", align = c("fancy", "right"),
-              m = as(x,"matrix"), asLogical=NULL, uniDiag=NULL,
+              m = as(x,"matrix"), asLogical=NULL, uniDiag=FALSE,
               digits=NULL, cx, iN0, dn = dimnames(m))
 
 .formatSparseSimple(m, asLogical=FALSE, digits=NULL,

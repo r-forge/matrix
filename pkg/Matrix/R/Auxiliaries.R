@@ -87,9 +87,25 @@ Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     }
 }
 
+## as long as .Arith_log2int() may return FALSE :
+.Arith.i.d <- function(x, kind, Mknd = .M.kind(x)) {
+    kind == "i" && Mknd == "l" && !.Arith_logi2int()
+}
 
-.tCRT <- function(x, trans = "T", lazy = TRUE)
-    .Call(R_sparse_transpose, x, "T", lazy)
+## Maybe fix Arith(metic) result kind  (using very lazy eval ..)
+.Arith.fixK <- function(x, kind, Mknd = .M.kind(x),
+                        i.d = .Arith.i.d(x, kind, Mknd)) {
+    if(i.d)
+        x <- .M2kind(x, "d")
+    else if(kind != Mknd)
+        x <- .M2kind(x, kind)
+    ## else  leave x unchanged
+    x
+}
+
+
+.tCRT <- function(x, trans = "T", lazy = TRUE) # called from ./t.R with `trans = "*"`
+    .Call(R_sparse_transpose, x, trans, lazy)
 
 .drop0 <- function(x, tol = 0, isM = TRUE) {
     if(isM)
@@ -162,7 +178,7 @@ non0.i <- function(M, cM = class(M), uniqT = TRUE) {
 non0ind <- function(x, cld = getClassDef(class(x)),
                     uniqT = TRUE, xtendSymm = TRUE, check.Udiag = TRUE)
 {
-    if(is.numeric(x)) {
+    if(is.atomic(x)) {
         n <- length(x)
         return(if(n == 0L)
                    integer(0L)

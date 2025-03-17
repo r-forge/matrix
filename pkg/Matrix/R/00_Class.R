@@ -1089,6 +1089,10 @@ setClass("abIndex",
 
 ## MJ: aim to deprecate and eventually remove these
 ##     (except perhaps 'index')
+## MM: agreed that "raw" is non-sense; couldn't we have method-signatures (& dispatch),
+##     e.g., for "Ops" / "Arith" ... using
+## --  genNum3 := {logical,numeric,complex}  and/or
+## --  genNum4 := {logical,numeric,complex , integer} ?
 
 setClassUnion("atomicVector",
               members = c("raw", "logical", "numeric", "complex", "character"))
