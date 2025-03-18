@@ -13,6 +13,9 @@
 \alias{dspMatrix-class}
 \alias{zspMatrix-class}
 %
+\alias{dppMatrix-class}
+\alias{zppMatrix-class}
+%
 \alias{ntpMatrix-class}
 \alias{ltpMatrix-class}
 \alias{itpMatrix-class}
@@ -35,24 +38,24 @@
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
       \code{\linkS4class{Matrix}}.  \code{Dim[1]} and \code{Dim[2]} must
-      be equal as the represented matrix is square by definition.}
+      be equal as \code{A} is square by definition.}
     \item{\code{uplo}}{a character string, either \code{"U"} or
       \code{"L"}, indicating that \code{x} stores upper or lower
-      triangular matrix entries.}
+      triangular entries of \code{A}.}
     \item{\code{x}}{a vector of length \code{n*(n+1)/2},
       \code{n=Dim[1]}, storing upper or lower triangular (depending on
-      \code{uplo}) matrix entries in column-major order.  Authors of
-      subclasses of \code{packedMatrix} may declare that only a subset
-      \code{k} of the elements of \code{x} is used to determine the
-      represented matrix \code{A}, defining implicitly a function
-      \code{F} such that \code{A = F(x[k])}; see \sQuote{Subclasses} for
-      examples in package \pkg{Matrix}.}
+      \code{uplo}) entries of \code{A} in column-major order.
+      Authors of subclasses of \code{packedMatrix} may declare that only
+      a subset \code{k} of the elements of \code{x} is used to determine
+      \code{A}, defining implicitly a function \code{F} such that
+      \code{A = F(x[k])}; see \sQuote{Subclasses} for examples in
+      package \pkg{Matrix}.}
   }
 }
 \section{Subclasses}{
-  The nonvirtual subclasses of \code{packedMatrix} are listed below
-  with links to virtual superclasses defining their data type and
-  structure.
+  The nonvirtual subclasses of \code{packedMatrix} defined in package
+  \pkg{Matrix} are listed below with links to virtual superclasses
+  defining their data type and structure.
   \tabular{rrr}{
     Nonvirtual subclass \tab Data type \tab Structure\cr
     \code{nspMatrix} \tab \code{\linkS4class{nMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
@@ -90,30 +93,43 @@ zspMatrix, uplo="L", trans="C" | Conj(x[j+(2*n-i)*(i-1)/2]) | Re(x[i+(2*n-j)*(j-
 .tpMatrix, uplo="L",  diag="U" |                         0  |                       1     |      x[i+(2*n-j)*(j-1)/2]  
 }
 
-  \code{uplo} is a slot of all \code{.spMatrix} and \code{.tpMatrix}.
-  If \code{uplo="U"}, then the strictly upper triangular entries of
-  \code{A} are stored explicitly and the strictly lower triangular
-  entries are not.  If \code{uplo="L"}, then the reverse is true.
+  Classes \code{.spMatrix} represent Hermitian or symmetric \code{A}.
+  Objects have \code{x} and \code{uplo} slots.  If \code{uplo="U"}, then
+  \code{x} stores the \code{n*(n+1)/2} upper triangular entries of
+  \code{A}.  If \code{uplo="L"}, then \code{x} stores the
+  \code{n*(n+1)/2} lower triangular entries of \code{A}.  Objects of
+  class \code{zspMatrix} have an additional \code{trans} slot that
+  distinguishes Hermitian and symmetric \code{A}, which use
+  \code{trans="C"} and \code{"T"}, respectively.  If \code{trans="C"},
+  then the imaginary parts of \code{x[du]} (\code{uplo="U"}) or
+  \code{x[dl]} (\code{uplo="L"}) are not referenced, where \code{du=d},
+  \code{dl=length(x)+1-d}, and \code{d=cumsum(seq_len(n))}.  (The
+  diagonal entries of Hermitian matrices are real by definition.)
 
-  \code{trans} is a slot of all \code{zspMatrix} indicating if \code{A}
-  is Hermitian (\code{trans="C"}) or symmetric (\code{trans="T"}).
+  Classes \code{dppMatrix} and \code{zppMatrix} extend \code{dspMatrix}
+  and \code{zspMatrix} and represent positive semidefinite \code{A}.
+  Positive semidefiniteness of \code{A} induces a constraint on the
+  \code{x} slot.  However, this constraint is not strictly enforced by
+  the validity methods, which test only that the diagonal entries of
+  \code{A} are nonnegative (a necessary, not sufficient condition).
+  For \code{zppMatrix}, only \code{trans="C"} is valid.
 
-  \code{diag} is a slot of all \code{.tpMatrix} indicating if \code{A}
-  is nonunit (\code{diag="N"}) or unit (\code{diag="U"}) triangular.
-  If \code{diag="U"}, then the diagonal entries of \code{A} (all ones)
-  are not stored explicitly.
-
-  \code{dppMatrix} and \code{zppMatrix} extend \code{dspMatrix} and
-  \code{zspMatrix}, implicitly contraining \code{x} so that \code{A}
-  is positive semidefinite.  This constraint is not strictly enforced
-  by validity methods, which test that \code{trans="C"} and that all
-  diagonal entries of \code{A} are nonnegative.  
+  Classes \code{.tpMatrix} represent triangular \code{A}.  Objects have
+  \code{x}, \code{uplo}, and \code{diag} slots.  If \code{uplo="U"},
+  then \code{A} is upper triangular and \code{x[-du]} stores the
+  \code{n*(n-1)/2} strictly upper triangular entries.  If
+  \code{uplo="L"}, then \code{A} is lower triangular and \code{x[-dl]}
+  stores the \code{n*(n-1)/2} strictly lower triangular entries.  If
+  \code{diag="N"}, then \code{x[du]} (\code{uplo="U"}) or \code{x[dl]}
+  (\code{uplo="L"}) stores the \code{n} diagonal entries of \code{A}.
+  If \code{diag="U"}, then \code{A} is unit triangular and those
+  elements of \code{x} are unreferenced.
 }
 \seealso{
   \dQuote{Complementary} class \code{\linkS4class{unpackedMatrix}}
   representing conventional (or \dQuote{unpacked}) dense format
-  matrices.  Generic function \code{\link{unpack}}, an alternative to
-  explicit coercion to \code{unpackedMatrix}.
+  matrices.  Generic function \code{\linkS4methods{unpack}}, an
+  alternative to explicit coercion to \code{unpackedMatrix}.
 }
 \examples{
 showClass("packedMatrix")

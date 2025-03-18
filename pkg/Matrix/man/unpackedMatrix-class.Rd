@@ -19,6 +19,9 @@
 \alias{dsyMatrix-class}
 \alias{zsyMatrix-class}
 %
+\alias{dpoMatrix-class}
+\alias{zpoMatrix-class}
+%
 \alias{ntrMatrix-class}
 \alias{ltrMatrix-class}
 \alias{itrMatrix-class}
@@ -41,19 +44,18 @@
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
       \code{\linkS4class{Matrix}}.}
-    \item{\code{x}}{a vector of length \code{prod(Dim)} storing matrix
-      entries in column-major order.  Authors of subclasses of
+    \item{\code{x}}{a vector of length \code{prod(Dim)} storing entries
+      of \code{A} in column-major order.  Authors of subclasses of
       \code{unpackedMatrix} may declare that only a subset \code{k} of
-      the elements of \code{x} is used to determine the represented
-      matrix \code{A}, defining implicitly a function \code{F} such that
-      \code{A = F(x[k])}; see \sQuote{Subclasses} for examples in
-      package \pkg{Matrix}.}
+      the elements of \code{x} is used to determine \code{A}, defining
+      implicitly a function \code{F} such that \code{A = F(x[k])}; see
+      \sQuote{Subclasses} for examples in package \pkg{Matrix}.}
   }
 }
 \section{Subclasses}{
-  The nonvirtual subclasses of \code{unpackedMatrix} are listed below
-  with links to virtual superclasses defining their data type and
-  structure.
+  The nonvirtual subclasses of \code{unpackedMatrix} defined in package
+  \pkg{Matrix} are listed below with links to virtual superclasses
+  defining their data type and structure.
   \tabular{rrr}{
     Nonvirtual subclass \tab Data type \tab Structure\cr
     \code{ngeMatrix} \tab \code{\linkS4class{nMatrix}} \tab    \code{\linkS4class{generalMatrix}}\cr
@@ -97,29 +99,53 @@ zsyMatrix, uplo="L", trans="C" | Conj(x[(i-1)*m+j]) |  Re(x[(j-1)*m+i])+0i |    
 .trMatrix, uplo="L",  diag="U" |                 0  |                1     |      x[(j-1)*m+j]  
 }
 
-  \code{uplo} is a slot of all \code{.syMatrix} and \code{.trMatrix}.
-  If \code{uplo="U"}, then the strictly upper triangular entries of
-  \code{A} are stored explicitly and the strictly lower triangular
-  entries are not.  If \code{uplo="L"}, then the reverse is true.
+  Classes \code{.geMatrix} represent general (that is, unstructured)
+  \code{A}.  Objects have an \code{x} slot that stores all \code{m*n}
+  entries of \code{A}.  These classes closely approximate traditional
+  matrices.  For example, a traditional matrix \code{z} of type
+  \code{integer} and its analogue \code{Z} of formal class
+  \code{igeMatrix} are related by:
+  \preformatted{	z <- array(Z@x, dim = Z@Dim, dimnames = Z@Dimnames)
+	Z <- new("igeMatrix", Dim = dim(z), Dimnames = dimnames(z), x = as.vector(z))}
 
-  \code{trans} is a slot of all \code{zsyMatrix} indicating if \code{A}
-  is Hermitian (\code{trans="C"}) or symmetric (\code{trans="T"}).
+  Classes \code{.syMatrix} represent Hermitian or symmetric \code{A}.
+  Objects have \code{x} and \code{uplo} slots.  If \code{uplo="U"}, then
+  \code{x[row(A) <= col(A)]} stores the \code{n*(n+1)/2} upper
+  triangular entries of \code{A} and \code{x[row(A) > col(A)]} is
+  unreferenced.  If \code{uplo="L"}, then \code{x[row(A) >= col(A)]}
+  stores the \code{n*(n+1)/2} lower triangular entries of \code{A} and
+  \code{x[row(A) < col(A)]} is unreferenced.  Objects of class
+  \code{zsyMatrix} have an additional \code{trans} slot that
+  distinguishes Hermitian and symmetric \code{A}, which use
+  \code{trans="C"} and \code{"T"}, respectively.  If \code{trans="C"},
+  then the imaginary parts of \code{x[row(A) == col(A)]} are not
+  referenced.  (The diagonal entries of Hermitian matrices are real by
+  definition.)
 
-  \code{diag} is a slot of all \code{.trMatrix} indicating if \code{A}
-  is nonunit (\code{diag="N"}) or unit (\code{diag="U"}) triangular.
-  If \code{diag="U"}, then the diagonal entries of \code{A} (all ones)
-  are not stored explicitly.
+  Classes \code{dpoMatrix} and \code{zpoMatrix} extend \code{dsyMatrix}
+  and \code{zsyMatrix} and represent positive semidefinite \code{A}.
+  Positive semidefiniteness of \code{A} induces a constraint on the
+  \code{x} slot.  However, this constraint is not strictly enforced by
+  the validity methods, which test only that the diagonal entries of
+  \code{A} are nonnegative (a necessary, not sufficient condition).
+  For \code{zpoMatrix}, only \code{trans="C"} is valid.
 
-  \code{dpoMatrix} and \code{zpoMatrix} extend \code{dsyMatrix} and
-  \code{zsyMatrix}, implicitly contraining \code{x} so that \code{A}
-  is positive semidefinite.  This constraint is not strictly enforced
-  by validity methods, which test that \code{trans="C"} and that all
-  diagonal entries of \code{A} are nonnegative.
+  Classes \code{.trMatrix} represent triangular \code{A}.  Objects have
+  \code{x}, \code{uplo}, and \code{diag} slots.  If \code{uplo="U"},
+  then \code{A} is upper triangular, \code{x[row(A) < col(A)]} stores
+  the \code{n*(n-1)/2} strictly upper triangular entries, and
+  \code{x[row(A) > col(A)]} is unreferenced.  If \code{uplo="L"}, then
+  \code{A} is lower triangular, \code{x[row(A) > col(A)]} stores the
+  \code{n*(n-1)/2} strictly lower triangular entries, and
+  \code{x[row(A) < col(A)]} is unreferenced.  If \code{diag="N"}, then
+  \code{x[row(A) == col(A)]} stores the \code{n} diagonal entries of
+  \code{A}.  If \code{diag="U"}, then \code{A} is unit triangular and
+  those elements of \code{x} are unreferenced.
 }
 \seealso{
   \dQuote{Complementary} class \code{\linkS4class{packedMatrix}}
   representing packed dense format matrices.  Generic function
-  \code{\link{pack}}, an alternative to explicit coercion to
+  \code{\linkS4methods{pack}}, an alternative to explicit coercion to
   \code{packedMatrix}.
 }
 \examples{

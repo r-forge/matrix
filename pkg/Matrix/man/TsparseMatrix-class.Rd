@@ -1,5 +1,5 @@
 \name{TsparseMatrix-class}
-\title{Class "TsparseMatrix" of Sparse Matrices in Triplet Form}
+\title{Virtual Class \sQuote{TsparseMatrix} of Triplet Format Matrices}
 %
 \docType{class}
 \keyword{array}
@@ -19,65 +19,135 @@
 \alias{dsTMatrix-class}
 \alias{zsTMatrix-class}
 %
+\alias{dpTMatrix-class}
+\alias{zpTMatrix-class}
+%
 \alias{ntTMatrix-class}
 \alias{ltTMatrix-class}
 \alias{itTMatrix-class}
 \alias{dtTMatrix-class}
 \alias{ztTMatrix-class}
 %
-\description{The \code{"TsparseMatrix"} class is the virtual class of
-  all sparse matrices coded in triplet form.  Since it is a virtual class,
-  no objects may be created from it.  See
-  \code{showClass("TsparseMatrix")} for its subclasses.
+\description{
+  \code{TsparseMatrix} is a virtual subclass of
+  \code{\linkS4class{sparseMatrix}} representing triplet format
+  matrices.  To represent an \code{m}-by-\code{n} matrix \code{A}, this
+  format stores the positions of \code{m*n} or fewer
+  (often \eqn{O(\max\{m, n\})}{O(max(m, n))}) entries of \code{A}.
+  Authors of subclasses of \code{TsparseMatrix} are free to declare how
+  this information is used to specify \code{A}.  See \sQuote{Subclasses}
+  for subclasses defined in package \pkg{Matrix}.
+
+  The triplet format is convenient for reading and writing sparse
+  matrices but often not amenable to direct computation.  Accordingly,
+  methods for \code{TsparseMatrix} defined in package \pkg{Matrix} tend
+  to work by coercion to and from a more tractable \emph{compressed}
+  sparse format.  Users can avoid repeated coercions by methods by
+  coercing sparse matrix operands to either
+  \code{\linkS4class{CsparseMatrix}} or
+  \code{\linkS4class{RsparseMatrix}} \emph{before} computing with them.
 }
 \section{Slots}{
   \describe{
-    \item{\code{Dim}, \code{Dimnames}:}{from the \code{"\linkS4class{Matrix}"} class,}
-    \item{\code{i}:}{Object of class \code{"integer"} - the row indices
-      of non-zero entries \emph{in 0-base}, i.e., must be in
-      \code{0:(nrow(.)-1)}.}
-    \item{\code{j}:}{Object of class \code{"integer"} - the column
-      indices of non-zero entries.  Must be the same length as slot
-      \code{i} and \emph{0-based} as well, i.e., in
-      \code{0:(ncol(.)-1)}.   For numeric Tsparse matrices, \code{(i,j)}
-      pairs can occur more than once, see \code{\linkS4class{dgTMatrix}}.
-    }
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
+      \code{\linkS4class{Matrix}}.}
+    \item{\code{i}, \code{j}}{integer vectors of equal length
+      corresponding to a subset \code{V} of the set of entries of
+      \code{A}.  Respectively, \code{i} and \code{j} store the 0-based
+      row and column indices of the elements of \code{V}.  Hence, to be
+      valid, \code{i} and \code{j} must satisfy \code{0 <= i < Dim[1]}
+      and \code{0 <= j < Dim[2]}.  The common length of \code{i} and
+      \code{j} can exceed the size of \code{V}, allowing for duplication
+      of the form \code{i[k1] == i[k2]}, \code{j[k1] == j[k2]},
+      \code{k1 != k2}.}
   }
 }
-\section{Extends}{
-Class \code{"sparseMatrix"}, directly.
-Class \code{"Matrix"}, by class \code{"sparseMatrix"}.
-}
-\section{Methods}{
-  Extraction (\code{"["}) methods, see
-  \code{\link{[-methods}}.%-> ./Xtrct-methods.Rd
-}
-\note{
-  Most operations with sparse matrices are performed using the
-  compressed, column-oriented or \code{\linkS4class{CsparseMatrix}}
-  representation.  The triplet representation is convenient for
-  creating a sparse matrix or for reading and writing such
-  matrices.  Once it is created, however, the matrix is generally
-  coerced to a \code{\linkS4class{CsparseMatrix}} for further
-  operations.
+\section{Subclasses}{
+  The nonvirtual subclasses of \code{TsparseMatrix} defined in package
+  \pkg{Matrix} are listed below with links to virtual superclasses
+  defining their data type and structure.
+  \tabular{rrr}{
+    Nonvirtual subclass \tab Data type \tab Structure\cr
+    \code{ngTMatrix} \tab \code{\linkS4class{nMatrix}} \tab    \code{\linkS4class{generalMatrix}}\cr
+    \code{lgTMatrix} \tab \code{\linkS4class{lMatrix}} \tab    \code{\linkS4class{generalMatrix}}\cr
+    \code{igTMatrix} \tab \code{\linkS4class{iMatrix}} \tab    \code{\linkS4class{generalMatrix}}\cr
+    \code{dgTMatrix} \tab \code{\linkS4class{dMatrix}} \tab    \code{\linkS4class{generalMatrix}}\cr
+    \code{zgTMatrix} \tab \code{\linkS4class{zMatrix}} \tab    \code{\linkS4class{generalMatrix}}\cr
+    \code{nsTMatrix} \tab \code{\linkS4class{nMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{lsTMatrix} \tab \code{\linkS4class{lMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{isTMatrix} \tab \code{\linkS4class{iMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{dsTMatrix} \tab \code{\linkS4class{dMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{zsTMatrix} \tab \code{\linkS4class{zMatrix}} \tab  \code{\linkS4class{symmetricMatrix}}\cr
+    \code{dpTMatrix} \tab \code{\linkS4class{dMatrix}} \tab     \code{\linkS4class{posdefMatrix}}\cr
+    \code{zpTMatrix} \tab \code{\linkS4class{zMatrix}} \tab     \code{\linkS4class{posdefMatrix}}\cr
+    \code{ntTMatrix} \tab \code{\linkS4class{nMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{ltTMatrix} \tab \code{\linkS4class{lMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{itTMatrix} \tab \code{\linkS4class{iMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{dtTMatrix} \tab \code{\linkS4class{dMatrix}} \tab \code{\linkS4class{triangularMatrix}}\cr
+    \code{ztTMatrix} \tab \code{\linkS4class{zMatrix}} \tab \code{\linkS4class{triangularMatrix}}
+  }
+  The subclasses of \code{iMatrix}, \code{zMatrix}, and
+  \code{posdefMatrix} were not defined until \pkg{Matrix} version 1.8-0.
 
-  Note that all \code{new(.)}, \code{\link{spMatrix}} and
-  \code{\link{sparseMatrix}(*, repr="T")} constructors
-  for \code{"TsparseMatrix"} classes implicitly add (i.e., \dQuote{sum up})
-  \eqn{x_k}'s that belong to identical \eqn{(i_k, j_k)} pairs, see, the
-  example below, or also \code{"\linkS4class{dgTMatrix}"}.
+  Classes \code{.gTMatrix} represent general (that is, unstructured)
+  \code{A}.  Objects have \code{i} and \code{j} slots specifying a
+  subset \code{V} of the set of entries of \code{A}, as described in
+  \sQuote{Slots}.  For \code{ngTMatrix}, whose data type is boolean, the
+  entries in \code{V} have value 1, and the entries not in \code{V} have
+  value 0.  For other \code{.gTMatrix}, the entries in \code{V} have
+  values taken from an additional \code{x} slot (a logical, integer,
+  double, or complex vector), and the entries not in \code{V} have value
+  0.  The \code{i}, \code{j}, and \code{x} slots have a common length,
+  and the value of \code{A[i[k], j[k]]} is the result of aggregating
+  \code{x[i == i[k] & j == j[k]]} by summation (reduction by \code{|} if
+  \code{x} is logical, by \code{+} otherwise).
 
-  For convenience, methods for some operations such as \code{\%*\%}
-  and \code{crossprod} are defined for
-  \code{\linkS4class{TsparseMatrix}} objects.  These methods simply
-  coerce the \code{\linkS4class{TsparseMatrix}} object to a
-  \code{\linkS4class{CsparseMatrix}} object then perform the
-  operation.
+  Classes \code{.sCMatrix} represent Hermitian or symmetric \code{A}.
+  Compared to \code{.gTMatrix}, objects have an additional \code{uplo}
+  slot indicating a restriction on \code{V}.  If \code{uplo="U"}, then
+  \code{V} contains only upper triangular entries of \code{A}.  If
+  \code{uplo="L"}, then \code{V} contains only lower triangular entries
+  of \code{A}.  The entries in \code{V} have value 1 (\code{nsCMatrix})
+  or values taken from an \code{x} slot (other \code{.sCMatrix}).  The
+  entries opposite the main diagonal, namely \code{A[j, i]} for all
+  \code{A[i, j]} in \code{V}, have value \code{op(A[i, j])}, where
+  \code{op=Conj} for Hermitian \code{A} and \code{op=identity} for
+  symmetric \code{A}.  All other entries of \code{A} have value 0.
+  Objects of class \code{zsTMatrix} have an additional \code{trans}
+  slot that distinguishes Hermitian and symmetric \code{A}, which use
+  \code{trans="C"} and \code{"T"}, respectively.  If \code{trans="C"}
+  and \code{V} contains diagonal entries of \code{A}, then the imaginary
+  parts of the corresponding elements of \code{x} are not referenced.
+  (The diagonal entries of Hermitian matrices are real by definition.)
+
+  Classes \code{dpTMatrix} and \code{zpTMatrix} extend \code{dsTMatrix}
+  and \code{zsTMatrix} and represent positive semidefinite \code{A}.
+  Positive semidefiniteness of \code{A} induces a constraint on the
+  \code{x} slot.  However, this constraint is not strictly enforced by
+  the validity methods, which test only that the diagonal entries of
+  \code{A} are nonnegative (a necessary, not sufficient condition).
+  For \code{zpTMatrix}, only \code{trans="C"} is valid.
+
+  Classes \code{.tTMatrix} represent triangular \code{A}.  Compared to
+  \code{.gTMatrix}, objects have additional \code{uplo} and \code{diag}
+  slots indicating restrictions on \code{V}.  If \code{uplo="U"}, then
+  \code{A} is upper triangular and \code{V} contains only upper
+  triangular entries.  If \code{uplo="L"}, then \code{A} is lower
+  triangular and \code{V} contains only lower triangular entries.  If
+  \code{diag="U"} (instead of \code{"N"}), then \code{A} is unit
+  triangular and \code{V} contains only \emph{strictly} upper or lower
+  triangular entries.  The entries in \code{V} have value 1
+  (\code{ntCMatrix}) or values taken from an \code{x} slot (other
+  \code{.tCMatrix}).  With the exception of diagonal entries when
+  \code{diag="U"}, which have value 1, entries not in \code{V} have
+  value 0.
 }
-% \author{Martin Maechler}
 \seealso{
-  its superclass, \code{\linkS4class{sparseMatrix}}, and the
-  \code{\linkS4class{dgTMatrix}} class, for the links to other classes.
+  \dQuote{Sibling} classes \code{\linkS4class{CsparseMatrix}} and
+  \code{\linkS4class{RsparseMatrix}} for compressed sparse column and
+  compressed sparse row format matrices.  Functions
+  \code{\link{aggregateT}} and \code{\link{asUniqueT}} for
+  \dQuote{canonicalizing} objects inheriting from \code{TsparseMatrix}.
 }
 \examples{
 showClass("TsparseMatrix")
