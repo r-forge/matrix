@@ -1,3 +1,6 @@
+### NOTA BENE:  Results of matrix multiplications will be  "dMatrix" or "zMatrix"
+### ---------   (i.e., never considering type "integer"  results)
+
 matmultDim <- function(d.a, d.b, type = 1L) {
     ## Return the 'dim' of the product indicated by 'type':
     ##     type 1:    a  %*%   b
@@ -53,6 +56,7 @@ setMethod("%*%", c(x = .cl, y = "denseMatrix"),
 
 
 ## .... CsparseMatrix ..................................................
+
 
 setMethod("%*%", c(x = "CsparseMatrix", y = "CsparseMatrix"),
           function(x, y)
@@ -131,7 +135,8 @@ setMethod("%*%", c(x = .cl, y = "TsparseMatrix"),
 
 setMethod("%*%", c(x = "diagonalMatrix", y = "diagonalMatrix"),
           function(x, y) {
-              r <- new("ddiMatrix")
+              cmplx <- .M.kind(x) == "z" || .M.kind(y) == "z"
+              r <- new(if(cmplx)"zdiMatrix" else "ddiMatrix")
               r@Dim <- matmultDim(x@Dim, y@Dim, type = 1L)
               r@Dimnames <- matmultDN(x@Dimnames, y@Dimnames, type = 1L)
               xu <- x@diag != "N"
@@ -149,7 +154,7 @@ setMethod("%*%", c(x = "diagonalMatrix", y = "diagonalMatrix"),
                       if(.M.kind(y) == "n" && anyNA(yii))
                           yii <- yii | is.na(yii)
                   }
-                  asN <- if(is.double(r@x)) as.double else if(is.complex(r@x)) as.complex else as.double
+                  asN <- if(cmplx) as.complex else as.double
                   r@x <-
                       if(xu)
                           asN(yii)

@@ -66,8 +66,10 @@ setMethod("isSymmetric" , c(object = .cl),
                         current = .M2V(op(object)),
                         tolerance = tol, ...))
           })
+rm(.cl)
 
 setMethod("isSymmetric", c(object = "diagonalMatrix"),
+          ## needs care w/ dimnames() and for <complex> :
           function(object,
                    tol = 100 * .Machine$double.eps,
                    trans = "C", checkDN = TRUE, ...) {
@@ -75,20 +77,20 @@ setMethod("isSymmetric", c(object = "diagonalMatrix"),
                   ca <- function(check.attributes = TRUE, ...)
                       check.attributes
                   if (ca(...) && !isSymmetricDN(object@Dimnames))
-                      return(FALSE)
+                     return(FALSE) # else continue
               }
-              ae <- function(target, current,
-                             tolerance, scale = NULL, ...)
-                  all.equal.numeric(target = target,
-                                    current = current,
-                                    tolerance = tolerance,
-                                    scale = scale,
-                                    check.attributes = FALSE,
-                                    check.class = FALSE)
-              !is.complex(x <- object@x) ||
-                  !identical(trans, "C") ||
-                  object@diag != "N" ||
-                  isTRUE(ae(x, Conj(x), tolerance = tol, ...))
+              !is.complex(x <- object@x) || # check more only if <complex>
+              !identical(trans, "C") ||
+               object@diag != "N" || {
+                   ae <- function(target, current, tolerance, scale = NULL, ...)
+                       all.equal.numeric(target = target,
+                                         current = current,
+                                         tolerance = tolerance,
+                                         scale = scale,
+                                         check.attributes = FALSE,
+                                         check.class = FALSE)
+                   isTRUE(ae(x, Conj(x), tolerance = tol, ...))
+               }
           })
 
 setMethod("isSymmetric", c(object = "indMatrix"),
@@ -105,5 +107,3 @@ setMethod("isSymmetric", c(object = "indMatrix"),
               perm <- object@perm
               all(perm[perm] == seq_len(n))
           })
-
-rm(.cl)

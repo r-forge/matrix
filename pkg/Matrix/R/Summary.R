@@ -29,7 +29,7 @@ setMethod("Summary", c(x = "denseMatrix"),
               g(y1, y2, ..., na.rm = na.rm)
           })
 
-setMethod("Summary", c(x = "sparseMatrix"),
+setMethod("Summary", c(x = "sparseMatrix"), # (*not* diagonalM*, nor indMatrix (done below))
           function(x, ..., na.rm = FALSE) {
               ## Avoid wrong overflow :
               if (.Generic == "sum")
@@ -47,7 +47,8 @@ setMethod("Summary", c(x = "sparseMatrix"),
               zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
               unit <- switch(kind, "z" = 1+0i, "d" = 1, "i" = 1L,  TRUE)
               n <- (d <- x@Dim)[2L]
-              nnz <- length(if (repr == "C") x@i else x@j)
+              nnz <- length(switch(repr, "C" = x@i, "R"=, "T" = x@j, stop("invalid 'repr': ", repr)))
+              if(shape == "t" && x@diag == "U") nnz <- nnz + n
               nnz.max <- if (shape == "s") 0.5 * (prod(d) + n) else prod(d)
               y1 <- if (kind != "n")
                         x@x
