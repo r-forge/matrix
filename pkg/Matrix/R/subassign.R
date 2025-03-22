@@ -555,7 +555,7 @@ replCmat <- function (x, i, j, ..., value) {
 	       if(iMi || jMi) sprintf("missing (i,j) = (%d,%d)", iMi, jMi),
 	       .M.level = 2)
     if(na == 3L) { ## vector (or 2-col) indexing M[i] <- v : includes M[TRUE] <- v or M[] <- v !
-	x <- .M2T(x)
+	x <- .M2T(x) # ->  use replTmat()  {above}, typically
 	x[i] <- value # may change class, e.g., from dtT* to dgT*
 	cl.C <- sub(".Matrix$", "CMatrix", class(x))
 	if(.hasSlot(x, "x") && any0(x@x))
@@ -774,12 +774,16 @@ setMethod("[<-", c(x = "CsparseMatrix", i = "Matrix", j = "missing",
 setMethod("[<-", c(x = "RsparseMatrix", i = "index", j = "missing",
 				value = "replValue"),
 		 function (x, i, j, ..., value)
-		 replTmat(.M2T(x), i=i, , value=value))
+                     if(nargs() == 3L)
+                          replTmat(.M2T(x), i=i,   value=value) # x[i] <- v
+                     else replTmat(.M2T(x), i=i, , value=value)) # x[i, ] <- v
 
 setMethod("[<-", c(x = "RsparseMatrix", i = "missing", j = "index",
 				value = "replValue"),
 		 function (x, i, j, ..., value)# extra " , ": want nargs() == 4
-		 replTmat(.M2T(x), , j=j, value=value))
+                     if(nargs() == 3L) # can this happen?
+                          replTmat(.M2T(x),   j=j, value=value)  # x[j] <- v
+                     else replTmat(.M2T(x), , j=j, value=value)) # x[, j] <- v
 
 setMethod("[<-", c(x = "RsparseMatrix", i = "index", j = "index",
 				value = "replValue"),
@@ -918,7 +922,7 @@ intI <- function(i, n, dn, give.dn = TRUE) {
 ### -----   M[i,j] <- v  with   i,j = length-1-numeric;  v= length-1 number
 ###                            *and* M[i,j] == 0 previously
 ##
-## FIXME(2): keep in sync with replCmat() in ./Csparse.R
+## FIXME(2): keep in sync with replCmat() below
 ## FIXME(3): It's terribly slow when used e.g. from diag(M[,-1]) <- value
 ## -----     which has "workhorse"   M[,-1] <- <dsparseVector>
 ##
@@ -954,35 +958,45 @@ replTmat <- function (x, i, j, ..., value) {
 	if(is.matrix(i))
 	    stop("internal bug: matrix 'i' in replTmat(): please report")
 	## Now: have  M[i] <- v	 with vector logical or "integer" i :
+        n <- prod(di)
+	i <- ## to become 0-based indices [to match m_encodeInd2()]
+            if(is.logical(i)) { # full-size logical indexing
+                if(n) {
+                    is <- 0:(n - 1L)
+                    if(isTRUE(i)) # shortcut
+                        is
+                    else {
+                        if(length(i) < n) i <- rep_len(i, n)
+                        is[i] # -> 0-based index vector as well {maybe LARGE!}
+                    }
+                } else integer()
+            } else { # also works with *negative* indices etc:
+                int2i(as.integer(i), n) - 1L ##
+            }
 	## Tmatrix maybe non-unique, have an entry split into a sum of several ones:
-
+	nr <- di[1L] # nrow(x)
 	x <- aggregateT(x)
         clx <- class(x)
         shx <- .M.shape(x)
-        if(shx == "t") { # triangular
-            if(x@diag == "U") x <- .diagU2N(x, cl = clx, checkDense = FALSE)
-        } else if(shx != "g") { # not general or triangular
+        if(isTri <- shx == "t") { # triangular
+            ## need to check additionally that no values are going to be assigned to the
+            ## "forbidden" triangle, in the case there are, we *still* must switch to "general"
+            i1 <- i %%  nr
+            i2 <- i %/% nr
+            ## (i1, i2) are the 0-origin indices which are to be changed (independent of uplo, diag, ...)
+            xU <- x@uplo == "U"
+            isTri <- if(xU) all(i1 <= i2) else all(i2 <= i1)
+            if(isTri) { ## result is *still* triangular
+                if(any(i1 == i2)) # diagonal affected
+                    x <- .diagU2N(x, cl = clx, checkDense = FALSE) # keeps class
+            }
+        }
+        if(!isTri && shx != "g") { # not general nor truly triangular
 	    x <- .M2gen(x)
 	    Matrix.message("'sub-optimal sparse 'x[i] <- v' assignment: Coercing class ",
                            clx," to ", (clx <- class(x)))
 	}
-	nr <- di[1]
 	x.i <- .Call(m_encodeInd2, x@i, x@j, di=di, FALSE, FALSE)
-
-        n <- prod(di)
-	i <- if(is.logical(i)) { # full-size logical indexing
-	    if(n) {
-                if(isTRUE(i)) # shortcut
-                    0:(n-1)
-                else {
-                    if(length(i) < n) i <- rep_len(i, n)
-                    (0:(n-1))[i] # -> 0-based index vector as well {maybe LARGE!}
-                }
-	    } else integer(0)
-	} else {
-	    ## also works with *negative* indices etc:
-	    int2i(as.integer(i), n) - 1L ## 0-based indices [to match m_encodeInd2()]
-	}
 
         clDx <- getClassDef(clx) # extends(), is() etc all use the class definition
         has.x <- "x" %in% slotNames(clDx) # === slotNames(x)
@@ -1301,7 +1315,7 @@ replTmat <- function (x, i, j, ..., value) {
 
 ## A[ ij ] <- value,  where ij is a matrix; typically (i,j) 2-column matrix :
 ## ----------------   ./Matrix.R has a general cheap method
-## This one should become as fast as possible -- is also used from Csparse.R --
+## This one should become as fast as possible -- is also used in some Csparse*/Rsparse*
 .TM.repl.i.mat <- function (x, i, j, ..., value) {
     x <- .promote(x)
     nA <- nargs()

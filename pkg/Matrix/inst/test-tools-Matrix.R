@@ -173,7 +173,7 @@ Q.eq <- function(x, y,
                          check.attributes = dimnames.check))
     }
     else stop("'tol' must be NA or non-negative number")
-}
+} # Q.eq()
 
 ## Here, 'kind' (d, l, z, i, n) does not matter
 Q.eq2 <- function(x, y,

@@ -20,7 +20,7 @@ if(interactive()) {
 suppressPackageStartupMessages(library(Matrix))
 
 source(system.file("test-tools.R", package = "Matrix"), keep.source = FALSE)
-##-> identical3() etc
+##-> identical3() , checkMatrix() etc
 cat("doExtras:",doExtras,"\n")
 if(exists("Sys.setLanguage", mode="function"))
     Sys.setLanguage("en")
@@ -158,12 +158,14 @@ sel <- (20 <  m) & (m <  150)
 sel.<- (20 <  m.)& (m.<  150)
 nsel <-(20 >= m) | (m >= 150)
 (ssel <- as(sel, "sparseMatrix"))
-stopifnot(is(sel, "lMatrix"), is(ssel, "lsparseMatrix"),
-	  identical3(as.mat(sel.), as.mat(sel), as.mat(ssel)),
-	  identical3(!sel, !ssel, nsel), # !<sparse> is typically dense
-	  identical3(m[ sel],  m[ ssel], as(m, "matrix")[as( ssel, "matrix")]),
-	  identical3(m[!sel],  m[!ssel], as(m, "matrix")[as(!ssel, "matrix")])
-	  )
+stopifnot(exprs = {
+    is(sel, "ldenseMatrix")
+    is(ssel, "lgCMatrix")
+    identical3(as.mat(sel.), as.mat(sel), as.mat(ssel))
+    identical(!sel, !ssel)
+    identical3(m[ sel],  m[ ssel], as(m, "matrix")[as( ssel, "matrix")])
+    identical3(m[!sel],  m[!ssel], as(m, "matrix")[as(!ssel, "matrix")])
+})
 showProc.time()
 
 ## more sparse Matrices --------------------------------------
@@ -239,7 +241,7 @@ m <- 1:800
 m[sample(800, 600)] <- 0
 m0 <- Matrix(m, nrow = 40)
 m1 <- add.simpleDimnames(m0)
-for(kind in c("n", "l", "d")) {
+for(kind in c("n", "l", "d", "z", "i")) {
  for(m in list(m0,m1)) { ## -- with and without dimnames -------------------------
     kClass <-paste0(kind, "Matrix"  )
     Ckind <- paste0(kind, "gCMatrix")
@@ -381,6 +383,7 @@ if(doExtras) {### {was ./AAA_index.R, MM-only}
         L.P <- with(ecc, crossprod(L,P))  ## == L'P
         ## crossprod(L.P) == (L'P)' L'P == P'LL'P
         stopifnot( all.equal(crossprod(L.P), As) )
+        ## MM: the above produces an Error: ... different Classes ...
     })
     ##---- end{ eigen( As ) -----------
 
@@ -389,7 +392,7 @@ if(doExtras) {### {was ./AAA_index.R, MM-only}
 
 ##---- Symmetric indexing of symmetric Matrix ----------
 m. <- mC
-m.[, c(2, 7:12)] <- 0
+m.[, c(2, 7:12)] <- 0L
 stopifnotValid(S <- crossprod(add.simpleDimnames(m.) %% 100), "dsCMatrix")
 ss <- as(S, "matrix")
 ds <- as(S, "denseMatrix")
@@ -451,7 +454,7 @@ for(n in 1:(if(doExtras) 100 else 6)) {
     i <- sample(1:nrow(A), 3+2*rpois(1, lambda=3), replace=TRUE)
     Aii  <- A[i,i]
     A.ii <- A.[i,i]
-    stopifnot(class(Aii) == class(A),
+    stopifnot(class(Aii ) == class(A),
               class(A.ii) == class(A.))
     assert.EQ.mat(Aii , a [i,i])
     assert.EQ.mat(A.ii, a.[i,i])
@@ -480,11 +483,13 @@ stopifnot(all.equal(mT[2,], mm[2,]),
 	  Q.C.identical(mT[-2,], t(t(mT)[,-2])),
 	  Q.C.identical(mT[c(2,5),], t(t(mT)[,c(2,5)])) )
 assert.EQ.mat(mT[4,, drop = FALSE], mm[4,, drop = FALSE])
+
+im <- as(m, "iMatrix")
 stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 	  identical3(mm[3,], mC[3,], mT[3,]),
-	  identical3(mT[2,3], mC[2,3], 0),
+	  identical3(mT[2,3], mC[2,3], 0L),
 	  identical(mT[], mT),
-          identical4(       mm[c(3,7), 2:4],  as.mat( m[c(3,7), 2:4]),
+          identical4(       mm[c(3,7), 2:4],  as.mat(im[c(3,7), 2:4]),
                      as.mat(mT[c(3,7), 2:4]), as.mat(mC[c(3,7), 2:4]))
           )
 
@@ -826,20 +831,22 @@ assertError(mT[-1:1,])
 showProc.time()
 
 ## Sub *Assignment* ---- now works (partially):
-mt0 <- mt
+mt0 <- mt # now "igTMatrix"
 nt <- as(mt, "nMatrix")
-mt[1, 4] <- -99
-mt[2:3, 1:6] <- 0
+mt[1, 4] <- -99L
+mt[2:3, 1:6] <- 0L
 mt
+stopifnot(validObject(mt, "igTMatrix"))
 m2 <- mt+mt
-m2[1,4] <- -200
+stopifnot(validObject(m2, "isparseMatrix"))
+m2[1,4] <- -200L
 m2[c(1,3), c(5:6,2)] <- 1:6
-stopifnot(m2[1,4] == -200,
+stopifnot(m2[1,4] == -200L,
           as.vector(m2[c(1,3), c(5:6,2)]) == 1:6)
-mt[,3] <- 30
-mt[2:3,] <- 250
-mt[1:5 %% 2 == 1, 3] <- 0
-mt[3:1, 1:7 > 5] <- 0
+mt[,3] <- 30L
+mt[2:3,] <- 250L
+mt[1:5 %% 2 == 1, 3] <- 0L
+mt[3:1, 1:7 > 5] <- 0L
 mt
 
 tt <- as(mt,"matrix")
@@ -853,19 +860,21 @@ mt[1:5, 2:6]
 as((mt0 - mt)[1:5,], "dsparseMatrix")# [1,5] and lines 2:3
 
 mt[c(2,4), ] <- 0; stopifnot(as(mt[c(2,4), ],"matrix") == 0)
-mt[2:3, 4:7] <- 33
+mt[2:3, 4:7] <- 33L
 checkMatrix(mt)
 mt
 
-mc[1,4] <- -99 ; stopifnot(mc[1,4] == -99)
-mc[1,4] <-  00 ; stopifnot(mc[1,4] ==  00)
-mc[1,4] <- -99 ; stopifnot(mc[1,4] == -99)
+stopifnot(validObject(mc, "igCMatrix"))
+mc[1,4] <- -99L ; stopifnot(mc[1,4] == -99L)
+mc[1,4] <-  00L ; stopifnot(mc[1,4] ==  00L)
+mc[1,4] <- -99L ; stopifnot(mc[1,4] == -99L)
 mc[1:2,4:3] <- 4:1; stopifnot(as(mc[1:2,4:3], "matrix") == 4:1)
 
 mc[-1, 3] <- -2:1 # 0 should not be entered; 'value' recycled
 mt[-1, 3] <- -2:1
 stopifnot(mc@x != 0, mt@x != 0,
-	  mc[-1,3] == -2:1, mt[-1,3] == -2:1) ## failed earlier
+	  mc[-1,3] == -2:1,
+          mt[-1,3] == -2:1) ## failed earlier
 
 mc0 <- mc
 mt0 <- as(mc0, "TsparseMatrix")
@@ -890,10 +899,10 @@ options(Matrix.verbose = TRUE)
 
 mc # no longer has non-structural zeros
 mc[ii, jj] <- 1:6
-mc[c(2,5), c(3,5)] <- 3.2
+mc[c(2,5), c(3,5)] <- 32L
 checkMatrix(mc)
 m. <- mc
-mc[4,] <- 0
+mc[4,] <- 0L
 mc
 
 S <- as(Diagonal(5),"TsparseMatrix")
@@ -1092,6 +1101,10 @@ stopifnot(dim(M[2:3, FALSE]) == c(2,0),
           identical(M.[2:3,TRUE], M.[2:3,]),
           identical(R [2:3,TRUE], R [2:3,]),
           dim(R[FALSE, FALSE]) == c(0,0))
+
+(lgR <- new("lgRMatrix", p = 0:2, j = 0:1, Dim = c(2L,2L), x = c(TRUE,TRUE)))
+lgR[3] <- TRUE # had failed
+
 
 n <- 50000L
 Lrg <- new("dgTMatrix", Dim = c(n,n))

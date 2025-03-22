@@ -144,6 +144,43 @@ stopifnot(identical(as(mT,"CsparseMatrix"), mC))
 (mlC <- as(mC. , "lMatrix"))
 as(mlC, "triangularMatrix")
 
+chk0 <- function(M, kind, shape2 = "ge") {
+## try({
+    stopifnot(identical(dim(M), c(0L,0L)))
+    kM <- Matrix:::.M.kind(M)
+    if(!isValid(M, (cl <- paste0(kind, shape2, "Matrix"))))
+        stop(sprintf('*not* "%s", but "%s"', cl, class(M)))
+## })
+}
+
+for(knd in c("d","l","n","i","z")) {
+    show(m0 <- new(paste0(knd, "geMatrix")))
+    dkind <- if(knd == "z") "z" else "d"
+    nlknd <- if(knd == "n") "n" else "l"
+    ## for _all_ `knd` :
+    for(dm in list(m0^2, 0 + m0, m0 / 2, m0 %% 2)) # Arith
+        chk0(dm, dkind)
+    ## Compare 1 :  (FIXME ?)
+    for(dm in list(m0 != m0, m0 == m0, m0 >= m0)) # Compare
+        chk0(dm, nlknd)
+    ## Compare 2 :  (FIXME ?)
+    for(dm in list(m0 <= 0, 1 >= m0)) # Compare
+        chk0(dm, "l", shape2 = "sy")
+    for(dm in list(!!m0, m0 | m0, m0 & m0)) # Logic
+        chk0(dm, nlknd)
+    stopifnot(identical(!!m0, .M2kind(m0, nlknd)))
+    switch(knd,# integer arithmetic __ mostly not yet __
+           "l" = ,
+           "n" = for(dm in list(-m0 #_not yet_, 0L + m0, m0 %/% 2L, m0 %% 2L)
+                                )) chk0(dm, kind = "i"),
+           "i" = for(dm in list(-m0, 0L + m0, m0 %/% 2L, m0 %% 2L)
+                                 ) chk0(dm, kind = "i"),
+           "d" =,
+           "z" = invisible(), # nothing
+           stop("invalid 'knd':", knd))
+}
+
+
 if(!doExtras && !interactive()) q("no") ## (saving testing time)
 
 ### Test all classes:  validObject(new( * )) should be fulfilled -----------

@@ -7,6 +7,7 @@ library(utils)
 library(Matrix)
 source(system.file("test-tools.R", package = "Matrix"))# identical3() etc
 assertErrV <- function(e) tools::assertError(e, verbose=TRUE)
+.M.kind <- Matrix:::.M.kind
 
 cat("doExtras:",doExtras,"\n")
 options(nwarnings = 1e4)
@@ -43,6 +44,11 @@ stopifnot(exprs = {
 M <- Matrix(1:12+0, 4, 3)
 m <- cbind(4:1+0)
 stopifnot(exprs = {
+    identical(c(m)*M, M*c(m)) # M*m failed in Matrix_1.3-3 pre-release:
+
+})
+if(FALSE) ## no longer!   Matrix dimensions must match now as with R's matrix()
+stopifnot(exprs = {
     identical(M*m, M*c(m)) # M*m failed in Matrix_1.3-3 pre-release:
     identical(m*M, c(m)*M)
     ## M*m: Error in eval(....) : object 'x1' not found
@@ -70,6 +76,38 @@ stopifnot(class(sm) == class(mC), class(mC) == class(mC^2),
           identical(mC*2, mC + mC)
           )
 
+## infinite loops [ Error: C stack usage  9522144 is too close to the limit ]
+i02 <- c(0L,2L)
+z02 <- c(0, 2i)
+(zM <- Matrix(cbind(1:0, z02,0, 0, 0 )                 )) # zgC
+(iM <- Matrix(cbind(1:0, i02,0L,0L,0L), int2dbl = FALSE)) # igC
+
+## many of these failed w/ "not yet implemented" :
+mk.g <- function(knd, repr) paste0(knd, "g", repr, "Matrix")
+for(repr in c("C","R","T")) {
+    zgC <- new("zgCMatrix")
+    for(knd in c("d", "l","n","i")) {
+        M  <- new(mk.g(knd, repr))
+        z.M <- new(mk.g("z", switch(repr, C=, T="C", R="R")))
+        stopifnot(identical(z.M, M + 0i),
+                  identical(z.M, (1+0i) * M))
+    }
+}; rm(M, z.M)
+
+## whereas several of these worked already earlier
+stopifnot(exprs = {
+    identical(zM, zM + c(0,0)*1i)
+    identical(iM, iM + c(0L,0L))
+    identical(zM, (zM * 1 ) - 0)
+    identical(iM, (iM * 1L) - 0L)
+    identical(zM, (zM * 2 )  /  2)
+    identical(iM, (iM * 2L) %/% 2L)
+    identical(zM, as((zM + i02) - i02, "sparseMatrix"))
+    identical(zM, as((zM + z02) - z02, "sparseMatrix"))
+    identical(iM, as((iM + z02) - z02, "isparseMatrix"))
+    identical(iM, as((iM + i02) - i02, "sparseMatrix"))
+})
+
 x <- Matrix(rbind(0,cbind(0, 0:3,0,0,-1:2,0),0))
 x # sparse
 (x2 <- x + 10*t(x))
@@ -85,6 +123,7 @@ stopifnot(px@i == c(3,4,1,4),
 ##---> MM:  Make a regression test:
 tst <- function(n, i = 1) {
     stopifnot(i >= 1, n >= i)
+    print(c(n, i))
     D <- .sparseDiagonal(n)
     ee <- numeric(n) ; ee[i] <- 1
     stopifnot(all(D - ee == diag(n) - ee),
@@ -94,7 +133,7 @@ tst <- function(n, i = 1) {
               TRUE)
 }
 nn <- if(doExtras) 27 else 7
-tmp <- sapply(1:nn, tst) # failed in Matrix 1.0-4
+tmp <- sapply(1:nn, tst) # i = 1 ;  failed in Matrix 1.0-4
 i <- sapply(1:nn, function(i) sample(i,1))
 tmp <- mapply(tst, n= 1:nn, i= i)# failed too
 
@@ -107,12 +146,19 @@ stopifnot(all(lsy), # failed in Matrix 1.0-4
 	  all(t1),  #   "
           ## ok previously (all following):
           !all(t2),
-	  all(sqrt(lsy) == 1))
+          all(sqrt(lsy) == 1)
+          , identical(-nsy, -lsy) # "-" failed up to 2025 (<= 1.7.2)
+          , as.logical( -t1 == -1)
+          , isValid(-t2, "triangularMatrix")
+          , all(- as(lsy, "sparseMatrix") == -1)
+          )
 dsy <- lsy+1
 
 D3 <- Diagonal(x=4:2); L7 <- Diagonal(7) > 0
+(Dz <- Diagonal(x=1:3 + 1i))
 validObject(xpp <- pack(round(xpx,2)))
 lsp <- xpp > 0
+ixpx <- as(xpx, "iMatrix")
 (dsyU <- .diag2dense(D3, ".", "s"))
  lsyU <- .diag2dense(Diagonal(5) > 0, ".", "s")
 str(lsyU)
@@ -127,6 +173,8 @@ stopifnot({
     isValid(lspU <- pack(lsyU), "lspMatrix") && lspU@uplo == "U"
     isValid(lspL <- pack(lsyL), "lspMatrix") && lspL@uplo == "L"
     identical(lspL, t(lspU))
+    identical(ixpx, as(trunc(xpx), "iMatrix"))
+    identical(Re(Dz), Diagonal(x=1:3))
     ##
     ## log(x, <base>) -- was mostly *wrong* upto 2019-10 [Matrix <= 1.2-17]
     all.equal(log(abs(dsy), 2), log2(abs(dsy)))
@@ -209,7 +257,7 @@ local({
                                     ignore.case=TRUE, # e.g. ARM : "BogoMIPS"
                                     value=TRUE)[[1]])))
         print(mips)
-        if(is.numeric(mips) && all(mips) > 0 && doExtras)
+        if(is.numeric(mips) && all(mips > 0) && doExtras)
                                         # doExtras: valgrind (2023-07-26) gave large 'st[1]'
         stopifnot(st[1] < 1000/mips)# ensure there was no gross inefficiency
     }
@@ -273,6 +321,12 @@ stopifnot(identical(crossprod(lm1),# "lgC": here works!
           identical(lm2, lm1 & lm2),
 	  identical(lm1, lm1 | lm2))
 
+diF <- Diagonal(2, FALSE) # the "same", in particular sparse class:
+RF <- new("ntRMatrix", p = c(0L, 0L, 0L), Dim = c(2L, 2L))
+stopifnot(all(RF == diF), # failed temporarily (2025-03-21) inside checkMatrix(RF)
+          !any(diF < RF),
+          all(diF <= RF))
+
 ddsc <- kronecker(Diagonal(7), dsc)
 isValid(ddv <- rowSums(ddsc, sparseResult=TRUE), "sparseVector")
 sv <- colSums(kC <- kronecker(mC,kronecker(mC,mC)), sparseResult=TRUE)
@@ -317,6 +371,7 @@ z[sample(77,15)] <- 0
 abs(D) >= 0.5       # logical sparse
 
 ## For the checks below, remove some and add a few more objects:
+Sys.setlocale("LC_COLLATE", "C") # for ls() sorting objects
 rm(list= ls(pattern="^.[mMC]?$"))
 T3 <- Diagonal(3) > 0; stopifnot(T3@diag == "U") # "uni-diagonal"
 validObject(dtp <- pack(as(dt3, "denseMatrix")))
@@ -336,7 +391,7 @@ showProc.time()
 cl <- sapply(ls(), function(.) class(get(.)))
 Mcl <- cl[vapply(cl, extends, "Matrix",       FUN.VALUE=NA) |
           vapply(cl, extends, "sparseVector", FUN.VALUE=NA)]
-table(Mcl)
+table(unlist(Mcl))
 ## choose *one* of each class:
 ## M.objs <- names(Mcl[!duplicated(Mcl)])
 ## choose all
@@ -344,6 +399,7 @@ M.objs <- names(Mcl) # == the ls() from above
 Mat.objs <- M.objs[vapply(M.objs, function(nm) is(get(nm), "Matrix"), NA)]
 MatDims <- t(vapply(Mat.objs, function(nm) dim(get(nm)), 0:1))
 ## Nice summary info :
+Mcl <- sapply(Mcl, as.vector) # dropping "package" attributes
 noquote(cbind(Mcl[Mat.objs], format(MatDims)))
 
 ## dtCMatrix, uplo="L" :
@@ -360,14 +416,27 @@ m2 <- matrix(c(0, NA, NA, 0, 0, NA, 0, 0, 0), 3)
 r <- M & m2 # failed in Matrix <= 1.4-1
 assert.EQ.mat(M        | m2 -> ro,
               as.mat(M)| m2, tol=0)
-D4 <- Diagonal(x=0+ 4:2)
-rd <- D4 | m2 # gave  invalid class "ltTMatrix" object: uplo='U' must not have sparse entries below the diagonal
-M2 <- Matrix(m2); T2 <- Matrix:::.diag2T.smart(D4, M2, kind="l")
+D3d <- Diagonal(x=0+ 4:2)
+rd <- D3d | m2 # gave invalid class "ltTMatrix" object:
+##               uplo='U' must not have sparse entries below the diagonal
+Mm <- Matrix(m2)
+T2 <- Matrix:::.diag2T.smart(D3d, Mm, kind="l")
+(ff <- rd > rd)
+validObject(ff) # gave  invalid “ltCMatrix” ..: uplo="U" but .. entries below the diagonal
+validObject(ef <- rd == rd)
 stopifnot(exprs = {
     all(!r)
     ## fix in .do.Logic.lsparse() {needed uplo="L"}
-    identical(rd,    T2                   |    M2)
-    identical(rd, as(T2, "CsparseMatrix") | as(M2, "lMatrix"))
+    identical(rd,    T2                   |    Mm)
+    identical(rd, as(T2, "CsparseMatrix") | as(Mm, "lMatrix"))
+    ##
+    identical(ff,  rd != rd)
+    identical(ff,  rd <  rd)
+    identical(ef,  rd >= rd)
+    identical(ef,  rd <= rd)
+    ## Possibly use one of the quasi-identical or Q.eq() from ../inst/test-tools-Matrix.R:
+    ## ff and !ef are sparse / dense  (and NA's !)
+    identical(as.matrix(ff), as.matrix(!ef))
 })
 
 options(op)
@@ -377,9 +446,48 @@ if(doExtras || interactive()) { # save testing time
 ### Systematically look at all "Ops" group generics for "all" Matrix classes
 ### -------------- Main issue: Detect infinite recursion problems
 
-mDims <- MatDims %*% (d.sig <- c(1, 1000)) # "dim-signature" to match against
+mDims <- c(MatDims %*% (d.sig <- c(1, 1000))) # "dim-signature" to match against
 m2num <- function(m) { if(is.integer(m)) storage.mode(m) <- "double" ; m }
-M.knd <- Matrix:::.M.kind
+##
+chk2 <- function(M, oM, nm, f) {
+    M. <- get(oM, envir=sys.parent())
+    isCpl. <- is.complex(M.) || inherits(M., "zMatrix")
+    if(isCpl. && f %in% c("%%", "%/%")) { ## Ops do *not* work for complex
+        cat(sQuote(f), "not implemented in R for complex operands\n")
+        return(invisible())
+    }
+    if(f %in% c("<", "<=", ">", ">=") &&
+       (isCpl. || is.complex(M) || inherits(M, "zMatrix"))) {
+        cat(sQuote(f), "makes no sense for complex operands\n")
+        return(invisible())
+    }
+    ##   R4 :=  M  f  M.
+    validObject(R4 <- do.call(f, list(M, M.)))
+    cat(".")
+    for(M_ in list(as.mat(M), M)) { ## two cases ..
+        r4 <- m2num(as.mat(do.call(f, list(M_, as.mat(M.)))))
+        cat(",")
+        if(!identical(r4, as.mat(R4))) {
+            cat(sprintf("\n %s %s %s gave not identical r4 & R4:\n",
+                        nm, f, oM));     print(r4); print(R4)
+            C1 <- (eq <- R4 == r4 | (is.na(R4) & is.na(r4))) |
+                (N4 <- as.matrix((nr4 <- is.na(eq)) & !is.finite(R4)))
+            if(isTRUE(all(C1)) || isTRUE(all.equal(as.mat(R4), r4,
+                                                   tolerance = 1e-14)))
+                cat(sprintf(
+                    " --> %s %s %s (ok): only difference is %s (matrix) and %s (Matrix)\n",
+                    .M.kind(M), f, .M.kind(M.)
+                  , paste(vapply(unique(r4[N4]), format, ""), collapse="/")
+                  , paste(vapply(unique(R4[N4]), format, ""), collapse="/")
+                ))
+            else if(isTRUE(all(eq | (nr4 & Matrix:::is0(R4)))))
+                cat(" --> 'ok': only difference is 'NA' (matrix) and 0 (Matrix)\n")
+            else stop("R4 & r4 differ \"too much\"")
+        }
+    } # for(M_ in ...)
+    cat("i")
+}
+
 cat("Checking all Ops group generics for a set of arguments:\n",
     "-------------------------------------------------------\n", sep='')
 op <- options(warn = 2)#, error=recover)
@@ -390,9 +498,14 @@ for(gr in getGroupMembers("Ops")) {
     line <- strrep("-", nchar(f) + 2)
     cat(sprintf("%s\n%s :\n%s\n", line, dQuote(f), line))
     for(nm in M.objs) {
-      if(doExtras) cat("  '",nm,"' ", sep="")
       M <- get(nm, inherits=FALSE)
+      isCplx <- inherits(M, "zMatrix")
+      if(isCplx && f %in% c("%%", "%/%",
+                            "<", "<=", ">", ">=")) # these Ops do *not* work for complex
+          next
+      if(doExtras) cat("  '",nm,"' ", sep="")
       n.m <- NROW(M)
+      isM <- inherits(M, "Matrix") # have also <atomic> (incl <matrix>) and <sparseVector>
       cat("o")
       for(x in list(TRUE, -3.2, 0L, seq_len(n.m))) {
         cat(".")
@@ -401,16 +514,19 @@ for(gr in getGroupMembers("Ops")) {
         stopifnot(dim(r1) == dim(M), dim(r2) == dim(M),
                   allow.logical0 = TRUE)
       }
-      ## M  o  0-length  === M :
-      validObject(M0. <- do.call(f, list(M, numeric())))
-      validObject(.M0 <- do.call(f, list(numeric(), M)))
-      if(length(M)) # <non-0-extent M>  o  <0-length v> == 0-length v
-	  stopifnot(identical(M0., v0), identical(.M0, v0))
-      else if(is(M, "Matrix"))
-	  stopifnot(identical(M0., as(M, if(gr == "Arith") "dMatrix" else "lMatrix")),
-		    identical(M0., .M0))
-      else # if(is(M, "sparseVector")) of length 0
-	  stopifnot(identical(M0., v0), identical(.M0, v0))
+      v. <- if(isCplx && gr == "Arith") complex() else v0
+      ## M  o  <0-length vector>  ===> <0-length vec>  (and *not*  M ):
+      validObject(M0. <- do.call(f, list(M, v.)))
+      validObject(.M0 <- do.call(f, list(v., M)))
+      if(length(M)) { # <non-0-extent M>  o  <0-length v> == 0-length v
+	  stopifnot(identical(M0., v.), identical(.M0, v.)) # <==>   M0. === .M0 === v.
+      } else if(isM) {
+          stopifnot(
+              identical(M0., as(M, paste0(if(gr == "Arith") { if(isCplx) "z" else "d" } else "l",
+                                          "Matrix"))),
+              identical(M0., .M0))
+      } else # if(is(M, "sparseVector")) of length 0
+          stopifnot(identical(M0., v.), identical(.M0, v.))
       ## M  o  <sparseVector>
       x <- numeric(n.m)
       if(length(x)) x[c(1,length(x))] <- 1:2
@@ -418,42 +534,19 @@ for(gr in getGroupMembers("Ops")) {
       cat("s.")
       validObject(r3 <- do.call(f, list(M, sv)))
       stopifnot(identical(dim(r3), dim(M)))
-      if(doExtras && is(M, "Matrix")) { ## M o <Matrix>
+      if(doExtras && isM) { ## M o <Matrix>
         d <- dim(M)
         ds <- sum(d * d.sig)         # signature .. match with all other sigs
         match. <- ds == mDims        # (matches at least itself)
         cat("\nM o M:")
         for(oM in Mat.objs[match.]) {
-          M2 <- get(oM)
-          ##   R4 :=  M  f  M2
-          validObject(R4 <- do.call(f, list(M, M2)))
-          cat(".")
-          for(M. in list(as.mat(M), M)) { ## two cases ..
-            r4 <- m2num(as.mat(do.call(f, list(M., as.mat(M2)))))
-            cat(",")
-            if(!identical(r4, as.mat(R4))) {
-              cat(sprintf("\n %s %s %s gave not identical r4 & R4:\n",
-                          nm, f, oM));     print(r4); print(R4)
-              C1 <- (eq <- R4 == r4) | (N4 <- as.logical((nr4 <- is.na(eq)) & !is.finite(R4)))
-              if(isTRUE(all(C1)) || isTRUE(all.equal(as.mat(R4), r4,
-                                                     tolerance = 1e-14)))
-                  cat(sprintf(
-                      " --> %s %s %s (ok): only difference is %s (matrix) and %s (Matrix)\n",
-                      M.knd(M), f, M.knd(M2)
-                    , paste(vapply(unique(r4[N4]), format, ""), collapse="/")
-                    , paste(vapply(unique(R4[N4]), format, ""), collapse="/")
-                      ))
-              else if(isTRUE(all(eq | (nr4 & Matrix:::is0(R4)))))
-                cat(" --> 'ok': only difference is 'NA' (matrix) and 0 (Matrix)\n")
-              else stop("R4 & r4 differ \"too much\"")
-            }
-          }
-          cat("i")
+            chk2(M, oM, nm=nm, f=f)
+            ##==
         }
-      }
-    }
+      } # if(doExtras && isM)
+    } # for(nm in M.objs)
     cat("\n")
-  }
+  } # for(f in getGroupMembers(..))
 }
 if(length(warnings())) print(summary(warnings()))
 showProc.time()
@@ -463,29 +556,49 @@ options(op) # reset 'warn'
 ###---- Now checking 0-length / 0-dim cases  <==> to R >= 3.4.0 !
 
 ## arithmetic, logic, and comparison (relop) for 0-extent arrays
-(m <- Matrix(cbind(a=1[0], b=2[0])))
-Lm <- as(m, "lMatrix")
-## Im <- as(m, "iMatrix")
-stopifnot(
-    identical(m, m + 1), identical(m, m + 1[0]),
-    identical(m, m + NULL),## now (2016-09-27) ok
-    identical(m, Lm+ 1L) ,
-    identical(m, m+2:3), ## gave error "length does not match dimension"
-    identical(Lm, m & 1),
-    identical(Lm, m | 2:3),## had Warning "In .... : data length exceeds size of matrix"
-    identical(Lm, m & TRUE[0]),
-    identical(Lm, m | FALSE[0]),
-    identical(Lm, m > NULL),
-    identical(Lm, m > 1),
-    identical(Lm, m > .1[0]),## was losing dimnames
-    identical(Lm, m > NULL), ## was not-yet-implemented
-    identical(Lm, m <= 2:3)  ## had "wrong" warning
-)
-mm <- m[,c(1:2,2:1,2)]
-assertErrV(m + mm) # ... non-conformable arrays
-assertErrV(m | mm) # ... non-conformable arrays
-## Matrix: ok ;  R : ok, in R >= 3.4.0
-assertErrV(m == mm)
+for(m in list(Matrix(cbind(a=1[0], b=2[0])) # dge
+            , Matrix(matrix(.5, 0, 1))
+            , Matrix(cbind(a=1,    b=2))
+            , Matrix(cbind(a=1:2,  b=2, c=3))
+              )
+    ) {
+    lM <- as(m, "lMatrix")
+    nM <- as(m, "nMatrix")
+    iM <- as(m, "iMatrix")
+    -lM
+    stopifnot( exprs = { ## in all cases (0-extent or not)
+        identical(nM+ 1L, lM+ 1L)
+        identical(lM, m & 1)
+    })
+    if(length(m) == 0) {
+        stopifnot(exprs = {
+            identical(m, m + 1)
+            identical(m, m + 1[0])
+            identical(m, m + NULL)## now (2016-09-27) ok
+            identical(iM, lM+ 1L)
+            identical(m, m+2:3) ## gave error "length does not match dimension"
+            identical( -m, m)
+            identical(-lM, iM)
+            identical(-nM, iM)
+            identical(-iM, iM)
+            identical(lM, m | 2:3) ## had Warning "In .... : data length exceeds size of matrix"
+            identical(lM, m & TRUE [0])
+            identical(lM, m | FALSE[0])
+            identical(lM, m > NULL)
+            identical(lM, m > 1)
+            identical(lM, m > .1[0]) ## was losing dimnames
+            identical(lM, m > NULL) ## was not-yet-implemented
+            identical(lM, m <= 2:3)  ## had "wrong" warning
+        })
+    }
+    it <- ncol(m)
+    mm <- m[,c(1:it,it:1,it)]
+    assertErrV(m + mm) # ... non-conformable arrays
+    assertErrV(m | mm) # ... non-conformable arrays
+    ## Matrix: ok ;  R : ok, in R >= 3.4.0
+    assertErrV(m == mm)
+}
+
 ## in R <= 3.3.x, relop returned logical(0) and  m + 2:3  returned numeric(0)
 ##
 ## arithmetic, logic, and comparison (relop) -- inconsistency for 1x1 array o <vector >= 2>:
@@ -514,6 +627,9 @@ cat("Checking the Math (+ Math2) group generics for a set of arguments:\n",
 doStop <- function() mStop("**Math: ", f,"(<",class(M),">) of 'wrong' class ", dQuote(class(R)))
 mM  <- getGroupMembers("Math")
 mM2 <- getGroupMembers("Math2")
+(cplM  <- lapply(setNames(,mM), \(nm) tryCatch(get(nm)(1i), error=function(e)NULL)))
+(cplM2 <- lapply(setNames(,mM2),\(nm) tryCatch(get(nm)(1i), error=function(e)NULL)))
+(not4cplx <- mM[sapply(cplM, is.null)]) # mM2 are fine
 (mVec <- grep("^cum", mM, value=TRUE)) ## <<- are special: return *vector* for matrix input
 for(f in c(mM, mM2)) {
   cat(sprintf("%-9s :\n %-7s\n", paste0('"',f,'"'), paste(rep("-", nchar(f)), collapse="")))
@@ -524,12 +640,18 @@ for(f in c(mM, mM2)) {
     M <- get(nm, inherits=FALSE)
     is.m <- length(dim(M)) == 2
     cat("  '",nm,"':", if(is.m) "m" else "v", sep="")
+    isCmplx <- is.complex(M[0])
+    if(isCmplx && (f %in% not4cplx)) { cat(" - not for complex\n"); next }
     R <- fn(M)
     r <- fn(m <- if(is.m) as.mat(M) else as.vector(M))
-    stopifnot(identical(dim(R), dim(r)))
+    ok.f <- !(isCmplx && f %in% c("log2", "log10", "round", "signif"))
+                                        # bug in R: log2(matrix(complex(), 0,2))  *not* matrix
+    if(ok.f)
+        stopifnot(identical(dim(R), dim(r)))
     if(givesVec || !is.m) {
         assert.EQ(R, r, check.class = FALSE)
     } else { ## (almost always:) matrix result
+        if(ok.f)
         assert.EQ.mat(R, r, check.class = FALSE)
 	## check preservation of properties, notably super class
 	if(prod(dim(M)) > 1 && is(M, "diagonalMatrix"  ) && isDiagonal(R) && !is(R, "diagonalMatrix"  )) doStop()
@@ -544,6 +666,7 @@ showProc.time()
 ##
 cat("Checking the Summary group generics for a set of arguments:\n",
     "------------ ======= ------------------------------------------------\n", sep='')
+Summ.notCplx <- c("min", "max", "range")
 for(f in getGroupMembers("Summary")) {
   cat(sprintf("%-9s :\n %-7s\n", paste0('"',f,'"'), paste(rep("-", nchar(f)), collapse="")))
   givesVec <- f %in% mVec
@@ -553,6 +676,8 @@ for(f in getGroupMembers("Summary")) {
     M <- get(nm, inherits=FALSE)
     is.m <- length(dim(M)) == 2
     cat("  '",nm,"':", if(is.m) "m" else "v", sep="")
+    isCmplx <- is.complex(M[0])
+    if(isCmplx && (f %in% Summ.notCplx)) { cat(" - not for complex\n"); next }
     R <- fn(M)
     r <- fn(m <- if(is.m) as.mat(M) else as.vector(M))
     stopifnot(identical(dim(R), dim(r)))
@@ -607,5 +732,17 @@ stopifnot(all.equal(p4,  p4. , tolerance = 1e-15),
 all.equal(p4,  p4. , tolerance = 0)
 all.equal(p4., p4.., tolerance = 0)
 .Machine[["sizeof.longdouble"]]
+
+## <Ops>  <matrix> o <sparseVector>  stopped working
+(M73p <- L7[1:3,] + na.ddv) # 3 x 7 sparse Matrix of class "dgCMatrix"
+m73 <- as.matrix(L7[1:3,])
+(m73p <- m73 + na.ddv)
+stopifnot(is(m73p, "sparseMatrix"),
+          identical(m73p, na.ddv + m73),
+          identical(m73p, M73p))
+## badly failed, returning sparseVector  in Matrix 1.7.{0,1,2}
+
+
+
 
 cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

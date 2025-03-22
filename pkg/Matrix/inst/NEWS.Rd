@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-03-22, svn r5148)}{
+\section{Changes in version 1.8-0 (2025-03-23, svn r5149)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -32,6 +32,16 @@
       error is signaled where the (symmetrized) argument is not positive
       definite.  Use \code{dimScale} (introduced in \pkg{Matrix} 1.5-2)
       for more general scaling.
+
+      \item \code{<Matrix> + <0-length-vector>} and other such zero-extent
+      arithmetic (\code{Arith}) or more general binary operations
+      (\code{Ops}) now behave \pkg{base} \R compatibly in returning a
+      zero-length vector or matrix, respectively.
+
+      \item Similarly, \code{<Matrix> o <Matrix>} operations now also error
+      when the matrix dimensions do not match exactly, as it has been in \R
+      for several years.  Previously, only \code{nrow(.)} needed to match
+      for the two matrices.
     }
   }
   \subsection{Classes}{
@@ -140,6 +150,10 @@
       formally positive definite.
 
       \item \code{isDiagonal()} now also works for \code{table(X, Y)} tables.
+
+      \item \code{diagN2U(<diagonalMatrix>)} now works, too.
+
+      \item Internal \code{replTmat()} keeps triangulartiy now.
     }
   }
   \subsection{Bug Fixes}{

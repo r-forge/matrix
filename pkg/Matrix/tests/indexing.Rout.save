@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2024-12-02 r87417) -- "Unsuffered Consequences"
-Copyright (C) 2024 The R Foundation for Statistical Computing
-Platform: aarch64-apple-darwin23.6.0
+R Under development (unstable) (2025-03-07 r87898) -- "Unsuffered Consequences"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -240,12 +240,14 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 [5,] . . . |
 [6,] . . . |
 [7,] . . | |
-> stopifnot(is(sel, "lMatrix"), is(ssel, "lsparseMatrix"),
-+ 	  identical3(as.mat(sel.), as.mat(sel), as.mat(ssel)),
-+ 	  identical3(!sel, !ssel, nsel), # !<sparse> is typically dense
-+ 	  identical3(m[ sel],  m[ ssel], as(m, "matrix")[as( ssel, "matrix")]),
-+ 	  identical3(m[!sel],  m[!ssel], as(m, "matrix")[as(!ssel, "matrix")])
-+ 	  )
+> stopifnot(exprs = {
++     is(sel, "ldenseMatrix")
++     is(ssel, "lgCMatrix")
++     identical3(as.mat(sel.), as.mat(sel), as.mat(ssel))
++     identical(!sel, !ssel)
++     identical3(m[ sel],  m[ ssel], as(m, "matrix")[as( ssel, "matrix")])
++     identical3(m[!sel],  m[!ssel], as(m, "matrix")[as(!ssel, "matrix")])
++ })
 > showProc.time()
 Time (user system elapsed): 0.057 0.002 0.058 
 > 
@@ -322,7 +324,7 @@ Time (user system elapsed): 0.057 0.002 0.058
 > m[sample(800, 600)] <- 0
 > m0 <- Matrix(m, nrow = 40)
 > m1 <- add.simpleDimnames(m0)
-> for(kind in c("n", "l", "d")) {
+> for(kind in c("n", "l", "d", "z", "i")) {
 +  for(m in list(m0,m1)) { ## -- with and without dimnames -------------------------
 +     kClass <-paste0(kind, "Matrix"  )
 +     Ckind <- paste0(kind, "gCMatrix")
@@ -593,8 +595,158 @@ r2 . 42 .   . . 202   . . . . .   . 482 522   . .   . . 722 .
 ok( d )
 == ###======================================================================
 
+Formal class 'zgCMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ p       : int [1:21] 0 8 22 28 37 41 50 63 71 81 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : NULL
+  .. ..$ : NULL
+  ..@ x       : cplx [1:200] 3+0i 7+0i 12+0i ...
+  ..@ factors : list()
+Formal class 'zgTMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ j       : int [1:200] 0 0 0 0 0 0 0 0 1 1 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : NULL
+  .. ..$ : NULL
+  ..@ x       : cplx [1:200] 3+0i 7+0i 12+0i ...
+  ..@ factors : list()
+IDENT():
+sapply(..):
+ok
+ [1]  0+0i  0+0i  3+0i  0+0i  0+0i  0+0i  7+0i  0+0i  0+0i  0+0i  0+0i 12+0i
+[13]  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i 22+0i  0+0i  0+0i
+[25] 25+0i  0+0i  0+0i  0+0i  0+0i 30+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i
+[37]  0+0i 38+0i 39+0i  0+0i
+2 x 20 sparse Matrix of class "zgCMatrix"
+                                                                           
+[1,] .     . . 121+0i .      . 241+0i . . . . 441+0i      .      . 561+0i .
+[2,] . 42+0i .      . . 202+0i      . . . . .      . 482+0i 522+0i      . .
+                      
+[1,] 641+0i .      . .
+[2,]      . . 722+0i .
+[1] 7+0i
+ for(): ....[-].
+[Ok]----------------------------------------------------------------
+
+Formal class 'zgCMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ p       : int [1:21] 0 8 22 28 37 41 50 63 71 81 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : chr [1:40] "r1" "r2" "r3" "r4" ...
+  .. ..$ : chr [1:20] "c1" "c2" "c3" "c4" ...
+  ..@ x       : cplx [1:200] 3+0i 7+0i 12+0i ...
+  ..@ factors : list()
+Formal class 'zgTMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ j       : int [1:200] 0 0 0 0 0 0 0 0 1 1 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : chr [1:40] "r1" "r2" "r3" "r4" ...
+  .. ..$ : chr [1:20] "c1" "c2" "c3" "c4" ...
+  ..@ x       : cplx [1:200] 3+0i 7+0i 12+0i ...
+  ..@ factors : list()
+IDENT():
+sapply(..):
+ok
+   r1    r2    r3    r4    r5    r6    r7    r8    r9   r10   r11   r12   r13 
+ 0+0i  0+0i  3+0i  0+0i  0+0i  0+0i  7+0i  0+0i  0+0i  0+0i  0+0i 12+0i  0+0i
+  r14   r15   r16   r17   r18   r19   r20   r21   r22   r23   r24   r25   r26 
+ 0+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i 22+0i  0+0i  0+0i 25+0i  0+0i
+  r27   r28   r29   r30   r31   r32   r33   r34   r35   r36   r37   r38   r39 
+ 0+0i  0+0i  0+0i 30+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i  0+0i 38+0i 39+0i
+  r40 
+ 0+0i
+2 x 20 sparse Matrix of class "zgCMatrix"
+  [[ suppressing 20 column names 'c1', 'c2', 'c3' ... ]]
+                                                                         
+r1 .     . . 121+0i .      . 241+0i . . . . 441+0i      .      . 561+0i .
+r2 . 42+0i .      . . 202+0i      . . . . .      . 482+0i 522+0i      . .
+                    
+r1 641+0i .      . .
+r2      . . 722+0i .
+[1] 7+0i
+ for(): .....
+[Ok]----------------------------------------------------------------
+
+
+ok( z )
+== ###======================================================================
+
+Formal class 'igCMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ p       : int [1:21] 0 8 22 28 37 41 50 63 71 81 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : NULL
+  .. ..$ : NULL
+  ..@ x       : int [1:200] 3 7 12 22 25 30 38 39 42 45 ...
+  ..@ factors : list()
+Formal class 'igTMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ j       : int [1:200] 0 0 0 0 0 0 0 0 1 1 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : NULL
+  .. ..$ : NULL
+  ..@ x       : int [1:200] 3 7 12 22 25 30 38 39 42 45 ...
+  ..@ factors : list()
+IDENT():
+sapply(..):
+ok
+ [1]  0  0  3  0  0  0  7  0  0  0  0 12  0  0  0  0  0  0  0  0  0 22  0  0 25
+[26]  0  0  0  0 30  0  0  0  0  0  0  0 38 39  0
+2 x 20 sparse Matrix of class "igCMatrix"
+                                                               
+[1,] .  . . 121 .   . 241 . . . . 441   .   . 561 . 641 .   . .
+[2,] . 42 .   . . 202   . . . . .   . 482 522   . .   . . 722 .
+[1] 7
+ for(): .....
+[Ok]----------------------------------------------------------------
+
+Formal class 'igCMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ p       : int [1:21] 0 8 22 28 37 41 50 63 71 81 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : chr [1:40] "r1" "r2" "r3" "r4" ...
+  .. ..$ : chr [1:20] "c1" "c2" "c3" "c4" ...
+  ..@ x       : int [1:200] 3 7 12 22 25 30 38 39 42 45 ...
+  ..@ factors : list()
+Formal class 'igTMatrix' [package "Matrix"] with 6 slots
+  ..@ i       : int [1:200] 2 6 11 21 24 29 37 38 1 4 ...
+  ..@ j       : int [1:200] 0 0 0 0 0 0 0 0 1 1 ...
+  ..@ Dim     : int [1:2] 40 20
+  ..@ Dimnames:List of 2
+  .. ..$ : chr [1:40] "r1" "r2" "r3" "r4" ...
+  .. ..$ : chr [1:20] "c1" "c2" "c3" "c4" ...
+  ..@ x       : int [1:200] 3 7 12 22 25 30 38 39 42 45 ...
+  ..@ factors : list()
+IDENT():
+sapply(..):
+ok
+ r1  r2  r3  r4  r5  r6  r7  r8  r9 r10 r11 r12 r13 r14 r15 r16 r17 r18 r19 r20 
+  0   0   3   0   0   0   7   0   0   0   0  12   0   0   0   0   0   0   0   0 
+r21 r22 r23 r24 r25 r26 r27 r28 r29 r30 r31 r32 r33 r34 r35 r36 r37 r38 r39 r40 
+  0  22   0   0  25   0   0   0   0  30   0   0   0   0   0   0   0  38  39   0 
+2 x 20 sparse Matrix of class "igCMatrix"
+  [[ suppressing 20 column names 'c1', 'c2', 'c3' ... ]]
+                                                             
+r1 .  . . 121 .   . 241 . . . . 441   .   . 561 . 641 .   . .
+r2 . 42 .   . . 202   . . . . .   . 482 522   . .   . . 722 .
+[1] 7
+ for(): ..[-]...
+[Ok]----------------------------------------------------------------
+
+
+ok( i )
+== ###======================================================================
+
 > showProc.time()
-Time (user system elapsed): 0.284 0.007 0.291 
+Time (user system elapsed): 0.936 0.012 0.953 
 > 
 > if(doExtras) {### {was ./AAA_index.R, MM-only}
 +     ## an nsparse-example
@@ -680,6 +832,7 @@ Time (user system elapsed): 0.284 0.007 0.291
 +         L.P <- with(ecc, crossprod(L,P))  ## == L'P
 +         ## crossprod(L.P) == (L'P)' L'P == P'LL'P
 +         stopifnot( all.equal(crossprod(L.P), As) )
++         ## MM: the above produces an Error: ... different Classes ...
 +     })
 +     ##---- end{ eigen( As ) -----------
 + 
@@ -688,7 +841,7 @@ Time (user system elapsed): 0.284 0.007 0.291
 > 
 > ##---- Symmetric indexing of symmetric Matrix ----------
 > m. <- mC
-> m.[, c(2, 7:12)] <- 0
+> m.[, c(2, 7:12)] <- 0L
 replCmat[x,i,j,..,val] : nargs()=4; missing (i,j) = (1,0)
 > stopifnotValid(S <- crossprod(add.simpleDimnames(m.) %% 100), "dsCMatrix")
 > ss <- as(S, "matrix")
@@ -753,14 +906,14 @@ replCmat[x,i,j,..,val] : nargs()=4;
 +     i <- sample(1:nrow(A), 3+2*rpois(1, lambda=3), replace=TRUE)
 +     Aii  <- A[i,i]
 +     A.ii <- A.[i,i]
-+     stopifnot(class(Aii) == class(A),
++     stopifnot(class(Aii ) == class(A),
 +               class(A.ii) == class(A.))
 +     assert.EQ.mat(Aii , a [i,i])
 +     assert.EQ.mat(A.ii, a.[i,i])
 +     assert.EQ.mat(T[i,i], ss[i,i])
 + }
 > showProc.time()
-Time (user system elapsed): 0.082 0.002 0.085 
+Time (user system elapsed): 0.147 0.001 0.15 
 > 
 > stopifnot(all.equal(mC[,3], mm[,3]),
 + 	  identical(mC[ij], mC[ij + 0.4]),
@@ -778,7 +931,7 @@ Time (user system elapsed): 0.082 0.002 0.085
 +           dim(mC[, integer(0)]) == c(40,0),
 +           identical(mC[, integer(0)], mC[, FALSE]))
 > validObject(print(mT[,c(2,4)]))
-40 x 2 sparse Matrix of class "dgTMatrix"
+40 x 2 sparse Matrix of class "igTMatrix"
     c2  c4
 r1   . 121
 r2  42   .
@@ -827,11 +980,13 @@ r40 80   .
 + 	  Q.C.identical(mT[-2,], t(t(mT)[,-2])),
 + 	  Q.C.identical(mT[c(2,5),], t(t(mT)[,c(2,5)])) )
 > assert.EQ.mat(mT[4,, drop = FALSE], mm[4,, drop = FALSE])
+> 
+> im <- as(m, "iMatrix")
 > stopifnot(identical3(mm[,1], mC[,1], mT[,1]),
 + 	  identical3(mm[3,], mC[3,], mT[3,]),
-+ 	  identical3(mT[2,3], mC[2,3], 0),
++ 	  identical3(mT[2,3], mC[2,3], 0L),
 + 	  identical(mT[], mT),
-+           identical4(       mm[c(3,7), 2:4],  as.mat( m[c(3,7), 2:4]),
++           identical4(       mm[c(3,7), 2:4],  as.mat(im[c(3,7), 2:4]),
 +                      as.mat(mT[c(3,7), 2:4]), as.mat(mC[c(3,7), 2:4]))
 +           )
 > 
@@ -1131,7 +1286,7 @@ kreplCmat[x,i,j,..,val] : nargs()=4; missing (i,j) = (0,1)
 replCmat[x,i,j,..,val] : nargs()=4; missing (i,j) = (1,0)
 replCmat[x,i,j,..,val] : nargs()=4; 
 .> showProc.time()
-Time (user system elapsed): 0.083 0.002 0.085 
+Time (user system elapsed): 0.174 0 0.175 
 > Nn <- Nn0
 > ## Check that  NA is interpreted as TRUE (with a warning), for "nsparseMatrix":
 > assertWarning(Nn[ii <-     3  ] <- NA); stopifnot(isValid(Nn,"nsparseMatrix"), Nn[ii])
@@ -1616,37 +1771,39 @@ Asserted warning: x[.] <- val: x is "ngTMatrix", val not in {TRUE, FALSE} is coe
 Time (user system elapsed): 0.055 0.002 0.056 
 > 
 > ## Sub *Assignment* ---- now works (partially):
-> mt0 <- mt
+> mt0 <- mt # now "igTMatrix"
 > nt <- as(mt, "nMatrix")
-> mt[1, 4] <- -99
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; 
-> mt[2:3, 1:6] <- 0
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; 
+> mt[1, 4] <- -99L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; 
+> mt[2:3, 1:6] <- 0L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; 
 > mt
-5 x 7 sparse Matrix of class "dgTMatrix"
+5 x 7 sparse Matrix of class "igTMatrix"
    c1 c2 c3  c4 c5 c6  c7
 r1  .  .  . -99  .  . 241
 r2  .  .  .   .  .  .   .
 r3  .  .  .   .  .  . 243
 r4  .  .  .   .  .  .   .
 r5  . 45  .   .  .  .   .
+> stopifnot(validObject(mt, "igTMatrix"))
 > m2 <- mt+mt
-> m2[1,4] <- -200
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; 
+> stopifnot(validObject(m2, "isparseMatrix"))
+> m2[1,4] <- -200L
+replCmat[x,i,j,..,val] : nargs()=4; 
 > m2[c(1,3), c(5:6,2)] <- 1:6
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=6; 
-> stopifnot(m2[1,4] == -200,
+replCmat[x,i,j,..,val] : nargs()=4; 
+> stopifnot(m2[1,4] == -200L,
 +           as.vector(m2[c(1,3), c(5:6,2)]) == 1:6)
-> mt[,3] <- 30
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; missing (i,j) = (1,0)
-> mt[2:3,] <- 250
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; missing (i,j) = (0,1)
-> mt[1:5 %% 2 == 1, 3] <- 0
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; 
-> mt[3:1, 1:7 > 5] <- 0
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; 
+> mt[,3] <- 30L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; missing (i,j) = (1,0)
+> mt[2:3,] <- 250L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; missing (i,j) = (0,1)
+> mt[1:5 %% 2 == 1, 3] <- 0L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; 
+> mt[3:1, 1:7 > 5] <- 0L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; 
 > mt
-5 x 7 sparse Matrix of class "dgTMatrix"
+5 x 7 sparse Matrix of class "igTMatrix"
     c1  c2  c3  c4  c5 c6 c7
 r1   .   .   . -99   .  .  .
 r2 250 250 250 250 250  .  .
@@ -1659,11 +1816,11 @@ r5   .  45   .   .   .  .  .
 > jj <- c(2:3,5)
 > tt[ii, jj] <- 1:6 # 0 is just "dropped"
 > mt[ii, jj] <- 1:6
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=6; 
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=6; 
 > assert.EQ.mat(mt, tt)
 > 
 > mt[1:5, 2:6]
-5 x 5 sparse Matrix of class "dgTMatrix"
+5 x 5 sparse Matrix of class "igTMatrix"
     c2 c3  c4  c5 c6
 r1   .  . -99   .  .
 r2   1  3 250   5  .
@@ -1680,22 +1837,22 @@ r4    .    . -30    .    .   .   .
 r5    .   43  -4    .   -6   .   .
 > 
 > mt[c(2,4), ] <- 0; stopifnot(as(mt[c(2,4), ],"matrix") == 0)
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; missing (i,j) = (0,1)
-> mt[2:3, 4:7] <- 33
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=1; 
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; missing (i,j) = (0,1)
+> mt[2:3, 4:7] <- 33L
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=1; 
 > checkMatrix(mt)
-Compare <Csparse> -- "dgCMatrix" != "dgCMatrix" :
+Compare <Csparse> -- "igCMatrix" != "igCMatrix" :
 
  norm(m [5 x 7]) : 1  I  F  M  ok
  Summary:  ok
 as(., "nMatrix") giving full nonzero-pattern: ok
-2*m =?= m+m: ok
+2*m =?= m+m: identical
 m >= m for all: ok
-m < m for none: Compare <Csparse> -- "dgCMatrix" < "dgCMatrix" :
+m < m for none: Compare <Csparse> -- "igCMatrix" < "igCMatrix" :
 
 ok
 > mt
-5 x 7 sparse Matrix of class "dgTMatrix"
+5 x 7 sparse Matrix of class "igTMatrix"
     c1  c2 c3  c4 c5 c6 c7
 r1   .   .  . -99  .  .  .
 r2   .   .  .  33 33 33 33
@@ -1703,11 +1860,12 @@ r3 250 250  .  33 33 33 33
 r4   .   .  .   .  .  .  .
 r5   .   2  4   .  6  .  .
 > 
-> mc[1,4] <- -99 ; stopifnot(mc[1,4] == -99)
+> stopifnot(validObject(mc, "igCMatrix"))
+> mc[1,4] <- -99L ; stopifnot(mc[1,4] == -99L)
 replCmat[x,i,j,..,val] : nargs()=4; 
-> mc[1,4] <-  00 ; stopifnot(mc[1,4] ==  00)
+> mc[1,4] <-  00L ; stopifnot(mc[1,4] ==  00L)
 replCmat[x,i,j,..,val] : nargs()=4; 
-> mc[1,4] <- -99 ; stopifnot(mc[1,4] == -99)
+> mc[1,4] <- -99L ; stopifnot(mc[1,4] == -99L)
 replCmat[x,i,j,..,val] : nargs()=4; 
 > mc[1:2,4:3] <- 4:1; stopifnot(as(mc[1:2,4:3], "matrix") == 4:1)
 replCmat[x,i,j,..,val] : nargs()=4; 
@@ -1715,9 +1873,10 @@ replCmat[x,i,j,..,val] : nargs()=4;
 > mc[-1, 3] <- -2:1 # 0 should not be entered; 'value' recycled
 replCmat[x,i,j,..,val] : nargs()=4; 
 > mt[-1, 3] <- -2:1
-.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=dgTMatrix; len.(value)=4; 
+.. replTmat(x,i,j,v): nargs()= 4; cl.(x)=igTMatrix; len.(value)=4; 
 > stopifnot(mc@x != 0, mt@x != 0,
-+ 	  mc[-1,3] == -2:1, mt[-1,3] == -2:1) ## failed earlier
++ 	  mc[-1,3] == -2:1,
++           mt[-1,3] == -2:1) ## failed earlier
 > 
 > mc0 <- mc
 > mt0 <- as(mc0, "TsparseMatrix")
@@ -1737,16 +1896,16 @@ replCmat[x,i,j,..,val] : nargs()=4;
 +     validObject(mc) ; assert.EQ.mat(mc, m)
 +     validObject(mt) ; assert.EQ.mat(mt, m)
 + }
-2 x 1 sparse Matrix of class "dgCMatrix"
+2 x 1 sparse Matrix of class "igCMatrix"
    c5
 r2  2
 r4  .
 > showProc.time()
-Time (user system elapsed): 0.092 0.002 0.095 
+Time (user system elapsed): 0.208 0.001 0.21 
 > options(Matrix.verbose = TRUE)
 > 
 > mc # no longer has non-structural zeros
-5 x 7 sparse Matrix of class "dgCMatrix"
+5 x 7 sparse Matrix of class "igCMatrix"
    c1 c2 c3 c4 c5  c6  c7
 r1  .  .  2  4  .   . 241
 r2  . 42  .  3  . 202   .
@@ -1754,7 +1913,7 @@ r3  3  . -1  .  .   . 243
 r4  .  .  1  .  .   .   .
 r5  . 45  1  .  .   .   .
 > mc[ii, jj] <- 1:6
-> mc[c(2,5), c(3,5)] <- 3.2
+> mc[c(2,5), c(3,5)] <- 32L
 > checkMatrix(mc)
  norm(m [5 x 7]) : 1  I  F  M  ok
  Summary:  ok
@@ -1763,15 +1922,15 @@ as(., "nMatrix") giving full nonzero-pattern: ok
 m >= m for all: ok
 m < m for none: ok
 > m. <- mc
-> mc[4,] <- 0
+> mc[4,] <- 0L
 > mc
-5 x 7 sparse Matrix of class "dgCMatrix"
-   c1 c2   c3 c4  c5  c6  c7
-r1  .  .  2.0  4 .     . 241
-r2  .  1  3.2  3 3.2 202   .
-r3  3  . -1.0  . .     . 243
-r4  .  .  .    . .     .   .
-r5  .  2  3.2  . 3.2   .   .
+5 x 7 sparse Matrix of class "igCMatrix"
+   c1 c2 c3 c4 c5  c6  c7
+r1  .  .  2  4  .   . 241
+r2  .  1 32  3 32 202   .
+r3  3  . -1  .  .   . 243
+r4  .  .  .  .  .   .   .
+r5  .  2 32  . 32   .   .
 > 
 > S <- as(Diagonal(5),"TsparseMatrix")
 > H <- Hilbert(9)
@@ -1856,15 +2015,15 @@ diagnosing replTmat(x,i,j,v): nargs()= 3; missing (i,j) = (0,1)
 > ## an example that failed for a long time
 > sy3 <- new("dsyMatrix", Dim = as.integer(c(2, 2)), x = c(14, -1, 2, -7))
 > checkMatrix(dm <- kronecker(Diagonal(2), sy3))# now sparse with new kronecker
- norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+ norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
  M  ok
  Summary:  ok
 as(., "nMatrix") giving full nonzero-pattern: ok
-2*m =?= m+m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+2*m =?= m+m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 identical
 m >= m for all: ok
 m < m for none: ok
-symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 ok;  determinant(): ok
 > dm <- Matrix(as(dm, "matrix"))# -> "dsyMatrix"
 > (s2 <- as(dm, "sparseMatrix"))
@@ -1875,15 +2034,15 @@ ok;  determinant(): ok
 [3,]  .  . 14  2
 [4,]  .  .  2 -7
 > checkMatrix(st <- as(s2, "TsparseMatrix"))
- norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+ norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
  M  ok
  Summary:  ok
 as(., "nMatrix") giving full nonzero-pattern: ok
-2*m =?= m+m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+2*m =?= m+m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 identical
 m >= m for all: ok
 m < m for none: ok
-symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 ok;  determinant(): ok
 > stopifnot(is(s2, "symmetricMatrix"),
 + 	  is(st, "symmetricMatrix"))
@@ -1916,26 +2075,26 @@ m < m for none: ok
 > ## now sub-assign  and check for consistency
 > ## symmetric subassign should keep symmetry
 > st[I,I] <- 0; checkMatrix(st); stopifnot(is(st,"symmetricMatrix"))
- norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+ norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
  M  ok
  Summary:  ok
 as(., "nMatrix") giving full nonzero-pattern: ok
-2*m =?= m+m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+2*m =?= m+m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 identical
 m >= m for all: ok
 m < m for none: ok
-symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 ok;  determinant(): ok
 > s2[I,I] <- 0; checkMatrix(s2); stopifnot(is(s2,"symmetricMatrix"))
- norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+ norm(m [4 x 4]) : 1  I  F suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
  M  ok
  Summary:  ok
 as(., "nMatrix") giving full nonzero-pattern: ok
-2*m =?= m+m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+2*m =?= m+m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 identical
 m >= m for all: ok
 m < m for none: ok
-symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of  'dsC*  o  dsC*'
+symmpart(m) + skewpart(m) == m: suboptimal 'Arith' implementation of   dsCMatrix  o  dsCMatrix
 ok;  determinant(): ok
 > ##
 > m <- as.mat(st)
@@ -2574,4 +2733,4 @@ sparse vector (nnz/length = 0/6) of class "dsparseVector"
 > 
 > proc.time()
    user  system elapsed 
-  3.464   0.164   3.623 
+  7.238   0.515   7.796 

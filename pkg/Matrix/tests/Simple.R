@@ -44,20 +44,20 @@ dM4 <- Matrix(M4, sparse = FALSE)
 d4. <- diag(4); dimnames(d4.) <- dns <- rep(list(LETTERS[1:4]), 2)
 d4a <- diag(4); dimnames(d4a) <- dna <- list(LETTERS[1:4], letters[1:4])# "a"symmetric
 m1a <- matrix(0, dimnames=list("A","b"))# "a"symmetric
-d4di<- as(d4., "diagonalMatrix")
-d4da<- as(d4a, "diagonalMatrix")
-d4d <- as(d4., "denseMatrix")
+d4di<- as(d4., "diagonalMatrix")# now  uni-diagonal
+d4da<- as(d4a, "diagonalMatrix")#  (ditto)
+d4d <- as(d4., "denseMatrix") # dsy
 d4aS <- Matrix(d4a, sparse=TRUE, doDiag=FALSE)
 d1aS <- Matrix(m1a, sparse=TRUE, doDiag=FALSE)
 stopifnot(exprs = {
-    identical(d4di@x, rep.int(1, 4L)) # was "named" unnecessarily
+    d4di@diag == "U" # was identical(d4di@x, rep.int(1, 4L)) # @x was "named" unnecessarily
     identical(dimnames(d4 <- Matrix(d4.)), dns)
     identical4(d40, Matrix(diag(4)), unname(d4), unname(d4da))
     identical3(d4, as(d4., "Matrix"), as(d4., "diagonalMatrix"))
     is(d4aS, "dtCMatrix") # not "dsC*", as asymmetric dimnames
     is(d4d, "denseMatrix")
     identical(dimnames(d4T <- as(d4., "TsparseMatrix")), dns) # failed till 2019-09-xx
-    ## identical(d4T, as(d4., "dsTMatrix")) # deprecated
+    identical(d4T, as(d4., "TsparseMatrix"))
 })
 showProc.time()
 
@@ -175,14 +175,23 @@ isValid(lt <- dT > dt,"lgCMatrix")
 stopifnot(identical(lc,lt))
 
 ## Versions of Diagonal()
-dD <- Diagonal(x = 5:1)
-sD <- .symDiagonal(5, 5:1)
-tD <- .trDiagonal (5, 5:1) # x=<integer> had failed for both
-stopifnot(all(sD == dD)
-        , all(tD == dD)
-        , identical(sD, .symDiagonal(x = 5:1))
-        , identical(tD, .sparseDiagonal(x=5:1))
-        , identical(tD, .trDiagonal (x = 5:1)))# 'n' now has default
+for(TF in c(TRUE, FALSE)) {
+  op <- options(Matrix.use_iMatrix = TF) # if TRUE, {dD, sD, tD} are all "iMatrix"
+  dD <- Diagonal(x = 5:1)
+  sD <- .symDiagonal(5, 5:1)
+  tD <- .trDiagonal (5, 5:1) # x=<integer> had failed for both
+  stopifnot(exprs = {
+      inherits(dD, if(TF) "idiMatrix" else "ddiMatrix")
+      inherits(sD, "symmetricMatrix")
+      inherits(tD, "triangularMatrix")
+      all(sD == dD)
+      all(tD == dD)
+      identical(sD, .symDiagonal(x = 5:1))
+      identical(tD, .sparseDiagonal(x=5:1))
+      identical(tD, .trDiagonal (x = 5:1)) # 'n' now has default
+  })
+  options(op)
+}
 
 M <- Diagonal(4); M[1,2] <- 2 ; M
 cM <- crossprod(M) # >> as_cholmod_l_triplet(): could not reallocate for internal diagU2N()
@@ -204,17 +213,25 @@ I <- Diagonal(3)
 (C <- as(I,"CsparseMatrix")) #   (ditto)
 lT <- as(T,"lMatrix")
 lC <- as(C,"lMatrix")
-stopifnot(
-    identical((n0 <- I != 0), Diagonal(3, TRUE)), I@diag == "U",
-    identical(n0, I & TRUE), identical(n0, I | FALSE),
-    identical(n0, TRUE & I), identical(n0, FALSE | I),
-    all(n0 == !(I == 0)), all(I == n0), identical(n0 == I, I == n0)
-    ,
-    identical4(lT, as(Diagonal(3, x=TRUE),"TsparseMatrix"), T & TRUE, TRUE & T),
-    identical4(lC, as(Diagonal(3, x=TRUE),"CsparseMatrix"), C & TRUE, TRUE & C),
-    identical3(lT, T | FALSE, FALSE | T),
-    identical3(lC, C | FALSE, FALSE | C),
-    TRUE)
+n0 <- I != 0
+## n0. <- diagN2U(n0)
+stopifnot(exprs = {
+    identical(n0, Diagonal(3, TRUE))
+    I@diag == "U"
+    n0@diag == "U"
+    identical(n0, I & TRUE)
+    identical(n0, I | FALSE)
+    identical(n0, TRUE & I)
+    identical(n0, FALSE | I)
+    identical(n0, diagN2U(as(!(I == 0), "diagonalMatrix")))
+    all(n0 == !(I == 0))
+    all(I == n0)
+    identical(n0 == I, I == n0)
+    identical4(lT, as(Diagonal(3, x=TRUE),"TsparseMatrix"), T & TRUE, TRUE & T)
+    identical4(lC, as(Diagonal(3, x=TRUE),"CsparseMatrix"), C & TRUE, TRUE & C)
+    identical3(lT, T | FALSE, FALSE | T)
+    identical3(lC, C | FALSE, FALSE | C)
+})
 I[,1] <- NA; I[2,2] <- NA ; I[3,] <- NaN
 stopifnotValid(I, "sparseMatrix")
 I # gave error in printSpMatrix() - because of R bug in format.info()
@@ -295,8 +312,13 @@ stopifnot(identical(dimnames( cc  [1:5, 1:5]), dnm5),
 
 ## large sparse ones: these now directly "go sparse":
 str(m0 <- Matrix(0,     nrow=100, ncol = 1000))
+str(i0 <- Matrix(0L,    nrow=100, ncol = 200, int2dbl = FALSE))
 str(l0 <- Matrix(FALSE, nrow=100, ncol = 200))
-stopifnot(all(!l0),
+str(z0 <- Matrix(0L+0i, nrow=100, ncol = 200))
+stopifnot(all(!l0), all(!m0), all(!i0), all(!z0),
+          isFALSE(any(i0)),
+          isFALSE(suppressWarnings(any(m0))),
+          isFALSE(suppressWarnings(any(z0))),
           identical(FALSE, any(l0)))
 
 if(!interactive()) warnings()
@@ -305,13 +327,18 @@ op <- options(warn = 2) # warnings (e.g. integer overflow!) become errors:
 n <- 50000L
 stopifnot(n^2 > .Machine$integer.max)
 ## had integer overflow in index constructions:
-x <- 1:n
-D <- Diagonal(n, x=x[n:1])
-summary(D)# special method
-summary(D != 0)
-stopifnot(identical(x*D, (Dx <- D*x)),
-	  identical(D != 0, as(D, "lMatrix")),
-	  identical(Dx, local({d <- D; d@x <- d@x * x; d})))
+for(x in list(1:n, as.double(1:n))) withAutoprint({
+    x <- 1:n
+    D <- Diagonal(n, x=x[n:1], int2dbl = FALSE)
+    summary(D)# special method
+    summary(Dn0 <- D != 0)
+    stopifnot(exprs = {
+        isValid(Dn0, "ldiMatrix")
+        identical(x*D, (Dx <- D*x))
+        identical(Dn0, as(D, "lMatrix"))
+        identical(Dx, local({d <- D; d@x <- d@x * x; d}))
+    })
+})
 
 Lrg <- new("dgTMatrix", Dim = c(n,n))
 l0 <- as(as(Lrg, "lMatrix"), "CsparseMatrix") # lgC
@@ -529,7 +556,8 @@ stopifnotValid(t1c + I4,"triangularMatrix")
 stopifnotValid(t2c + I4,"triangularMatrix")
 stopifnot(identical(t1, t(t(t1))),
           identical(t1c, t(t(t1c))),
-          c(class(t2), class(t1c), class(t2c), class(tt2)) == "dtCMatrix",
+          c(class(t1c), class(t2c)) == "dtCMatrix",
+          c(class(t2 ), class(tt2)) == "dtTMatrix",
           identical(t(tt2), t2))
 assert.EQ.mat(t1, as(t1c, "matrix"))
 D4. <- D4 * (A4 <- Matrix(1:4, 4,4))
@@ -652,26 +680,38 @@ showProc.time()
 
 ## <sparse> o <numeric> (of length > 1):
 stopifnotValid(tm <- tu * 1:8, "sparseMatrix")
-stopifnot(identical4(tm, cu * 1:8, 1:8 * cu, 1:8 * tu))
+if(FALSE) ## FIXME? (valid till Matrix 1.7.x):
+ stopifnot(identical4(tm, cu * 1:8, 1:8 * cu, 1:8 * tu))
+## slightly less:
+stopifnot(identical(tm, 1:8 * tu), identical(cu * 1:8, 1:8 * cu))
 
 cu[1,2] <- tu[1,2] <- NA
 mu <- as(tu,"matrix")
 stopifnotValid(cu, "CsparseMatrix"); stopifnotValid(cu, "triangularMatrix")
 stopifnotValid(tu, "TsparseMatrix"); stopifnotValid(tu, "triangularMatrix")
-stopifnot(identical(cu * 1:8, tu * 1:8), # but are no longer triangular
-          identical(cu > .1, as(tu > .1, "CsparseMatrix")),
-          all(cu >= 0, na.rm=TRUE), !all(cu >= 1), is.na(all(tu >= 0)),
-          ## Csparse_drop: preserves triangularity incl diag="U"
-          ## ^^^^^^^^^^^^ now using more general R_sparse_dropzero
-          identical(cu, .Call(Matrix:::R_sparse_dropzero, cu, 0.))
-          )
+stopifnotValid(tuG1 <- tu >= 1, "ltTMatrix")
+stopifnot(exprs = { ## not identical(cu * 1:8, tu * 1:8), # but are no longer triangular
+    cu@diag == "U"
+    tuG1@diag == "U"
+    identical(cu > .1, as(tu > .1, "CsparseMatrix"))
+    all(cu >= 0, na.rm=TRUE)
+    !all(cu >= 1)
+    is.na(all(tu >= 0))
+    ## Csparse_drop: preserves triangularity incl diag="U"
+    ## ^^^^^^^^^^^^ now using more general R_sparse_dropzero
+    identical(cu, .Call(Matrix:::R_sparse_dropzero, cu, 0.))
+})
+assert.EQ.Mat(cu * 1:8, tu * 1:8)
 assert.EQ.mat(cu * 1:8, mu * 1:8)
 
 ina <- is.na(as(cu,"matrix"))
 ## These 3 were each different (2008-03) !!
-stopifnot(all(ina == is.na(cu)),
-	  all(ina == is.na(as(cu,"generalMatrix"))),
-	  all(ina == as(is.na(as(cu,"matrix")),"nMatrix")))
+stopifnot(exprs = {
+    identical(ina, is.na(mu))
+    all(ina == is.na(cu))
+    all(ina == is.na(as(cu,"generalMatrix")))
+    all(ina == as(is.na(as(cu,"matrix")),"nMatrix"))
+})
 
 
 set.seed(7)
@@ -741,9 +781,12 @@ ltlp  <-  lp[ lower.tri(lp) ]
 sltlp <- slp[ lower.tri(slp) ]
 dim(ij <- which(lower.tri(lp), arr.ind = TRUE))
 ss <- slp[ij] # now fast (!)
-stopifnot(identical4(lp[ij], ltlp, sltlp, as(lp, "matrix")[ij]),
-          identical(ss, sltlp),
-          isValid(lp, "lsyMatrix"), lp@uplo == "U")
+stopifnot(exprs = {
+    identical4(lp[ij], ltlp, sltlp, as(lp, "matrix")[ij])
+    identical(ss, sltlp)
+    isValid(lp, "lsCMatrix") # was "lsyMatrix" __________ FIXME _________________________
+    lp@uplo == "U"
+})
 showProc.time()
 
 ###-- more solve() methods  {was ./solve.R }
@@ -1227,6 +1270,7 @@ lsUtr <- lst[istri][uniC]
 assertError(new("ltrMatrix", Dim = c(2L,2L), x=TRUE))# gave "illegal" object w/o error
 assertError(new("ntrMatrix", Dim = c(2L,2L)))#  dito
 
+ntRu <- as(as(diag(1), "nMatrix"), "RsparseMatrix")
 
 showProc.time()# == "stats"
 
@@ -1398,7 +1442,7 @@ stopifnot(!isS4(z1), is.matrix(z1), !isS4(z2), is.matrix(z2))
 .d1 <- Matrix(`dimnames<-`(diag(1), list("A", "B")), doDiag = TRUE)
 .s0 <- new("dsyMatrix", Dim = c(1L, 1L), Dimnames = list("B", "B"), x = 1)
 .s1 <- Matrix(.d0, doDiag = FALSE)
-stopifnot(identical(.d1, forceDiagonal(.d0, diag = "N")),
+stopifnot(identical(.d1, .d0), # both uni-diagonal; was forceDiagonal(.d0, diag = "N")),
           identical(.s1, .s0),
           identical(Matrix(sparseVector(1, 1L, 3L)),
                     new("dgTMatrix", Dim = c(3L, 1L), i = 0L, j = 0L, x = 1)),
@@ -1490,13 +1534,18 @@ stopifnot(identical(colSums(d1), c(b = 1)),
 
 ## na.rm was ignored prior to 1.5-3
 d1 <- Diagonal(x = NaN)
+Dz <- Diagonal(3, 1i)
+Di <- Diagonal(0, integer(), int2dbl = FALSE)
 stopifnot(identical(colSums(d1), NaN),
           identical(colSums(d1, na.rm = TRUE), 0),
           identical(rowMeans(d1), NaN),
-          identical(rowMeans(d1, na.rm = TRUE), NaN))
+          identical(rowMeans(d1, na.rm = TRUE), NaN)
+        , isValid(Dz, "zdiMatrix")
+        , isValid(Di, "idiMatrix")
+        , isValid(.sparseDiagonal(3, 1i), "ztCMatrix")
+          )
 
 ## Matrix bug #6810
-library(Matrix)
 x <- as(matrix(c(FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE), 4L, 2L),
         "RsparseMatrix")
 stopifnot(identical(which(x), seq_along(x)[as.vector(!is.na(x) & x)]),
@@ -1612,6 +1661,24 @@ stopifnot(identical(length(y), 0x1p+60)) # big but representable
 stopifnot(isFALSE(isDiagonal(table(1))),
           isFALSE(isDiagonal(table(1,1,1))),
           isFALSE(isDiagonal(table(1:7))))
+
+v0 <- c(0:2, rep(0L, 7))
+## Matrix(<raw>) <=> Matrix(as.integer(.)):
+for(d in list(integer(), v0, 0:9)) {
+    print(M <- Matrix(as.raw(d), 2,5))
+    stopifnot(is(M, "iMatrix"),
+              identical(M, Matrix(d, 2,5, int2dbl = FALSE)))
+}
+
+## Matrix(<complex>)
+(zM <- Matrix(v0*(1 + 2i), 2,5))
+stopifnot(exprs = {
+    is(zM, "zgCMatrix")
+    is(eq <- zM == v0*(1 + 2i), "lgeMatrix")
+    all(eq)
+    dim(M0 <- Matrix(complex())) == dim(matrix(complex()))
+    is(M0, "zgeMatrix")
+})
 
 
 

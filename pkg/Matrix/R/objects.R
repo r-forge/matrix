@@ -3,19 +3,19 @@
 ## to be "ours" (exported by 'Matrix'):
 .promote <-
 function(x, mode = 7L)
-    as(x, .M.class(x, 7L))
+    as(x, .M.class(x, mode))
 
-## "...Matrix" or ".sparseVector" or "", promoting:
-##     "pMatrix" -> "indMatrix"  if  bit 0 is set
-##   "co.Matrix" -> "dp.Matrix"  if  bit 1 is set
-##   "dp.Matrix" -> "ds.Matrix"  if  bit 2 is set
-##   "zp.Matrix" -> "zs.Matrix"  if  bit 2 is set
+## returns "...Matrix" or ".sparseVector" or "", promoting:
+##     "pMatrix" -> "indMatrix"  if  bit 1 is set
+##   "co.Matrix" -> "dp.Matrix"  if  bit 2 is set
+##   "dp.Matrix" -> "ds.Matrix"  if  bit 4 is set
+##   "zp.Matrix" -> "zs.Matrix"  if  bit 4 is set
 .M.class <-
 function(x, mode = 7L)
     .Call(R_Matrix_class, x, mode)
 
 ## "[nlidz]" for Matrix, sparseVector,
-## logical, integer, double, complex 'x'; otherwise ""
+##               logical, integer, double, complex 'x'; otherwise ""
 .M.kind <-
 function(x)
     .Call(R_Matrix_kind , x)
@@ -26,6 +26,7 @@ function(x, mode = 7L)
     .Call(R_Matrix_shape, x, mode)
 
 ## "[CRTdinp]" for Matrix 'x'; otherwise ""
+## d: diag, i: {ind,p}M*, n: u[n]packed,  p: packed
 .M.repr <-
 function(x)
     .Call(R_Matrix_repr , x)
@@ -45,18 +46,22 @@ function(x)
 .isSparse   <- function(x) any(.M.repr(x) == c("C", "R", "T", "d", "i"))
 .isCRT      <- function(x) any(.M.repr(x) == c("C", "R", "T"))
 
-## for .type.kind[.M.kind(x)]:
+## for .type.kind[[ .M.kind(x) ]]:
 .type.kind <- c("n" = "logical",
                 "l" = "logical",
                 "i" = "integer",
                 "d" = "double",
                 "z" = "complex")
 
-## for .kind.type[ typeof(x)]:
+## for .kind.type[[ typeof(x) ]]:
 .kind.type <- c("logical" = "l",
                 "integer" = "i",
                 "double"  = "d",
                 "complex" = "z")
+
+## not really: .type2kind <- function(type) .kind.type[[type]]
+
+.NULL2vec <- function(x) do.call(.type.kind[[.M.kind(x)]], list(0L))
 
 extends1of <- function(class, classes, ...) {
     if(is.character(class))

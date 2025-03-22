@@ -614,8 +614,10 @@ validObject(sS <- crossprod(sU))
 C. <- chol(sS)
 stopifnot(all.equal(C., sU, tolerance=1e-15))
 ## chol(<triangular sparse which is diagonal>)
-tC7 <- .trDiagonal(7, 7:1)
-stopifnotValid(tC7, "dtCMatrix")
+op <- options(Matrix.use_iMatrix = TRUE) ## => get iMatrix
+tC7  <- .trDiagonal(7, 7:1   ) ; stopifnotValid(tC7, "itCMatrix")
+tC7d <- .trDiagonal(7, 7:1 +0) ; stopifnotValid(tC7d,"dtCMatrix")
+options(op)
 ch7  <- chol(tC7) ## this (and the next 2) failed: 'no slot .. "factors" ..."dtCMatrix"'
 chT7 <- chol(tT7 <- as(tC7, "TsparseMatrix"))
 chR7 <- chol(tR7 <- as(tC7, "RsparseMatrix"))
