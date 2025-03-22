@@ -54,6 +54,9 @@ determinant(x, logarithm = TRUE, \dots)
 %% \item{determinant}{\code{(x = "sparseMatrix", logarithm=TRUE)}:
 %%   \code{\link{determinant}()} methods for sparse matrices typically
 %%   work via \code{\link{Cholesky}} or \code{\link{lu}} decompositions.}
+%% \item{determinant}{\code{signature(x = "dpoMatrix")}:
+%%   Returns the \code{\link{determinant}} of \code{x}, via
+%%   \code{chol(x)}, see above.}
 
 \examples{
 (M <- Matrix(c(0, 1, 0, 0), 6, 4))

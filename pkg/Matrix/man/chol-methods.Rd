@@ -205,3 +205,7 @@ stopifnot(exprs = {
     all.equal(x4, solve(ch.A4, b4))
 })
 }
+
+%% \item{chol}{\code{signature(x = "dpoMatrix")}:
+%%   Returns (and stores) the Cholesky decomposition of \code{x}, see
+%%   \code{\link{chol}}.}

@@ -46,3 +46,7 @@
 %% \item{dimnames<-}{\code{signature(x = "Matrix", value = "list")}: set
 %%   the \code{dimnames} to a \code{\link{list}} of length 2, see
 %%   \code{\link{dimnames<-}}.}
+%% \item{dimnames}{\code{signature(object = "symmetricMatrix")}:
+%%    returns \emph{symmetric} \code{\link{dimnames}}, even when the
+%%    \code{Dimnames} slot only has row or column names.  This allows to
+%%    save storage for large (typically sparse) symmetric matrices.}

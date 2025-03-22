@@ -69,3 +69,7 @@ show(object)
 %%   \code{\link{print}} method resembles Matlab's way of printing
 %%   sparse matrices, and also the MatrixMarket format, see
 %%   \code{\link{writeMM}}.}
+%% \item{summary}{\code{(object = "diagonalMatrix")}: Returns
+%%   an object of S3 class \code{"diagSummary"} which is the summary of
+%%   the vector \code{object@x} plus a simple heading, and an
+%%   appropriate \code{\link{print}} method.}

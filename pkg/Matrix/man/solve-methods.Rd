@@ -243,3 +243,7 @@ stopifnot( all.equal(as(I0, "diagonalMatrix"), Diagonal(n)),
            all.equal(as(.I0,"diagonalMatrix"), Diagonal(n)) )
 
 }
+
+%% \item{solve}{\code{signature(a = "dpoMatrix", b = "....")}, and}
+%% \item{solve}{\code{signature(a = "dppMatrix", b = "....")}  work
+%%   via the Cholesky composition, see also the Matrix \code{\link{solve-methods}}.}

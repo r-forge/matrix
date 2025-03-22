@@ -89,18 +89,18 @@
   The subclasses of \code{iMatrix}, \code{zMatrix}, and
   \code{posdefMatrix} were not defined until \pkg{Matrix} version 1.8-0.
 
-  Classes \code{.gTMatrix} represent general (that is, unstructured)
-  \code{A}.  Objects have \code{i} and \code{j} slots specifying a
-  subset \code{V} of the set of entries of \code{A}, as described in
-  \sQuote{Slots}.  For \code{ngTMatrix}, whose data type is boolean, the
-  entries in \code{V} have value 1, and the entries not in \code{V} have
-  value 0.  For other \code{.gTMatrix}, the entries in \code{V} have
-  values taken from an additional \code{x} slot (a logical, integer,
-  double, or complex vector), and the entries not in \code{V} have value
-  0.  The \code{i}, \code{j}, and \code{x} slots have a common length,
-  and the value of \code{A[i[k], j[k]]} is the result of aggregating
-  \code{x[i == i[k] & j == j[k]]} by summation (reduction by \code{|} if
-  \code{x} is logical, by \code{+} otherwise).
+  Classes \code{.gTMatrix} represent general (unstructured, possibly
+  nonsquare) \code{A}.  Objects have \code{i} and \code{j} slots
+  specifying a subset \code{V} of the set of entries of \code{A}, as
+  described in \sQuote{Slots}.  For \code{ngTMatrix}, whose data type is
+  boolean, the entries in \code{V} have value 1, and the entries not in
+  \code{V} have value 0.  For other \code{.gTMatrix}, the entries in
+  \code{V} have values taken from an additional \code{x} slot (a
+  logical, integer, double, or complex vector), and the entries not in
+  \code{V} have value 0.  The \code{i}, \code{j}, and \code{x} slots
+  have a common length, and the value of \code{A[i[k], j[k]]} is the
+  result of aggregating \code{x[i == i[k] & j == j[k]]} by summation
+  (reduction by \code{|} if \code{x} is logical, by \code{+} otherwise).
 
   Classes \code{.sCMatrix} represent Hermitian or symmetric \code{A}.
   Compared to \code{.gTMatrix}, objects have an additional \code{uplo}
@@ -143,7 +143,7 @@
   value 0.
 }
 \seealso{
-  \dQuote{Sibling} classes \code{\linkS4class{CsparseMatrix}} and
+  \dQuote{Sister} classes \code{\linkS4class{CsparseMatrix}} and
   \code{\linkS4class{RsparseMatrix}} for compressed sparse column and
   compressed sparse row format matrices.  Functions
   \code{\link{aggregateT}} and \code{\link{asUniqueT}} for

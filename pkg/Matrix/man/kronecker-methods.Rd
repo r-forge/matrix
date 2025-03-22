@@ -76,3 +76,7 @@ stopifnot(identical(NN,MM),
 \keyword{methods}
 \keyword{array}
 
+%% \item{kronecker}{\code{signature(X = "indMatrix", Y = "indMatrix")}:
+%%   Kronecker product of two row index matrices or two column index
+%%   matrices, giving the row or column index matrix corresponding to
+%%   their \dQuote{interaction}.}

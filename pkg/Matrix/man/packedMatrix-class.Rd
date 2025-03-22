@@ -13,6 +13,7 @@
 \alias{dspMatrix-class}
 \alias{zspMatrix-class}
 %
+\alias{copMatrix-class}
 \alias{dppMatrix-class}
 \alias{zppMatrix-class}
 %
@@ -38,17 +39,18 @@
   \describe{
     \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
       \code{\linkS4class{Matrix}}.  \code{Dim[1]} and \code{Dim[2]} must
-      be equal as \code{A} is square by definition.}
+      be equal.}
     \item{\code{uplo}}{a character string, either \code{"U"} or
-      \code{"L"}, indicating that \code{x} stores upper or lower
-      triangular entries of \code{A}.}
+      \code{"L"}.  \code{"U"} indicates that \code{x} stores only the
+      upper triangular entries of \code{A}.  \code{"L"} indicates that
+      \code{x} stores only the lower triangular entries of \code{A}.}
     \item{\code{x}}{a vector of length \code{n*(n+1)/2},
-      \code{n=Dim[1]}, storing upper or lower triangular (depending on
-      \code{uplo}) entries of \code{A} in column-major order.
-      Authors of subclasses of \code{packedMatrix} may declare that only
-      a subset \code{k} of the elements of \code{x} is used to determine
-      \code{A}, defining implicitly a function \code{F} such that
-      \code{A = F(x[k])}; see \sQuote{Subclasses} for examples in
+      \code{n=Dim[1]=Dim[2]}, storing upper or lower triangular
+      (depending on \code{uplo}) entries of \code{A} in column-major
+      order.  Authors of subclasses of \code{packedMatrix} may declare
+      that only a subset \code{k} of the elements of \code{x} is used to
+      determine \code{A}, defining implicitly a function \code{F} such
+      that \code{A = F(x[k])}; see \sQuote{Subclasses} for examples in
       package \pkg{Matrix}.}
   }
 }
@@ -112,7 +114,11 @@ zspMatrix, uplo="L", trans="C" | Conj(x[j+(2*n-i)*(i-1)/2]) | Re(x[i+(2*n-j)*(j-
   \code{x} slot.  However, this constraint is not strictly enforced by
   the validity methods, which test only that the diagonal entries of
   \code{A} are nonnegative (a necessary, not sufficient condition).
-  For \code{zppMatrix}, only \code{trans="C"} is valid.
+  For \code{zppMatrix}, only \code{trans="C"} is valid.  Class
+  \code{copMatrix} extends \code{dppMatrix} and represents correlation
+  matrices; it has an additional \code{sd} slot, a numeric vector of
+  length \code{n} listing standard deviations, enabling recovery of a
+  covariance matrix.
 
   Classes \code{.tpMatrix} represent triangular \code{A}.  Objects have
   \code{x}, \code{uplo}, and \code{diag} slots.  If \code{uplo="U"},

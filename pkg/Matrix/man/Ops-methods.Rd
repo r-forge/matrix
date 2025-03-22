@@ -352,3 +352,25 @@ Logic(e1, e2)
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+%% \item{Arith}{\code{signature(e1 = "dpoMatrix", e2 = "numeric")} (and
+%%   quite a few other signatures): The result of (\dQuote{elementwise}
+%%   defined) arithmetic operations is typically \emph{not}
+%%   positive-definite anymore.  The only exceptions, currently, are
+%%   multiplications, divisions or additions with \emph{positive}
+%%   \code{length(.) == 1} numbers (or \code{\link{logical}}s).}
+%% \item{"Math"}{\code{signature(x = "diagonalMatrix")}: all these
+%%   group methods return a \code{"diagonalMatrix"}, apart from
+%%   \code{\link{cumsum}()} etc which return a \emph{vector} also for
+%%   \pkg{base} \code{\link{matrix}}.}
+%% \item{*}{\code{signature(e1 = "ddiMatrix", e2="denseMatrix")}:
+%%   arithmetic and other operators from the \code{\link[=S4groupGeneric]{Ops}}
+%%   group have a few dozen explicit method definitions, in order to
+%%   keep the results \emph{diagonal} in many cases, including the following:}
+%% \item{/}{\code{signature(e1 = "ddiMatrix", e2="denseMatrix")}:
+%%   the result is from class \code{\linkS4class{ddiMatrix}} which is
+%%   typically very desirable.  Note that when \code{e2} contains
+%%   off-diagonal zeros or \code{\link{NA}}s, we implicitly use \eqn{0 / x = 0}, hence
+%%   differing from traditional \R arithmetic (where
+%%   \eqn{0 / 0 \mapsto \mbox{NaN}}{0/0 |-> NaN}), in order to preserve
+%%   sparsity.}

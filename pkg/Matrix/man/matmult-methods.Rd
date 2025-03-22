@@ -367,3 +367,8 @@ library(utils, pos = "package:base", verbose = FALSE)
  ## show sparse sub matrix
  tCmm[1:16, 1:30]
 }
+
+%% \item{\code{\%*\%}}{\code{signature(x = "indMatrix", y = "Matrix")}
+%%   and others listed by \code{showMethods("\%*\%", classes = "indMatrix")}:
+%%   matrix products implemented where appropriate as indexing operations.}
+

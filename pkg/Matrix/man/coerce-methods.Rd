@@ -188,3 +188,15 @@
 %%   of the result by the numeric covariate then take the transpose.
 %%   Missing values (\code{\link{NA}}) from the factor are translated
 %%   to columns of all \code{0}s.}
+
+%% \item{\code{coerce}}{\code{signature(from = "numeric", to = "indMatrix")}:
+%%   supporting typical \code{indMatrix} construction from
+%%   a vector of positive integers.  Row indexing is assumed.}
+%% \item{\code{coerce}}{\code{signature(from = "list", to = "indMatrix")}:
+%%   supporting \code{indMatrix} construction for row \emph{and}
+%%   column indexing, including index vectors of length 0 and
+%%   index vectors whose maximum is less than the number of rows
+%%   or columns being indexed.}
+%% \item{\code{coerce}}{\code{signature(from = "indMatrix", to = "matrix")}:
+%%   coercion to a traditional \code{\link{matrix}} of \link{logical} type,
+%%   with \code{FALSE} and \code{TRUE} in place of 0 and 1.}

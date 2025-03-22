@@ -19,6 +19,7 @@
 \alias{dsyMatrix-class}
 \alias{zsyMatrix-class}
 %
+\alias{corMatrix-class}
 \alias{dpoMatrix-class}
 \alias{zpoMatrix-class}
 %
@@ -128,7 +129,11 @@ zsyMatrix, uplo="L", trans="C" | Conj(x[(i-1)*m+j]) |  Re(x[(j-1)*m+i])+0i |    
   \code{x} slot.  However, this constraint is not strictly enforced by
   the validity methods, which test only that the diagonal entries of
   \code{A} are nonnegative (a necessary, not sufficient condition).
-  For \code{zpoMatrix}, only \code{trans="C"} is valid.
+  For \code{zpoMatrix}, only \code{trans="C"} is valid.  Class
+  \code{corMatrix} extends \code{dpoMatrix} and represents correlation
+  matrices; it has an additional \code{sd} slot, a numeric vector of
+  length \code{n} listing standard deviations, enabling recovery of a
+  covariance matrix.
 
   Classes \code{.trMatrix} represent triangular \code{A}.  Objects have
   \code{x}, \code{uplo}, and \code{diag} slots.  If \code{uplo="U"},

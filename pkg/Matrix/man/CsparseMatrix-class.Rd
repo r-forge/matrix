@@ -94,16 +94,16 @@
   The subclasses of \code{iMatrix}, \code{zMatrix}, and
   \code{posdefMatrix} were not defined until \pkg{Matrix} version 1.8-0.
 
-  Classes \code{.gCMatrix} represent general (that is, unstructured)
-  \code{A}.  Objects have \code{p} and \code{i} slots specifying a
-  subset \code{V} of the set of entries of \code{A}, as described in
-  \sQuote{Slots}.  For \code{ngCMatrix}, whose data type is boolean, the
-  entries in \code{V} have value 1, and the entries not in \code{V} have
-  value 0.  For other \code{.gCMatrix}, the entries in \code{V} have
-  values taken from an additional \code{x} slot (a logical, integer,
-  double, or complex vector), and the entries not in \code{V} have value
-  0.  The \code{i} and \code{x} slots are entirely parallel, both using
-  the ordering of \code{V} by column then by row.
+  Classes \code{.gCMatrix} represent general (unstructured, possibly
+  nonsquare) \code{A}.  Objects have \code{p} and \code{i} slots
+  specifying a subset \code{V} of the set of entries of \code{A}, as
+  described in \sQuote{Slots}.  For \code{ngCMatrix}, whose data type is
+  boolean, the entries in \code{V} have value 1, and the entries not in
+  \code{V} have value 0.  For other \code{.gCMatrix}, the entries in
+  \code{V} have values taken from an additional \code{x} slot (a
+  logical, integer, double, or complex vector), and the entries not in
+  \code{V} have value 0.  The \code{i} and \code{x} slots are entirely
+  parallel, both using the ordering of \code{V} by column then by row.
 
   Classes \code{.sCMatrix} represent Hermitian or symmetric \code{A}.
   Compared to \code{.gCMatrix}, objects have an additional \code{uplo}
@@ -146,7 +146,7 @@
   value 0.
 }
 \seealso{
-  \dQuote{Sibling} classes \code{\linkS4class{RsparseMatrix}} and
+  \dQuote{Sister} classes \code{\linkS4class{RsparseMatrix}} and
   \code{\linkS4class{TsparseMatrix}} for compressed sparse row and
   triplet format matrices.  Generic functions
   \code{\linkS4methods{cbind2}}, \code{\linkS4methods{colSums}},

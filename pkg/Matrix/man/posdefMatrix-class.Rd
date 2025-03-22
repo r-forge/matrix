@@ -1,5 +1,5 @@
 \name{posdefMatrix-class}
-\title{Positive Semi-definite Dense (Packed | Non-packed) Numeric Matrices}
+\title{Virtual Class \sQuote{posdefMatrix} of Positive Semidefinite Matrices}
 %
 \docType{class}
 \keyword{array}
@@ -7,100 +7,86 @@
 %
 \alias{posdefMatrix-class}
 %
-\alias{corMatrix-class}
-\alias{copMatrix-class}
-%
 \description{
-  \itemize{
-    \item The \code{"dpoMatrix"} class is the class of
-      positive-semidefinite symmetric matrices in nonpacked storage.
-    \item The \code{"dppMatrix"} class is the same except in packed
-      storage.  Only the upper triangle or the lower triangle is
-      required to be available.
-    \item The \code{"corMatrix"} and \code{"copMatrix"} classes
-      represent correlation matrices.  They extend \code{"dpoMatrix"}
-      and \code{"dppMatrix"}, respectively, with an additional slot
-      \code{sd} allowing restoration of the original covariance matrix.
-  }
+  \code{posdefMatrix} is a virtual subclass of
+  \code{\linkS4class{symmetricMatrix}} representing positive
+  semidefinite matrices.  Positive semidefinite matrices tend to arise
+  as the product of a matrix and its conjugate tranpose
+  (\code{ct(x) \%*\% x} or \code{x \%*\% ct(x)}; see
+  \code{\link{ct-methods}}).  In particular, covariance and
+  correlation matrices are positive semidefinite.
+
+  \code{posdefMatrix} was not defined until \pkg{Matrix} version 1.8-0.
 }
-\section{Objects from the Class}{Objects can be created by calls of the
-  form \code{new("dpoMatrix", ...)} or from \code{crossprod} applied to
-  an \code{"dgeMatrix"} object.}
 \section{Slots}{
   \describe{
-    \item{\code{uplo}:}{Object of class \code{"character"}. Must be
-      either "U", for upper triangular, and "L", for lower triangular.}
-    \item{\code{x}:}{Object of class \code{"numeric"}. The numeric
-      values that constitute the matrix, stored in column-major order.}
-    \item{\code{Dim}:}{Object of class \code{"integer"}. The dimensions
-      of the matrix which must be a two-element vector of non-negative
-      integers.}
-    \item{\code{Dimnames}:}{inherited from class \code{"Matrix"}}
-    \item{\code{factors}:}{Object of class \code{"list"}.  A named
-      list of factorizations that have been computed for the matrix.}
-
-    \item{\code{sd}:}{(for \code{"corMatrix"} and \code{"copMatrix"})
-      a \code{\link{numeric}} vector of length \code{n} containing the
-      (original) \eqn{\sqrt{var(.)}}{sqrt(var(.))} entries which allow
-      reconstruction of a covariance matrix from the correlation matrix.}
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
+      \code{\linkS4class{Matrix}}.}
+    \item{\code{factors}}{inherited from virtual superclass
+      \code{\linkS4class{symmetricMatrix}}.}
   }
 }
-\section{Extends}{
-  Class \code{"dsyMatrix"}, directly.\cr
-  Classes \code{"dgeMatrix"}, \code{"symmetricMatrix"}, and many more
-  by class \code{"dsyMatrix"}.
-}
-\section{Methods}{
-  \describe{
-    \item{chol}{\code{signature(x = "dpoMatrix")}:
-      Returns (and stores) the Cholesky decomposition of \code{x}, see
-      \code{\link{chol}}.}
-    \item{determinant}{\code{signature(x = "dpoMatrix")}:
-      Returns the \code{\link{determinant}} of \code{x}, via
-      \code{chol(x)}, see above.}
-    \item{rcond}{\code{signature(x = "dpoMatrix", norm = "character")}:
-      Returns (and stores) the reciprocal of the condition number of
-      \code{x}.  The \code{norm} can be \code{"O"} for the
-      one-norm (the default) or \code{"I"} for the infinity-norm.  For
-      symmetric matrices the result does not depend on the norm.}
-    \item{solve}{\code{signature(a = "dpoMatrix", b = "....")}, and}
-    \item{solve}{\code{signature(a = "dppMatrix", b = "....")}  work
-      via the Cholesky composition, see also the Matrix \code{\link{solve-methods}}.}
-    \item{Arith}{\code{signature(e1 = "dpoMatrix", e2 = "numeric")} (and
-      quite a few other signatures): The result of (\dQuote{elementwise}
-      defined) arithmetic operations is typically \emph{not}
-      positive-definite anymore.  The only exceptions, currently, are
-      multiplications, divisions or additions with \emph{positive}
-      \code{length(.) == 1} numbers (or \code{\link{logical}}s).}
+\section{Subclasses}{
+  The direct, nonvirtual subclasses of \code{posdefMatrix} defined in
+  package \pkg{Matrix} are listed below with links to virtual
+  superclasses defining their data type and storage format.
+  \tabular{rrr}{
+    Nonvirtual subclass \tab Data type \tab Storage format\cr
+    \code{dpoMatrix} \tab \code{\linkS4class{dMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{zpoMatrix} \tab \code{\linkS4class{zMatrix}} \tab \code{\linkS4class{unpackedMatrix}}\cr
+    \code{dppMatrix} \tab \code{\linkS4class{dMatrix}} \tab   \code{\linkS4class{packedMatrix}}\cr
+    \code{zppMatrix} \tab \code{\linkS4class{zMatrix}} \tab   \code{\linkS4class{packedMatrix}}\cr
+    \code{dpCMatrix} \tab \code{\linkS4class{dMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+    \code{zpCMatrix} \tab \code{\linkS4class{zMatrix}} \tab  \code{\linkS4class{CsparseMatrix}}\cr
+    \code{dpRMatrix} \tab \code{\linkS4class{dMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+    \code{zpRMatrix} \tab \code{\linkS4class{zMatrix}} \tab  \code{\linkS4class{RsparseMatrix}}\cr
+    \code{dpTMatrix} \tab \code{\linkS4class{dMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}\cr
+    \code{zpTMatrix} \tab \code{\linkS4class{zMatrix}} \tab  \code{\linkS4class{TsparseMatrix}}
   }
-}
-%\references{}
-%\author{}
-\note{Currently the validity methods for these classes such as
-  \code{\link{getValidity}(getClass("dpoMatrix"))} for efficiency reasons
-  only check the diagonal entries of the matrix -- they may not be negative.
-  This is only necessary but not sufficient for a symmetric matrix to be
-  positive semi-definite.
+  The subclasses of \code{zMatrix}, \code{CsparseMatrix},
+  \code{RsparseMatrix}, and \code{TsparseMatrix} were not defined until
+  \pkg{Matrix} version 1.8-0.
 
-  A more reliable (but often more expensive) check for positive
-  semi-definiteness would look at the signs of \code{diag(\link{BunchKaufman}(.))}
-  (with some tolerance for very small negative values), and for (strict)
-  positive definiteness at something like
-  \code{!inherits(tryCatch(chol(.), error=identity), "error")} .
-  Indeed, when \emph{coercing} to these classes, a version
-  of \code{\link{Cholesky}()} or \code{\link{chol}()} is
-  typically used, e.g., see \code{selectMethod("coerce",
-    c(from="dsyMatrix", to="dpoMatrix"))} .
+  Each of the above extends a nonvirtual class \code{ds.Matrix} or
+  \code{zs.Matrix} representing Hermitian or symmetric matrices more
+  generally; \code{dpoMatrix} and \code{dppMatrix} are extended by
+  nonvirtual classes \code{corMatrix} and \code{copMatrix} representing
+  correlation matrices.  For implementation details, see the help topic
+  for the storage format.
+}
+\note{
+  Tests for positive semidefiniteness in finite precision arithmetic are
+  generally expensive and inexact.  Validity methods for nonvirtual
+  subclasses of \code{posdefMatrix} defined in package \pkg{Matrix} test
+  only that the diagonal entries of the represented matrix are
+  nonnegative (a necessary, not sufficient condition).  Meanwhile,
+  methods for \emph{coercion} to \code{posdefMatrix} defined in package
+  \pkg{Matrix} test that the represented matrix has a Cholesky
+  factorization (a sufficient, not necessary condition, being equivalent
+  to positive \emph{definiteness}) by evaluating a suitable call to
+  \code{\linkS4methods{Cholesky}}.  A more rigorous test for positive
+  semidefiniteness, supporting matrices which are not positive definite,
+  would use the Bunch-Kaufman or pivoted Cholesky factorization; see
+  \code{\linkS4methods{BunchKaufman}} and
+  \code{\linkS4methods{Cholesky}}.
 }
 \seealso{
-  Classes \code{\linkS4class{dsyMatrix}} and \code{\linkS4class{dgeMatrix}};
-  further, \code{\link{Matrix}}, \code{\link{rcond}},
-  \code{\link[base]{chol}}, \code{\link[base]{solve}}, \code{\link{crossprod}}.
+  Related classes
+  \code{\linkS4class{generalMatrix}},
+  \code{\linkS4class{symmetricMatrix}},
+  \code{\linkS4class{triangularMatrix}},
+  \code{\linkS4class{diagonalMatrix}}, and
+  \code{\linkS4class{indexMatrix}} representing
+  general (unstructured, possibly nonsquare), Hermitian or symmetric,
+  triangular, diagonal, and index matrices.  Generic functions
+  \code{\linkS4methods{crossprod}} and \code{\linkS4methods{tcrossprod}}
+  for a common way to generate positive semidefinite matrices.  Generic
+  function \code{\linkS4methods{Cholesky}} for (pivoted or unpivoted)
+  Cholesky factorization of positive semidefinite matrices.  Generic
+  function \code{\linkS4methods{chol}} for getting the upper triangular
+  Cholesky factor.
 }
 \examples{
-\dontshow{ % for R_DEFAULT_PACKAGES=NULL
-library(utils, pos = "package:base", verbose = FALSE)
-}
 h6 <- Hilbert(6)
 rcond(h6)
 str(h6)

@@ -91,16 +91,16 @@
   The subclasses of \code{iMatrix}, \code{zMatrix}, and
   \code{posdefMatrix} were not defined until \pkg{Matrix} version 1.8-0.
 
-  Classes \code{.gRMatrix} represent general (that is, unstructured)
-  \code{A}.  Objects have \code{p} and \code{j} slots specifying a
-  subset \code{V} of the set of entries of \code{A}, as described in
-  \sQuote{Slots}.  For \code{ngRMatrix}, whose data type is boolean, the
-  entries in \code{V} have value 1, and the entries not in \code{V} have
-  value 0.  For other \code{.gRMatrix}, the entries in \code{V} have
-  values taken from an additional \code{x} slot (a logical, integer,
-  double, or complex vector), and the entries not in \code{V} have value
-  0.  The \code{j} and \code{x} slots are entirely parallel, both using
-  the ordering of \code{V} by row then by column.
+  Classes \code{.gRMatrix} represent general (unstructured, possibly
+  nonsquare) \code{A}.  Objects have \code{p} and \code{j} slots
+  specifying a subset \code{V} of the set of entries of \code{A}, as
+  described in \sQuote{Slots}.  For \code{ngRMatrix}, whose data type is
+  boolean, the entries in \code{V} have value 1, and the entries not in
+  \code{V} have value 0.  For other \code{.gRMatrix}, the entries in
+  \code{V} have values taken from an additional \code{x} slot (a
+  logical, integer, double, or complex vector), and the entries not in
+  \code{V} have value 0.  The \code{j} and \code{x} slots are entirely
+  parallel, both using the ordering of \code{V} by row then by column.
 
   Classes \code{.sRMatrix} represent Hermitian or symmetric \code{A}.
   Compared to \code{.gRMatrix}, objects have an additional \code{uplo}
@@ -141,7 +141,7 @@
   value 0.
 }
 \seealso{
-  \dQuote{Sibling} classes \code{\linkS4class{CsparseMatrix}} and
+  \dQuote{Sister} classes \code{\linkS4class{CsparseMatrix}} and
   \code{\linkS4class{TsparseMatrix}} for compressed sparse column and
   triplet format matrices.  Generic functions
   \code{\linkS4methods{rbind2}}, \code{\linkS4methods{rowSums}},

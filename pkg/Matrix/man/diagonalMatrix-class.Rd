@@ -1,5 +1,5 @@
 \name{diagonalMatrix-class}
-\title{Class "diagonalMatrix" of Diagonal Matrices}
+\title{Virtual Class \sQuote{diagonalMatrix} of Diagonal Matrices}
 %
 \docType{class}
 \keyword{array}
@@ -14,72 +14,58 @@
 \alias{zdiMatrix-class}
 %
 \description{
-  Class "diagonalMatrix" is the virtual class of all diagonal matrices.
+  \code{diagonalMatrix} is a virtual subclass of
+  \code{\linkS4class{triangularMatrix}} and of
+  \code{\linkS4class{indexMatrix}} representing diagonal matrices.
 }
-\section{Objects from the Class}{A virtual Class: No objects may be
-  created from it.}
 \section{Slots}{
   \describe{
-    \item{\code{diag}:}{\code{\link{character}} string, either \code{"U"} or
-      \code{"N"}, where \code{"U"} means \sQuote{unit-diagonal}.}
-    \item{\code{Dim}:}{matrix dimension, and}
-    \item{\code{Dimnames}:}{the \code{\link{dimnames}}, a
-      \code{\link{list}}, see the \code{\linkS4class{Matrix}} class
-      description.  Typically \code{list(NULL,NULL)} for diagonal matrices.}
+    \item{\code{Dim}, \code{Dimnames}}{inherited from virtual superclass
+      \code{\linkS4class{Matrix}}.  \code{Dim[1]} and \code{Dim[2]} must
+      be equal.}
   }
-}
-\section{Extends}{
-  Class \code{"\linkS4class{sparseMatrix}"}, directly.
-}
-\section{Methods}{
-  These are just a subset of the signature for which defined methods.
-  Currently, there are (too) many explicit methods defined in order to
-  ensure efficient methods for diagonal matrices.
-
+  All direct, nonvirtual subclasses of \code{diagonalMatrix} defined in
+  package \pkg{Matrix} have two additional slots:
   \describe{
-    \item{coerce}{\code{signature(from = "matrix", to = "diagonalMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "Matrix", to = "diagonalMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "generalMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "triangularMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "nMatrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "matrix")}: ... }
-    \item{coerce}{\code{signature(from = "diagonalMatrix", to = "sparseVector")}: ... }
-    \item{t}{\code{signature(x = "diagonalMatrix")}: ... }
-    \cr and many more methods
-
-    \item{solve}{\code{signature(a = "diagonalMatrix", b, ...)}: is
-      trivially implemented, of course; see also \code{\link{solve-methods}}.}
-
-    \item{which}{\code{signature(x = "nMatrix")}, semantically
-      equivalent to \pkg{base} function \code{\link{which}(x, arr.ind)}.}
-
-    \item{"Math"}{\code{signature(x = "diagonalMatrix")}: all these
-      group methods return a \code{"diagonalMatrix"}, apart from
-      \code{\link{cumsum}()} etc which return a \emph{vector} also for
-      \pkg{base} \code{\link{matrix}}.}
-
-    \item{*}{\code{signature(e1 = "ddiMatrix", e2="denseMatrix")}:
-      arithmetic and other operators from the \code{\link[=S4groupGeneric]{Ops}}
-      group have a few dozen explicit method definitions, in order to
-      keep the results \emph{diagonal} in many cases, including the following:}
-    \item{/}{\code{signature(e1 = "ddiMatrix", e2="denseMatrix")}:
-      the result is from class \code{\linkS4class{ddiMatrix}} which is
-      typically very desirable.  Note that when \code{e2} contains
-      off-diagonal zeros or \code{\link{NA}}s, we implicitly use \eqn{0 / x = 0}, hence
-      differing from traditional \R arithmetic (where \eqn{0 / 0
-	\mapsto \mbox{NaN}}{0/0 |-> NaN}), in order to preserve sparsity.}
-
-    \item{summary}{\code{(object = "diagonalMatrix")}: Returns
-      an object of S3 class \code{"diagSummary"} which is the summary of
-      the vector \code{object@x} plus a simple heading, and an
-      appropriate \code{\link{print}} method.}
+    \item{\code{diag}}{a character string, either \code{"N"} or
+      \code{"U"}.  \code{"N"} indicates that \code{x} stores the
+      diagonal entries of the represented matrix.  \code{"U"} indicates
+      that the represented matrix is unit diagonal and that \code{x} is
+      empty.}
+    \item{\code{x}}{a vector of length \code{n=Dim[1]=Dim[2]} or 0,
+      conditionally (depending on \code{diag}) storing the diagonal
+      entries of the represented matrix.}
   }
+}
+\section{Subclasses}{
+  The direct, nonvirtual subclasses of \code{diagonalMatrix} defined in
+  package \pkg{Matrix} are listed below with links to virtual
+  superclasses defining their data type.
+  \tabular{rr}{
+    Nonvirtual subclass \tab Data type\cr
+    \code{ndiMatrix} \tab \code{\linkS4class{nMatrix}}\cr
+    \code{ldiMatrix} \tab \code{\linkS4class{lMatrix}}\cr
+    \code{idiMatrix} \tab \code{\linkS4class{iMatrix}}\cr
+    \code{ddiMatrix} \tab \code{\linkS4class{dMatrix}}\cr
+    \code{zdiMatrix} \tab \code{\linkS4class{zMatrix}}
+  }
+  Class \code{ndiMatrix} was not defined until \pkg{Matrix} version
+  1.6-2.
 }
 \seealso{
-  \code{\link{Diagonal}()} as constructor of these matrices, and
-  \code{\link{isDiagonal}}.
-  \code{\linkS4class{ddiMatrix}} and \code{\linkS4class{ldiMatrix}} are
-  \dQuote{actual} classes extending \code{"diagonalMatrix"}.
+  Related classes
+  \code{\linkS4class{generalMatrix}},
+  \code{\linkS4class{symmetricMatrix}},
+  \code{\linkS4class{posdefMatrix}},
+  \code{\linkS4class{triangularMatrix}}, and
+  \code{\linkS4class{indexMatrix}} representing
+  general (unstructured, possibly nonsquare), Hermitian or symmetric,
+  positive semidefinite, triangular, and index matrices.  Generic
+  function \code{\linkS4methods{isDiagonal}} for testing for testing
+  if a matrix is diagonal.  Generic function
+  \code{\linkS4methods{forceDiagonal}} for inducing diagonal structure.
+  Function \code{\link{Diagonal}}, a constructor for
+  \code{diagonalMatrix} objects.
 }
 \examples{
 I5 <- Diagonal(5)

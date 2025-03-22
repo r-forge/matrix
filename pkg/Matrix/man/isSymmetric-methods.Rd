@@ -93,3 +93,6 @@ isSymmetric(triu(M)) # FALSE
 ## Look at implementations:
 showMethods("isSymmetric", includeDefs = TRUE) # includes S3 generic from base
 }
+
+%% \item{isSymmetric}{\code{signature(object = "symmetricMatrix")}:
+%%   returns \code{TRUE} trivially.}

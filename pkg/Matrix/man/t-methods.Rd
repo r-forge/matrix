@@ -41,3 +41,7 @@ ct(x)
 %% \value{}
 %% \seealso{}
 %% \examples{}
+
+%% \item{\code{t}}{\code{signature(x = "indMatrix")}:
+%%   the transpose, which is an \code{indMatrix} with identical
+%%   \code{perm} but opposite \code{margin}.}

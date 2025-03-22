@@ -148,3 +148,9 @@ cbind(rr <- sapply(c("O","I","F","M"),
              function(N) rcond(M3, norm=N, exact=TRUE)))
 \dontshow{stopifnot(all.equal(r., 1/72, tolerance=1e-12))}
 }
+
+%% \item{rcond}{\code{signature(x = "dpoMatrix", norm = "character")}:
+%%   Returns (and stores) the reciprocal of the condition number of
+%%   \code{x}.  The \code{norm} can be \code{"O"} for the
+%%   one-norm (the default) or \code{"I"} for the infinity-norm.  For
+%%   symmetric matrices the result does not depend on the norm.}
