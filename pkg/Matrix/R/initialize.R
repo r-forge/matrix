@@ -23,18 +23,14 @@ setMethod("initialize", c(.Object = "sparseVector"),
                   ## There are no NA, and the order of ties does not
                   ## matter (since ties are invalid), so it is safe
                   ## to use "quick" here
-                  method <-
-                      if (is.integer(length(i)))
-                          "radix"
-                      else "quick"
-                  i <-
-                      if (missing(x) || .M.kind(.Object) == "n")
-                          sort.int(i, method = method)
-                      else {
-                          s <- sort.int(i, method = method, index.return = TRUE)
-                          x <- x[s[["ix"]]]
-                          s[["x"]]
-                      }
+                  method <- if (is.integer(length(i))) "radix" else "quick"
+                  if (missing(x))
+                      i <- sort.int(i, method = method)
+                  else if (length(x) == length(i)) {
+                      s <- sort.int(i, method = method, index.return = TRUE)
+                      x <- x[s[["ix"]]]
+                      i <- s[["x"]]
+                  }
               }
               callNextMethod()
           })

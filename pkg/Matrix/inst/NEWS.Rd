@@ -180,6 +180,10 @@
       \code{TRUE} for  \code{diagU2N()} and \code{diagN2U()} whereas the
       default \code{checkDense = FALSE} remains for the faster low-level
       versions \code{.diagU2N()} and \code{.diagN2U()}.
+
+      \item The method for \code{initialize} with signature
+      \code{.Object="sparseVector"} behaved wrongly when the lengths of
+      arguments \code{i} and \code{x} were not equal.
     }
   }
   \subsection{Misc}{

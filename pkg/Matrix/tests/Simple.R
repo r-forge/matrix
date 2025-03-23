@@ -1680,6 +1680,11 @@ stopifnot(exprs = {
     is(M0, "zgeMatrix")
 })
 
+## initialize(".sparseVector", i=<unsorted>, x=) masked invalid 'x'
+assertError(new("dsparseVector", length = 2L, i = 2:1, x = 0))
+assertError(new("dsparseVector", length = 2L, i = 2:1, x = c(0, 0, 0)))
+
+
 
 
 ## Platform - and other such info -- so we find it in old saved outputs
