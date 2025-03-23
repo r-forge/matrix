@@ -37,34 +37,7 @@ setMethod("initialize", c(.Object = "Matrix"),
           .initialize)
 
 
-## ------ Virtual by structure -----------------------------------------
-
-## Virtual class of general matrices
-setClass("generalMatrix",
-         contains = c("VIRTUAL", "Matrix"),
-         slots = c(factors = "list"),
-         validity = function(object) .Call(generalMatrix_validate, object))
-
-## Virtual class of Hermitian or symmetric matrices
-setClass("symmetricMatrix",
-         contains = c("VIRTUAL", "Matrix"),
-         slots = c(uplo = "character", factors = "list"),
-         prototype = list(uplo = "U"),
-         validity = function(object) .Call(symmetricMatrix_validate, object))
-
-## Virtual class of positive semidefinite matrices
-setClass("posdefMatrix",
-         contains = c("VIRTUAL", "symmetricMatrix"))
-
-## Virtual class of triangular matrices
-setClass("triangularMatrix",
-         contains = c("VIRTUAL", "Matrix"),
-         slots = c(uplo = "character", diag = "character"),
-         prototype = list(uplo = "U", diag = "N"),
-         validity = function(object) .Call(triangularMatrix_validate, object))
-
-
-## ------ Virtual by kind ----------------------------------------------
+## ------ Virtual by data type -----------------------------------------
 
 ## Virtual class of nonzero pattern matrices
 setClass("nMatrix",
@@ -95,77 +68,70 @@ setClass("zMatrix",
          validity = function(object) .Call(zMatrix_validate, object))
 
 
-## ------ Virtual Dense ------------------------------------------------
+## ------ Virtual by structure -----------------------------------------
 
-## Virtual class of dense matrices
+## Virtual class of general matrices
+setClass("generalMatrix",
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(factors = "list"),
+         validity = function(object) .Call(generalMatrix_validate, object))
+
+## Virtual class of Hermitian or symmetric matrices
+setClass("symmetricMatrix",
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(uplo = "character", factors = "list"),
+         prototype = list(uplo = "U"),
+         validity = function(object) .Call(symmetricMatrix_validate, object))
+
+## Virtual class of positive semidefinite matrices
+setClass("posdefMatrix",
+         contains = c("VIRTUAL", "symmetricMatrix"))
+
+## Virtual class of triangular matrices
+setClass("triangularMatrix",
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(uplo = "character", diag = "character"),
+         prototype = list(uplo = "U", diag = "N"),
+         validity = function(object) .Call(triangularMatrix_validate, object))
+
+
+## ------ Virtual by storage format ------------------------------------
+
+## Virtual class of dense format matrices
 setClass("denseMatrix",
          contains = c("VIRTUAL", "Matrix"))
 
-
-## ...... Virtual Dense ... by storage .................................
-
-## Virtual class of dense, unpacked matrices
+## Virtual class of conventional, dense format matrices
 setClass("unpackedMatrix",
          contains = c("VIRTUAL", "denseMatrix"),
          validity = function(object) .Call(unpackedMatrix_validate, object))
 
-## Virtual class of dense, packed matrices
+## Virtual class of packed, dense format matrices
 setClass("packedMatrix",
          contains = c("VIRTUAL", "denseMatrix"),
          slots = c(uplo = "character"),
          prototype = list(uplo = "U"),
          validity = function(object) .Call(packedMatrix_validate, object))
 
-
-## ...... Virtual Dense ... by kind ....................................
-
-## Virtual class of dense, nonzero pattern matrices
-setClass("ndenseMatrix",
-         contains = c("VIRTUAL", "nMatrix", "denseMatrix"),
-         slots = c(x = "logical"),
-         validity = function(object) .Call(nMatrix_validate, object))
-
-## Virtual class of dense, logical matrices
-setClass("ldenseMatrix",
-         contains = c("VIRTUAL", "lMatrix", "denseMatrix"))
-
-## Virtual class of dense, integer matrices
-setClass("idenseMatrix",
-         contains = c("VIRTUAL", "iMatrix", "denseMatrix"))
-
-## Virtual class of dense, double matrices
-setClass("ddenseMatrix",
-         contains = c("VIRTUAL", "dMatrix", "denseMatrix"))
-
-## Virtual class of dense, complex matrices
-setClass("zdenseMatrix",
-         contains = c("VIRTUAL", "zMatrix", "denseMatrix"))
-
-
-## ------ Virtual Sparse -----------------------------------------------
-
-## Virtual class of sparse matrices
+## Virtual class of sparse (:= not dense) format matrices
 setClass("sparseMatrix",
          contains = c("VIRTUAL", "Matrix"))
 
-
-## ...... Virtual Sparse ... by storage ................................
-
-## Virtual class of sparse matrices in compressed sparse column (CSC) format
+## Virtual class of compressed sparse column (CSC) format matrices
 setClass("CsparseMatrix",
          contains = c("VIRTUAL", "sparseMatrix"),
          slots = c(i = "integer", p = "integer"),
          prototype = list(p = 0L), # to be valid
          validity = function(object) .Call(CsparseMatrix_validate, object))
 
-## Virtual class of sparse matrices in compressed sparse row (CSR) format
+## Virtual class of compressed sparse row (CSR) format matrices
 setClass("RsparseMatrix",
          contains = c("VIRTUAL", "sparseMatrix"),
          slots = c(p = "integer", j = "integer"),
          prototype = list(p = 0L), # to be valid
          validity = function(object) .Call(RsparseMatrix_validate, object))
 
-## Virtual class of sparse matrices in triplet format
+## Virtual class of triplet format matrices
 setClass("TsparseMatrix",
          contains = c("VIRTUAL", "sparseMatrix"),
          slots = c(i = "integer", j = "integer"),
@@ -178,56 +144,38 @@ setClass("diagonalMatrix",
          prototype = list(diag = "N"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
-if(FALSE) { # --NOT YET--
-## These methods would allow initialization of zero matrices _without_ 'p',
-## as in the call new("dgCMatrix", Dim = c(6L, 6L)).  However, they would
-## also incur a small performance penalty on all other new("..[CR]Matrix")
-## calls.
-setMethod("initialize", c(.Object = "CsparseMatrix"),
-          function(.Object, ...) {
-              ## Suboptimal if ...names() is NULL or if 'Dim' is missing
-              ## but that will "never" happen if ...length() is nonzero:
-              if(...length() &&
-                 all((nms <- ...names()) != "p") &&
-                 length(w <- which(nms == "Dim")) &&
-                 !is.character(validDim(d <- ...elt(w[1L]))))
-                  callNextMethod(.Object, ..., p = integer(d[2L] + 1))
-              else callNextMethod()
-          })
 
-setMethod("initialize", c(.Object = "RsparseMatrix"),
-          function(.Object, ...) {
-              ## Suboptimal if ...names() is NULL or if 'Dim' is missing
-              ## but that will "never" happen if ...length() is nonzero:
-              if(...length() &&
-                 all((nms <- ...names()) != "p") &&
-                 length(w <- which(nms == "Dim")) &&
-                 !is.character(validDim(d <- ...elt(w[1L]))))
-                  callNextMethod(.Object, ..., p = integer(d[1L] + 1))
-              else callNextMethod()
-          })
-} # --NOT YET--
+## ------ Virtual intersections ----------------------------------------
 
+setClass("ndenseMatrix",
+         contains = c("VIRTUAL", "nMatrix", "denseMatrix"),
+         slots = c(x = "logical"),
+         validity = function(object) .Call(nMatrix_validate, object))
 
-## ...... Virtual Sparse ... by kind ...................................
+setClass("ldenseMatrix",
+         contains = c("VIRTUAL", "lMatrix", "denseMatrix"))
 
-## Virtual class of sparse, nonzero pattern matrices
+setClass("idenseMatrix",
+         contains = c("VIRTUAL", "iMatrix", "denseMatrix"))
+
+setClass("ddenseMatrix",
+         contains = c("VIRTUAL", "dMatrix", "denseMatrix"))
+
+setClass("zdenseMatrix",
+         contains = c("VIRTUAL", "zMatrix", "denseMatrix"))
+
 setClass("nsparseMatrix",
          contains = c("VIRTUAL", "nMatrix", "sparseMatrix"))
 
-## Virtual class of sparse, logical matrices
 setClass("lsparseMatrix",
          contains = c("VIRTUAL", "lMatrix", "sparseMatrix"))
 
-## Virtual class of sparse, integer matrices
 setClass("isparseMatrix",
          contains = c("VIRTUAL", "iMatrix", "sparseMatrix"))
 
-## Virtual class of sparse, double matrices
 setClass("dsparseMatrix",
          contains = c("VIRTUAL", "dMatrix", "sparseMatrix"))
 
-## Virtual class of sparse, complex matrices
 setClass("zsparseMatrix",
          contains = c("VIRTUAL", "zMatrix", "sparseMatrix"))
 
