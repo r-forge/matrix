@@ -79,6 +79,13 @@ setClass("triangularMatrix",
          prototype = list(uplo = "U", diag = "N"),
          validity = function(object) .Call(triangularMatrix_validate, object))
 
+## Virtual class of diagonal matrices
+setClass("diagonalMatrix",
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(diag = "character"),
+         prototype = list(diag = "N"),
+         validity = function(object) .Call(diagonalMatrix_validate, object))
+
 
 ## ------ Virtual by storage format ------------------------------------
 
@@ -121,13 +128,6 @@ setClass("TsparseMatrix",
          contains = c("VIRTUAL", "sparseMatrix"),
          slots = c(i = "integer", j = "integer"),
          validity = function(object) .Call(TsparseMatrix_validate, object))
-
-## Virtual class of diagonal matrices
-setClass("diagonalMatrix",
-         contains = c("VIRTUAL", "sparseMatrix"),
-         slots = c(diag = "character"),
-         prototype = list(diag = "N"),
-         validity = function(object) .Call(diagonalMatrix_validate, object))
 
 
 ## ------ Virtual intersections ----------------------------------------
@@ -368,7 +368,7 @@ setClass("ntTMatrix",
 
 ## Diagonal
 setClass("ndiMatrix",
-         contains = c("diagonalMatrix", "nMatrix"),
+         contains = c("diagonalMatrix", "nMatrix", "sparseMatrix"),
          slots = c(x = "logical"),
          validity = function(object) .Call(nMatrix_validate, object))
 
@@ -422,7 +422,7 @@ setClass("ltTMatrix",
 
 ## Diagonal
 setClass("ldiMatrix",
-         contains = c("diagonalMatrix", "lMatrix"))
+         contains = c("diagonalMatrix", "lMatrix", "sparseMatrix"))
 
 
 ## ...... Sparse, integer ..............................................
@@ -474,7 +474,7 @@ setClass("itTMatrix",
 
 ## Diagonal
 setClass("idiMatrix",
-         contains = c("diagonalMatrix", "iMatrix"))
+         contains = c("diagonalMatrix", "iMatrix", "sparseMatrix"))
 
 
 ## ...... Sparse, double ...............................................
@@ -541,7 +541,7 @@ setClass("dtTMatrix",
 
 ## Diagonal
 setClass("ddiMatrix",
-         contains = c("diagonalMatrix", "dMatrix"))
+         contains = c("diagonalMatrix", "dMatrix", "sparseMatrix"))
 
 
 ## ...... Sparse, complex ..............................................
@@ -614,7 +614,7 @@ setClass("ztTMatrix",
 
 ## Diagonal
 setClass("zdiMatrix",
-         contains = c("diagonalMatrix", "zMatrix"))
+         contains = c("diagonalMatrix", "zMatrix", "sparseMatrix"))
 
 
 ## ...... Sparse, index ................................................
