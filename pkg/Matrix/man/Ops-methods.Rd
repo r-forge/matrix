@@ -136,8 +136,6 @@
 \alias{Ops,zdiMatrix,ndiMatrix-method}
 \alias{Ops,zdiMatrix,zdiMatrix-method}
 %
-\alias{Arith,abIndex,abIndex-method}
-\alias{Arith,abIndex,numLike-method}
 \alias{Arith,complex,CsparseMatrix-method}
 \alias{Arith,complex,dgCMatrix-method}
 \alias{Arith,complex,dgeMatrix-method}
@@ -288,7 +286,6 @@
 \alias{Arith,numeric,zgCMatrix-method}
 \alias{Arith,numeric,zgeMatrix-method}
 \alias{Arith,numeric,zsparseMatrix-method}
-\alias{Arith,numLike,abIndex-method}
 \alias{Arith,sparseVector,denseMatrix-method}
 \alias{Arith,sparseVector,dgeMatrix-method}
 \alias{Arith,sparseVector,igeMatrix-method}
