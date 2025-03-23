@@ -1,15 +1,3 @@
-## initialize() method for Matrix and MatrixFactorization, which both
-## allow Dimnames[[i]] to be a vector of type other than "character"
-## and furthermore to be a vector of length zero rather than NULL ...
-.initialize <- function(.Object, ...) {
-    .Object <- callNextMethod()
-    ## Suboptimal if ...names() is NULL but that will "never"
-    ## happen if ...length() is nonzero:
-    if(...length() && any(...names() == "Dimnames"))
-        .Object@Dimnames <- fixupDN(.Object@Dimnames)
-    .Object
-}
-
 ## new() does not work at build time because native symbols such as
 ## 'Matrix_validate' needed for validity checking are not available ...
 .new <- function(cl, ...) {
@@ -32,9 +20,6 @@ setClass("Matrix",
          slots = c(Dim = "integer", Dimnames = "list"),
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object) .Call(Matrix_validate, object))
-
-setMethod("initialize", c(.Object = "Matrix"),
-          .initialize)
 
 
 ## ------ Virtual by data type -----------------------------------------
@@ -659,9 +644,6 @@ setClass("MatrixFactorization",
          prototype = list(Dim = integer(2L), Dimnames = list(NULL, NULL)),
          validity = function(object) .Call(MatrixFactorization_validate, object))
 
-setMethod("initialize", c(.Object = "MatrixFactorization"),
-          .initialize)
-
 
 ## ------ Schur --------------------------------------------------------
 
@@ -882,29 +864,6 @@ setClass("sparseVector",
          prototype = list(length = 0L, i = integer(0L)),
          validity = function(object) .Call(sparseVector_validate, object))
 
-## Allow users to do new("[nlidz]sparseVector", i=, x=) with unsorted 'i'
-setMethod("initialize", c(.Object = "sparseVector"),
-          function(.Object, i, x, ...) {
-              if(!missing(i)) {
-                  i.uns <- is.unsorted(i, strictly = TRUE)
-                  i <-
-                      if(is.na(i.uns) || !i.uns)
-                          i
-                      else {
-                          ## we know that there are no NA, and the order of
-                          ## ties does not matter (since ties are an error),
-                          ## hence it is safe to use "quick" here
-                          m <- if(is.integer(length(i))) "radix" else "quick"
-                          if(.hasSlot(.Object, "x") && !missing(x)) {
-                              s <- sort.int(i, method = m, index.return = TRUE)
-                              x <- x[s[["ix"]]]
-                              s[["x"]]
-                          } else sort.int(i, method = m)
-                      }
-              }
-              callNextMethod()
-          })
-
 
 ## ------ Non-Virtual Subclasses ---------------------------------------
 
@@ -1089,4 +1048,4 @@ setClass("nCHMsuper")
 setClass("pBunchKaufman")
 setClass("pCholesky")
 
-rm(.new, .initialize)
+rm(.new)
