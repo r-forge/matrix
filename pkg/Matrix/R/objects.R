@@ -79,7 +79,7 @@ MatrixClass <- function(cl, cld = getClassDef(cl),
     if(is.null(pkg <- cld@package) && is.null(pkg <- attr(cl, "package")))
         return(character(0L))
     if(identical(pkg, "Matrix") && (!...Matrix ||
-           grepl("^[nlidz](ge|sy|sp|tr|tp|di|[gst][CRT])Matrix$", cl)))
+           grepl("^([nlidz](ge|sy|sp|tr|tp|di|[gst][CRT])|ind)Matrix$", cl)))
         return(cl)
     r <- .selectSuperClasses(cld@contains, dropVirtual = dropVirtual,
                              namesOnly = TRUE, ...)

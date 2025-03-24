@@ -299,6 +299,8 @@ exportClasses(Matrix, # and its subclasses .............................
               symmetricMatrix,
               posdefMatrix,
               triangularMatrix,
+              diagonalMatrix,
+              indexMatrix,
 
               denseMatrix,
               unpackedMatrix,
@@ -308,9 +310,6 @@ exportClasses(Matrix, # and its subclasses .............................
               CsparseMatrix,
               RsparseMatrix,
               TsparseMatrix,
-              diagonalMatrix,
-              indMatrix,
-              pMatrix,
 
               nMatrix,
 
@@ -331,8 +330,9 @@ exportClasses(Matrix, # and its subclasses .............................
               ntCMatrix,
               ntRMatrix,
               ntTMatrix,
-
               ndiMatrix,
+              indMatrix,
+              pMatrix,
 
               lMatrix,
 
@@ -353,7 +353,6 @@ exportClasses(Matrix, # and its subclasses .............................
               ltCMatrix,
               ltRMatrix,
               ltTMatrix,
-
               ldiMatrix,
 
               iMatrix,
@@ -375,7 +374,6 @@ exportClasses(Matrix, # and its subclasses .............................
               itCMatrix,
               itRMatrix,
               itTMatrix,
-
               idiMatrix,
 
               dMatrix,
@@ -404,7 +402,6 @@ exportClasses(Matrix, # and its subclasses .............................
               dtCMatrix,
               dtRMatrix,
               dtTMatrix,
-
               ddiMatrix,
 
               zMatrix,
@@ -429,7 +426,6 @@ exportClasses(Matrix, # and its subclasses .............................
               ztCMatrix,
               ztRMatrix,
               ztTMatrix,
-
               zdiMatrix,
 
               MatrixFactorization, # and its subclasses ................

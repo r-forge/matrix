@@ -86,6 +86,10 @@ setClass("diagonalMatrix",
          prototype = list(diag = "N"),
          validity = function(object) .Call(diagonalMatrix_validate, object))
 
+## Virtual class of generalized index matrices
+setClass("indexMatrix",
+         contains = c("VIRTUAL", "Matrix"))
+
 
 ## ------ Virtual by storage format ------------------------------------
 
@@ -372,6 +376,18 @@ setClass("ndiMatrix",
          slots = c(x = "logical"),
          validity = function(object) .Call(nMatrix_validate, object))
 
+## Row or column index
+setClass("indMatrix",
+         contains = c("indexMatrix", "nMatrix", "sparseMatrix"),
+         slots = c(perm = "integer", margin = "integer"),
+         prototype = list(margin = 1L), # to be valid
+         validity = function(object) .Call(indMatrix_validate, object))
+
+## Row or column permutation
+setClass("pMatrix",
+         contains = "indMatrix",
+         validity = function(object) .Call(pMatrix_validate, object))
+
 
 ## ...... Sparse, logical ..............................................
 
@@ -615,21 +631,6 @@ setClass("ztTMatrix",
 ## Diagonal
 setClass("zdiMatrix",
          contains = c("diagonalMatrix", "zMatrix", "sparseMatrix"))
-
-
-## ...... Sparse, index ................................................
-
-## Row or column index
-setClass("indMatrix",
-         contains = "sparseMatrix",
-         slots = c(perm = "integer", margin = "integer"),
-         prototype = list(margin = 1L), # to be valid
-         validity = function(object) .Call(indMatrix_validate, object))
-
-## Row or column permutation
-setClass("pMatrix",
-         contains = "indMatrix",
-         validity = function(object) .Call(pMatrix_validate, object))
 
 
 ########################################################################

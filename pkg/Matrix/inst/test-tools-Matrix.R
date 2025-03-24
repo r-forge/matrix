@@ -728,8 +728,10 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
         ## FIXME --- some stuff is for all 'kinds'  (e.g. the one for "n" ?)
 	if(is.n) { # "nMatrix"
 	    mM <- if(nonMatr) as(m, Mcl) else m
-	    stopifnot(identical(mM, as(as(m, "dMatrix"),"nMatrix")),
-		      identical(mM, as(as(m, "lMatrix"),"nMatrix")),
+	    ## As currently all indexMatrix are nonzero pattern:
+	    to. <- if(Mcl == "indMatrix") "indMatrix" else "nMatrix"
+	    stopifnot(identical(mM, as(as(m, "dMatrix"),to.)),
+		      identical(mM, as(as(m, "lMatrix"),to.)),
 		      identical(which(m), which(m.m)))
 	}
 	else if(is.l) { ## "lMatrix"  -- should fulfill even with NA:
@@ -759,7 +761,7 @@ checkMatrix <- function(m, m.m = if(do.matrix) as(m, "matrix"),
 		      Q.C.identical(m1 , as(as(m., "lMatrix"),"dMatrix"),
 				    isSp, checkClass = FALSE))
 	}
-        else if(is.i) { 
+        else if(is.i) {
             ## __FIXME__  "iMatrix"
 	}
         else if(is.z) {

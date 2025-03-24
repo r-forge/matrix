@@ -14,8 +14,8 @@ stopifnot(exprs = {
     MatrixClass( "dppMatrix") == "dspMatrix"
     MatrixClass( "corMatrix") == "dsyMatrix"
     MatrixClass( "copMatrix") == "dspMatrix"
-    identical(MatrixClass("indMatrix"), character(0L))
-    identical(MatrixClass(  "pMatrix"), character(0L))
+    MatrixClass( "indMatrix") == "indMatrix"
+    MatrixClass(   "pMatrix") == "indMatrix"
 })
 
 ## [matrix-Bugs][6182] Coercion method doesn't work on child class
