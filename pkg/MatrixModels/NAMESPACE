@@ -44,14 +44,14 @@ importMethodsFrom("Matrix", as.matrix, as.vector, coerce,
 		  )
 
 importClassesFrom("Matrix",
-		  CHMfactor, CHMsimpl, CHMsuper, dCHMsimpl, dCHMsuper,
-		  Cholesky, CholeskyFactorization,
-		  compMatrix, corMatrix,
-		  dgCMatrix, dgeMatrix, dMatrix,
-		  dsparseMatrix, sparseMatrix, CsparseMatrix,
-		  ddenseMatrix, denseMatrix,
-                  unpackedMatrix,
-		  generalMatrix, Matrix)
+                  Matrix, dMatrix, generalMatrix,
+                  denseMatrix, ddenseMatrix, unpackedMatrix, dgeMatrix,
+                  sparseMatrix, dsparseMatrix, CsparseMatrix, dgCMatrix,
+                  MatrixFactorization, Cholesky,
+                  denseCholesky, ddenseCholesky,
+                  sparseCholesky, dsparseCholesky,
+                  simplicialCholesky, dsimplicialCholesky,
+                  supernodalCholesky, dsupernodalCholesky)
 
 importFrom("Matrix",
 	   .solve.dgC.chol, .solve.dgC.qr,

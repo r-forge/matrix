@@ -56,13 +56,13 @@ setClass("dsparseModelMatrix", contains = c("dgCMatrix", "sparseModelMatrix"))
 ## the super class contains the slots already;
 setClass("predModule",
          representation(X = "modelMatrix", coef = "numeric", Vtr = "numeric",
-                        fac = "CholeskyFactorization",
+                        fac = "Cholesky",
                         "VIRTUAL"))
 ## the sub classes specify more specific classes for the two non-trivial slots:
 setClass("dPredModule", contains = "predModule",
-	 representation(X = "ddenseModelMatrix", fac = "Cholesky"))
+	 representation(X = "ddenseModelMatrix", fac = "ddenseCholesky"))
 setClass("sPredModule", contains = "predModule",
-	 representation(X = "dsparseModelMatrix", fac = "CHMfactor"))
+	 representation(X = "dsparseModelMatrix", fac = "dsparseCholesky"))
 
 ## Response modules for models with a linear predictor, which can
 ## include linear models, generalized linear models, nonlinear models
