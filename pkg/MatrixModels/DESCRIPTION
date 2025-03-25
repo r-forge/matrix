@@ -1,7 +1,7 @@
 Package: MatrixModels
 Version: 0.5-4
 VersionNote: Released 0.5-3 on 2023-11-06
-Date: 2024-08-14
+Date: 2025-03-25
 Title: Modelling with Sparse and Dense Matrices
 Contact: Matrix-authors@R-project.org
 Authors@R: c(
@@ -12,7 +12,7 @@ Authors@R: c(
 Description: Generalized Linear Modelling with sparse and dense 'Matrix' matrices, using
   modular prediction and response module classes.
 Depends: R (>= 3.6.0)
-Imports: stats, methods, Matrix (>= 1.6-0)
+Imports: stats, methods, Matrix (>= 1.6-0), Matrix(< 1.8-0)
 ImportsNote: _not_yet_stats4
 Encoding: UTF-8
 LazyLoad: yes
