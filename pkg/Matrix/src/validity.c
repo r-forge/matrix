@@ -32,7 +32,7 @@
 */
 
 static
-char *Dim_validate(SEXP dim)
+char *valid_slot_Dim(SEXP dim)
 {
 	if (TYPEOF(dim) != INTSXP)
 		RMS(_("'%s' slot is not of type \"%s\""), "Dim", "integer");
@@ -47,14 +47,8 @@ char *Dim_validate(SEXP dim)
 	return NULL;
 }
 
-SEXP R_Dim_validate(SEXP dim)
-{
-	char *msg = Dim_validate(dim);
-	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
-}
-
 static
-char *DimNames_validate(SEXP dimnames, int *pdim)
+char *valid_slot_Dimnames(SEXP dimnames, SEXP dim)
 {
 	if (TYPEOF(dimnames) != VECSXP)
 		RMS(_("'%s' slot is not a list"), "Dimnames");
@@ -63,11 +57,11 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 
 	/* Behave as do_matrix() from src/main/array.c:
 	   Dimnames[[i]] must be NULL or _coercible to_ character
-	   of length Dim[i] or 0 ... see ./attrib.c, R_DimNames_fixup()
+	   of length Dim[i] or 0 ... see R_DimNames_fixup [./attrib.c]
 	*/
 
 	SEXP s;
-	int i;
+	int i, *pdim = INTEGER(dim);
 	R_xlen_t ns;
 
 	for (i = 0; i < 2; ++i) {
@@ -86,9 +80,15 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 	return NULL;
 }
 
-SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
+SEXP R_valid_slot_Dim(SEXP dim)
 {
-	char *msg = DimNames_validate(dimnames, INTEGER(dim));
+	char *msg = valid_slot_Dim(dim);
+	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
+}
+
+SEXP R_valid_slot_Dimnames(SEXP dimnames, SEXP dim)
+{
+	char *msg = valid_slot_Dimnames(dimnames, dim);
 	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
@@ -98,21 +98,21 @@ SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
    have already been called via validObject() ...
 */
 
-SEXP Matrix_validate(SEXP obj)
+SEXP R_valid_Matrix(SEXP obj)
 {
 	SEXP dim = PROTECT(GET_SLOT(obj, Matrix_DimSym));
-	char *msg = Dim_validate(dim);
+	char *msg = valid_slot_Dim(dim);
 	if (!msg) {
 		SEXP dimnames = PROTECT(GET_SLOT(obj, Matrix_DimNamesSym));
-		msg = DimNames_validate(dimnames, INTEGER(dim));
+		msg = valid_slot_Dimnames(dimnames, dim);
 		UNPROTECT(1); /* dimnames */
 	}
 	UNPROTECT(1); /* dim */
 	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
-#define KINDMATRIX_VALIDATE(_PREFIX_, _SEXPTYPE_) \
-SEXP _PREFIX_ ## Matrix_validate(SEXP obj) \
+#define TEMPLATE(_CLASS_, _SEXPTYPE_) \
+SEXP R_valid_ ## _CLASS_(SEXP obj) \
 { \
 	SEXP x = GET_SLOT(obj, Matrix_xSym); \
 	if (TYPEOF(x) != _SEXPTYPE_) \
@@ -120,14 +120,14 @@ SEXP _PREFIX_ ## Matrix_validate(SEXP obj) \
 		      "x", Rf_type2char(_SEXPTYPE_)); \
 	return Rf_ScalarLogical(1); \
 }
-KINDMATRIX_VALIDATE(n,  LGLSXP)
-KINDMATRIX_VALIDATE(l,  LGLSXP)
-KINDMATRIX_VALIDATE(i,  INTSXP)
-KINDMATRIX_VALIDATE(d, REALSXP)
-KINDMATRIX_VALIDATE(z, CPLXSXP)
-#undef KINDMATRIX_VALIDATE
+TEMPLATE(nMatrix,  LGLSXP)
+TEMPLATE(lMatrix,  LGLSXP)
+TEMPLATE(iMatrix,  INTSXP)
+TEMPLATE(dMatrix, REALSXP)
+TEMPLATE(zMatrix, CPLXSXP)
+#undef TEMPLATE
 
-SEXP generalMatrix_validate(SEXP obj)
+SEXP R_valid_generalMatrix(SEXP obj)
 {
 	SEXP factors = GET_SLOT(obj, Matrix_factorsSym);
 	if (TYPEOF(factors) != VECSXP)
@@ -143,7 +143,7 @@ SEXP generalMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP symmetricMatrix_validate(SEXP obj)
+SEXP R_valid_symmetricMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -213,10 +213,10 @@ SEXP symmetricMatrix_validate(SEXP obj)
 		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
 	}
 
-	return generalMatrix_validate(obj);
+	return R_valid_generalMatrix(obj);
 }
 
-SEXP triangularMatrix_validate(SEXP obj)
+SEXP R_valid_triangularMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -243,7 +243,7 @@ SEXP triangularMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP unpackedMatrix_validate(SEXP obj)
+SEXP R_valid_unpackedMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -252,7 +252,7 @@ SEXP unpackedMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP packedMatrix_validate(SEXP obj)
+SEXP R_valid_packedMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1];
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -261,7 +261,7 @@ SEXP packedMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP CsparseMatrix_validate(SEXP obj)
+SEXP R_valid_CsparseMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
@@ -311,7 +311,7 @@ SEXP CsparseMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP RsparseMatrix_validate(SEXP obj)
+SEXP R_valid_RsparseMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
@@ -361,7 +361,7 @@ SEXP RsparseMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP TsparseMatrix_validate(SEXP obj)
+SEXP R_valid_TsparseMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
 
@@ -399,7 +399,7 @@ SEXP TsparseMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP diagonalMatrix_validate(SEXP obj)
+SEXP R_valid_diagonalMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -423,7 +423,7 @@ SEXP diagonalMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP indMatrix_validate(SEXP obj)
+SEXP R_valid_indMatrix(SEXP obj)
 {
 	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
 	if (TYPEOF(margin) != INTSXP)
@@ -458,7 +458,7 @@ SEXP indMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP pMatrix_validate(SEXP obj)
+SEXP R_valid_pMatrix(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -481,7 +481,7 @@ SEXP pMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sCMatrix_validate(SEXP obj)
+SEXP R_valid_sCMatrix(SEXP obj)
 {
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
 	int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
@@ -520,10 +520,10 @@ SEXP sCMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP tCMatrix_validate(SEXP obj)
+SEXP R_valid_tCMatrix(SEXP obj)
 {
 	if (DIAG(obj) == 'N')
-		return sCMatrix_validate(obj);
+		return R_valid_sCMatrix(obj);
 
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
 	int *pp = INTEGER(p), n = (int) (XLENGTH(p) - 1);
@@ -568,7 +568,7 @@ SEXP tCMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sRMatrix_validate(SEXP obj)
+SEXP R_valid_sRMatrix(SEXP obj)
 {
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
 	int *pp = INTEGER(p), m = (int) (XLENGTH(p) - 1);
@@ -607,10 +607,10 @@ SEXP sRMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP tRMatrix_validate(SEXP obj)
+SEXP R_valid_tRMatrix(SEXP obj)
 {
 	if (DIAG(obj) == 'N')
-		return sRMatrix_validate(obj);
+		return R_valid_sRMatrix(obj);
 
 	SEXP p = GET_SLOT(obj, Matrix_pSym);
 	int *pp = INTEGER(p), m = (int) (XLENGTH(p) - 1);
@@ -655,7 +655,7 @@ SEXP tRMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sTMatrix_validate(SEXP obj)
+SEXP R_valid_sTMatrix(SEXP obj)
 {
 	SEXP i = GET_SLOT(obj, Matrix_iSym);
 	R_xlen_t nnz = XLENGTH(i);
@@ -684,10 +684,10 @@ SEXP sTMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP tTMatrix_validate(SEXP obj)
+SEXP R_valid_tTMatrix(SEXP obj)
 {
 	if (DIAG(obj) == 'N')
-		return sTMatrix_validate(obj);
+		return R_valid_sTMatrix(obj);
 
 	SEXP i = GET_SLOT(obj, Matrix_iSym);
 	R_xlen_t nnz = XLENGTH(i);
@@ -728,7 +728,7 @@ SEXP tTMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xgCMatrix_validate(SEXP obj)
+SEXP R_valid_xgCMatrix(SEXP obj)
 {
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
@@ -738,23 +738,23 @@ SEXP xgCMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xsCMatrix_validate(SEXP obj)
+SEXP R_valid_xsCMatrix(SEXP obj)
 {
-	SEXP val = xgCMatrix_validate(obj);
+	SEXP val = R_valid_xgCMatrix(obj);
 	if (TYPEOF(val) != STRSXP)
-		val = sCMatrix_validate(obj);
+		val = R_valid_sCMatrix(obj);
 	return val;
 }
 
-SEXP xtCMatrix_validate(SEXP obj)
+SEXP R_valid_xtCMatrix(SEXP obj)
 {
-	SEXP val = xgCMatrix_validate(obj);
+	SEXP val = R_valid_xgCMatrix(obj);
 	if (TYPEOF(val) != STRSXP)
-		val = tCMatrix_validate(obj);
+		val = R_valid_tCMatrix(obj);
 	return val;
 }
 
-SEXP xgRMatrix_validate(SEXP obj)
+SEXP R_valid_xgRMatrix(SEXP obj)
 {
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		j = PROTECT(GET_SLOT(obj, Matrix_jSym));
@@ -764,23 +764,23 @@ SEXP xgRMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xsRMatrix_validate(SEXP obj)
+SEXP R_valid_xsRMatrix(SEXP obj)
 {
-	SEXP val = xgRMatrix_validate(obj);
+	SEXP val = R_valid_xgRMatrix(obj);
 	if (TYPEOF(val) != STRSXP)
-		val = sRMatrix_validate(obj);
+		val = R_valid_sRMatrix(obj);
 	return val;
 }
 
-SEXP xtRMatrix_validate(SEXP obj)
+SEXP R_valid_xtRMatrix(SEXP obj)
 {
-	SEXP val = xgRMatrix_validate(obj);
+	SEXP val = R_valid_xgRMatrix(obj);
 	if (TYPEOF(val) != STRSXP)
-		val = tRMatrix_validate(obj);
+		val = R_valid_tRMatrix(obj);
 	return val;
 }
 
-SEXP xgTMatrix_validate(SEXP obj)
+SEXP R_valid_xgTMatrix(SEXP obj)
 {
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)),
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym));
@@ -790,19 +790,19 @@ SEXP xgTMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xsTMatrix_validate(SEXP obj)
+SEXP R_valid_xsTMatrix(SEXP obj)
 {
-	SEXP val = xgTMatrix_validate(obj);
+	SEXP val = R_valid_xgTMatrix(obj);
 	if (TYPEOF(val) != STRSXP)
-		val = sTMatrix_validate(obj);
+		val = R_valid_sTMatrix(obj);
 	return val;
 }
 
-SEXP xtTMatrix_validate(SEXP obj)
+SEXP R_valid_xtTMatrix(SEXP obj)
 {
-	SEXP val = xgTMatrix_validate(obj);
+	SEXP val = R_valid_xgTMatrix(obj);
 	if (TYPEOF(val) != STRSXP)
-		val = tTMatrix_validate(obj);
+		val = R_valid_tTMatrix(obj);
 	return val;
 }
 
@@ -811,7 +811,7 @@ SEXP xtTMatrix_validate(SEXP obj)
    even if 'x' contains non-finite entries (for speed) ...
 */
 
-SEXP xpoMatrix_validate(SEXP obj)
+SEXP R_valid_xpoMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1], j;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -834,7 +834,7 @@ SEXP xpoMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xppMatrix_validate(SEXP obj)
+SEXP R_valid_xppMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1], j;
 	char ul = UPLO(obj);
@@ -869,7 +869,7 @@ SEXP xppMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xpCMatrix_validate(SEXP obj)
+SEXP R_valid_xpCMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1], j;
 	char ul = UPLO(obj);
@@ -912,7 +912,7 @@ SEXP xpCMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xpRMatrix_validate(SEXP obj)
+SEXP R_valid_xpRMatrix(SEXP obj)
 {
 	int m = DIM(obj)[0], i;
 	char ul = UPLO(obj);
@@ -955,7 +955,7 @@ SEXP xpRMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP xpTMatrix_validate(SEXP obj)
+SEXP R_valid_xpTMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1];
 
@@ -997,7 +997,7 @@ SEXP xpTMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP corMatrix_validate(SEXP obj)
+SEXP R_valid_corMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1], j;
 	R_xlen_t n1a = (R_xlen_t) n + 1;
@@ -1021,7 +1021,7 @@ SEXP corMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP copMatrix_validate(SEXP obj)
+SEXP R_valid_copMatrix(SEXP obj)
 {
 	int n = DIM(obj)[1], j;
 	char ul = UPLO(obj);
@@ -1051,7 +1051,7 @@ SEXP copMatrix_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sparseVector_validate(SEXP obj)
+SEXP R_valid_sparseVector(SEXP obj)
 {
 	SEXP length = GET_SLOT(obj, Matrix_lengthSym);
 	if (TYPEOF(length) != INTSXP && TYPEOF(length) != REALSXP)
@@ -1115,8 +1115,8 @@ SEXP sparseVector_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-#define KINDVECTOR_VALIDATE(_PREFIX_, _SEXPTYPE_) \
-SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
+#define TEMPLATE(_CLASS_, _SEXPTYPE_) \
+SEXP R_valid_ ## _CLASS_(SEXP obj) \
 { \
 	SEXP x = PROTECT(GET_SLOT(obj, Matrix_xSym)), \
 		i = PROTECT(GET_SLOT(obj, Matrix_iSym)); \
@@ -1129,18 +1129,18 @@ SEXP _PREFIX_ ## sparseVector_validate(SEXP obj) \
 		      "i", "x"); \
 	return Rf_ScalarLogical(1); \
 }
-KINDVECTOR_VALIDATE(l,  LGLSXP)
-KINDVECTOR_VALIDATE(i,  INTSXP)
-KINDVECTOR_VALIDATE(d, REALSXP)
-KINDVECTOR_VALIDATE(z, CPLXSXP)
-#undef KINDVECTOR_VALIDATE
+TEMPLATE(lsparseVector,  LGLSXP)
+TEMPLATE(isparseVector,  INTSXP)
+TEMPLATE(dsparseVector, REALSXP)
+TEMPLATE(zsparseVector, CPLXSXP)
+#undef TEMPLATE
 
-SEXP MatrixFactorization_validate(SEXP obj)
+SEXP R_valid_MatrixFactorization(SEXP obj)
 {
-	return Matrix_validate(obj);
+	return R_valid_Matrix(obj);
 }
 
-SEXP denseSchur_validate(SEXP obj)
+SEXP R_valid_denseSchur(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -1179,7 +1179,7 @@ SEXP denseSchur_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP denseQR_validate(SEXP obj)
+SEXP R_valid_denseQR(SEXP obj)
 {
 	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 
@@ -1221,7 +1221,7 @@ SEXP denseQR_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP denseLU_validate(SEXP obj)
+SEXP R_valid_denseLU(SEXP obj)
 {
 	int *pdim = DIM(obj), m = pdim[0], n = pdim[1], r = (m < n) ? m : n;
 
@@ -1250,7 +1250,7 @@ SEXP denseLU_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP denseBunchKaufman_validate(SEXP obj)
+SEXP R_valid_denseBunchKaufman(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -1310,7 +1310,7 @@ SEXP denseBunchKaufman_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP denseCholesky_validate(SEXP obj)
+SEXP R_valid_denseCholesky(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -1396,7 +1396,7 @@ SEXP denseCholesky_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sparseQR_validate(SEXP obj)
+SEXP R_valid_sparseQR(SEXP obj)
 {
 	/* MJ: assuming for simplicity that 'V' and 'R' slots are formally valid */
 
@@ -1497,7 +1497,7 @@ SEXP sparseQR_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sparseLU_validate(SEXP obj)
+SEXP R_valid_sparseLU(SEXP obj)
 {
 	/* MJ: assuming for simplicity that 'L' and 'U' slots are formally valid */
 
@@ -1595,7 +1595,7 @@ SEXP sparseLU_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP sparseCholesky_validate(SEXP obj)
+SEXP R_valid_sparseCholesky(SEXP obj)
 {
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
@@ -1652,7 +1652,7 @@ SEXP sparseCholesky_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP simplicialCholesky_validate(SEXP obj)
+SEXP R_valid_simplicialCholesky(SEXP obj)
 {
 	int pattern = !HAS_SLOT(obj, Matrix_minorSym);
 	if (pattern)
@@ -1809,7 +1809,7 @@ SEXP simplicialCholesky_validate(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP supernodalCholesky_validate(SEXP obj)
+SEXP R_valid_supernodalCholesky(SEXP obj)
 {
 	int pattern = !HAS_SLOT(obj, Matrix_minorSym), n = DIM(obj)[1];
 
@@ -1974,7 +1974,7 @@ void validObject(SEXP obj, const char *cl)
 
 # define IS_VALID(_CLASS_) \
 	do { \
-		status = _CLASS_ ## _validate(obj); \
+		status = R_valid_ ## _CLASS_(obj); \
 		if (TYPEOF(status) == STRSXP) \
 			Rf_error(_("invalid class \"%s\" object: %s"), \
 			         cl, CHAR(STRING_ELT(status, 0))); \

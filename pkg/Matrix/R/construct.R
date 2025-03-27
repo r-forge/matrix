@@ -232,7 +232,7 @@ sparseMatrix <- function(i, j, p, x, dims, dimnames,
     r@Dim <- dims
     if(!missing(dimnames) && !is.null(dimnames))
         r@Dimnames <-
-            if(is.character(validDN(dimnames, dims)))
+            if(is.character(validSlot.Dimnames(dimnames, dims)))
                 dimnames
             else fixupDN(dimnames) # needs a valid argument
     if((symmetric || triangular) && all(i >= j))

@@ -2,7 +2,7 @@
 #include "cs-etc.h"
 #include "cholmod-etc.h"
 
-/* NB: mostly parallel to CsparseMatrix_validate in ./validity.c */
+/* NB: mostly parallel to R_valid_CsparseMatrix [./validity.c] */
 SEXP checkpi(SEXP dim, SEXP p, SEXP i)
 {
 	int m = INTEGER(dim)[0], n = INTEGER(dim)[1];
@@ -61,7 +61,7 @@ SEXP checkpi(SEXP dim, SEXP p, SEXP i)
 }
 
 /* .validateCsparse(x, sort.if.needed = TRUE) */
-SEXP CsparseMatrix_validate_maybe_sorting(SEXP x)
+SEXP R_valid_CsparseMatrix_maybe_sorting(SEXP x)
 {
 	SEXP dim = PROTECT(GET_SLOT(x, Matrix_DimSym)),
 		p = PROTECT(GET_SLOT(x, Matrix_pSym)),

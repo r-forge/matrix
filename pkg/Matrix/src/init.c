@@ -11,7 +11,7 @@ SEXP R_dense_cholesky(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP R_sparse_cholesky(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 /* Csparse.c : */
-SEXP CsparseMatrix_validate_maybe_sorting(SEXP);
+SEXP R_valid_CsparseMatrix_maybe_sorting(SEXP);
 SEXP dgCMatrix_lusol(SEXP, SEXP);
 SEXP dgCMatrix_qrsol(SEXP, SEXP, SEXP);
 SEXP dgCMatrix_cholsol(SEXP, SEXP);
@@ -230,63 +230,63 @@ SEXP Matrix_rle_d(SEXP, SEXP);
 SEXP Matrix_rle_i(SEXP, SEXP);
 
 /* validity.c : */
-SEXP R_Dim_validate(SEXP);
-SEXP R_DimNames_validate(SEXP, SEXP);
-SEXP Matrix_validate(SEXP);
-SEXP nMatrix_validate(SEXP);
-SEXP lMatrix_validate(SEXP);
-SEXP iMatrix_validate(SEXP);
-SEXP dMatrix_validate(SEXP);
-SEXP zMatrix_validate(SEXP);
-SEXP generalMatrix_validate(SEXP);
-SEXP symmetricMatrix_validate(SEXP);
-SEXP triangularMatrix_validate(SEXP);
-SEXP unpackedMatrix_validate(SEXP);
-SEXP packedMatrix_validate(SEXP);
-SEXP CsparseMatrix_validate(SEXP);
-SEXP RsparseMatrix_validate(SEXP);
-SEXP TsparseMatrix_validate(SEXP);
-SEXP diagonalMatrix_validate(SEXP);
-SEXP indMatrix_validate(SEXP);
-SEXP pMatrix_validate(SEXP);
-SEXP sCMatrix_validate(SEXP);
-SEXP tCMatrix_validate(SEXP);
-SEXP sRMatrix_validate(SEXP);
-SEXP tRMatrix_validate(SEXP);
-SEXP sTMatrix_validate(SEXP);
-SEXP tTMatrix_validate(SEXP);
-SEXP xgCMatrix_validate(SEXP);
-SEXP xsCMatrix_validate(SEXP);
-SEXP xtCMatrix_validate(SEXP);
-SEXP xgRMatrix_validate(SEXP);
-SEXP xsRMatrix_validate(SEXP);
-SEXP xtRMatrix_validate(SEXP);
-SEXP xgTMatrix_validate(SEXP);
-SEXP xsTMatrix_validate(SEXP);
-SEXP xtTMatrix_validate(SEXP);
-SEXP xpoMatrix_validate(SEXP);
-SEXP xppMatrix_validate(SEXP);
-SEXP xpCMatrix_validate(SEXP);
-SEXP xpRMatrix_validate(SEXP);
-SEXP xpTMatrix_validate(SEXP);
-SEXP corMatrix_validate(SEXP);
-SEXP copMatrix_validate(SEXP);
-SEXP sparseVector_validate(SEXP);
-SEXP lsparseVector_validate(SEXP);
-SEXP isparseVector_validate(SEXP);
-SEXP dsparseVector_validate(SEXP);
-SEXP zsparseVector_validate(SEXP);
-SEXP MatrixFactorization_validate(SEXP);
-SEXP denseSchur_validate(SEXP);
-SEXP denseQR_validate(SEXP);
-SEXP denseLU_validate(SEXP);
-SEXP denseBunchKaufman_validate(SEXP);
-SEXP denseCholesky_validate(SEXP);
-SEXP sparseQR_validate(SEXP);
-SEXP sparseLU_validate(SEXP);
-SEXP sparseCholesky_validate(SEXP);
-SEXP simplicialCholesky_validate(SEXP);
-SEXP supernodalCholesky_validate(SEXP);
+SEXP R_valid_slot_Dim(SEXP);
+SEXP R_valid_slot_Dimnames(SEXP, SEXP);
+SEXP R_valid_Matrix(SEXP);
+SEXP R_valid_nMatrix(SEXP);
+SEXP R_valid_lMatrix(SEXP);
+SEXP R_valid_iMatrix(SEXP);
+SEXP R_valid_dMatrix(SEXP);
+SEXP R_valid_zMatrix(SEXP);
+SEXP R_valid_generalMatrix(SEXP);
+SEXP R_valid_symmetricMatrix(SEXP);
+SEXP R_valid_triangularMatrix(SEXP);
+SEXP R_valid_unpackedMatrix(SEXP);
+SEXP R_valid_packedMatrix(SEXP);
+SEXP R_valid_CsparseMatrix(SEXP);
+SEXP R_valid_RsparseMatrix(SEXP);
+SEXP R_valid_TsparseMatrix(SEXP);
+SEXP R_valid_diagonalMatrix(SEXP);
+SEXP R_valid_indMatrix(SEXP);
+SEXP R_valid_pMatrix(SEXP);
+SEXP R_valid_sCMatrix(SEXP);
+SEXP R_valid_tCMatrix(SEXP);
+SEXP R_valid_sRMatrix(SEXP);
+SEXP R_valid_tRMatrix(SEXP);
+SEXP R_valid_sTMatrix(SEXP);
+SEXP R_valid_tTMatrix(SEXP);
+SEXP R_valid_xgCMatrix(SEXP);
+SEXP R_valid_xsCMatrix(SEXP);
+SEXP R_valid_xtCMatrix(SEXP);
+SEXP R_valid_xgRMatrix(SEXP);
+SEXP R_valid_xsRMatrix(SEXP);
+SEXP R_valid_xtRMatrix(SEXP);
+SEXP R_valid_xgTMatrix(SEXP);
+SEXP R_valid_xsTMatrix(SEXP);
+SEXP R_valid_xtTMatrix(SEXP);
+SEXP R_valid_xpoMatrix(SEXP);
+SEXP R_valid_xppMatrix(SEXP);
+SEXP R_valid_xpCMatrix(SEXP);
+SEXP R_valid_xpRMatrix(SEXP);
+SEXP R_valid_xpTMatrix(SEXP);
+SEXP R_valid_corMatrix(SEXP);
+SEXP R_valid_copMatrix(SEXP);
+SEXP R_valid_sparseVector(SEXP);
+SEXP R_valid_lsparseVector(SEXP);
+SEXP R_valid_isparseVector(SEXP);
+SEXP R_valid_dsparseVector(SEXP);
+SEXP R_valid_zsparseVector(SEXP);
+SEXP R_valid_MatrixFactorization(SEXP);
+SEXP R_valid_denseSchur(SEXP);
+SEXP R_valid_denseQR(SEXP);
+SEXP R_valid_denseLU(SEXP);
+SEXP R_valid_denseBunchKaufman(SEXP);
+SEXP R_valid_denseCholesky(SEXP);
+SEXP R_valid_sparseQR(SEXP);
+SEXP R_valid_sparseLU(SEXP);
+SEXP R_valid_sparseCholesky(SEXP);
+SEXP R_valid_simplicialCholesky(SEXP);
+SEXP R_valid_supernodalCholesky(SEXP);
 
 /* version.c : */
 SEXP R_Matrix_version(void);
@@ -304,7 +304,7 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_sparse_cholesky, 8),
 
 	/* Csparse.c : */
-	CALL_METHOD(CsparseMatrix_validate_maybe_sorting, 1),
+	CALL_METHOD(R_valid_CsparseMatrix_maybe_sorting, 1),
 	CALL_METHOD(dgCMatrix_lusol, 2),
 	CALL_METHOD(dgCMatrix_qrsol, 3),
 	CALL_METHOD(dgCMatrix_cholsol, 2),
@@ -326,6 +326,7 @@ static R_CallMethodDef CallMethodTable[] = {
 
 	/* attrib.c : */
 	CALL_METHOD(R_Dim_prod, 1),
+	CALL_METHOD(R_DimNames_fixup, 1),
 	CALL_METHOD(R_DimNames_is_symmetric, 1),
 	CALL_METHOD(R_symDN, 1),
 	CALL_METHOD(R_set_factor, 4),
@@ -518,64 +519,63 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(Matrix_rle_d, 2),
 
 	/* validity.c : */
-	CALL_METHOD(R_Dim_validate, 1),
-	CALL_METHOD(R_DimNames_validate, 2),
-	CALL_METHOD(R_DimNames_fixup, 1),
-	CALL_METHOD(Matrix_validate, 1),
-	CALL_METHOD(nMatrix_validate, 1),
-	CALL_METHOD(lMatrix_validate, 1),
-	CALL_METHOD(iMatrix_validate, 1),
-	CALL_METHOD(dMatrix_validate, 1),
-	CALL_METHOD(zMatrix_validate, 1),
-	CALL_METHOD(generalMatrix_validate, 1),
-	CALL_METHOD(symmetricMatrix_validate, 1),
-	CALL_METHOD(triangularMatrix_validate, 1),
-	CALL_METHOD(unpackedMatrix_validate, 1),
-	CALL_METHOD(packedMatrix_validate, 1),
-	CALL_METHOD(CsparseMatrix_validate, 1),
-	CALL_METHOD(RsparseMatrix_validate, 1),
-	CALL_METHOD(TsparseMatrix_validate, 1),
-	CALL_METHOD(diagonalMatrix_validate, 1),
-	CALL_METHOD(indMatrix_validate, 1),
-	CALL_METHOD(pMatrix_validate, 1),
-	CALL_METHOD(sCMatrix_validate, 1),
-	CALL_METHOD(tCMatrix_validate, 1),
-	CALL_METHOD(sRMatrix_validate, 1),
-	CALL_METHOD(tRMatrix_validate, 1),
-	CALL_METHOD(sTMatrix_validate, 1),
-	CALL_METHOD(tTMatrix_validate, 1),
-	CALL_METHOD(xgCMatrix_validate, 1),
-	CALL_METHOD(xsCMatrix_validate, 1),
-	CALL_METHOD(xtCMatrix_validate, 1),
-	CALL_METHOD(xgRMatrix_validate, 1),
-	CALL_METHOD(xsRMatrix_validate, 1),
-	CALL_METHOD(xtRMatrix_validate, 1),
-	CALL_METHOD(xgTMatrix_validate, 1),
-	CALL_METHOD(xsTMatrix_validate, 1),
-	CALL_METHOD(xtTMatrix_validate, 1),
-	CALL_METHOD(xpoMatrix_validate, 1),
-	CALL_METHOD(xppMatrix_validate, 1),
-	CALL_METHOD(xpCMatrix_validate, 1),
-	CALL_METHOD(xpRMatrix_validate, 1),
-	CALL_METHOD(xpTMatrix_validate, 1),
-	CALL_METHOD(corMatrix_validate, 1),
-	CALL_METHOD(copMatrix_validate, 1),
-	CALL_METHOD(sparseVector_validate, 1),
-	CALL_METHOD(lsparseVector_validate, 1),
-	CALL_METHOD(isparseVector_validate, 1),
-	CALL_METHOD(dsparseVector_validate, 1),
-	CALL_METHOD(zsparseVector_validate, 1),
-	CALL_METHOD(MatrixFactorization_validate, 1),
-	CALL_METHOD(denseSchur_validate, 1),
-	CALL_METHOD(denseQR_validate, 1),
-	CALL_METHOD(denseLU_validate, 1),
-	CALL_METHOD(denseBunchKaufman_validate, 1),
-	CALL_METHOD(denseCholesky_validate, 1),
-	CALL_METHOD(sparseQR_validate, 1),
-	CALL_METHOD(sparseLU_validate, 1),
-	CALL_METHOD(sparseCholesky_validate, 1),
-	CALL_METHOD(simplicialCholesky_validate, 1),
-	CALL_METHOD(supernodalCholesky_validate, 1),
+	CALL_METHOD(R_valid_slot_Dim, 1),
+	CALL_METHOD(R_valid_slot_Dimnames, 2),
+	CALL_METHOD(R_valid_Matrix, 1),
+	CALL_METHOD(R_valid_nMatrix, 1),
+	CALL_METHOD(R_valid_lMatrix, 1),
+	CALL_METHOD(R_valid_iMatrix, 1),
+	CALL_METHOD(R_valid_dMatrix, 1),
+	CALL_METHOD(R_valid_zMatrix, 1),
+	CALL_METHOD(R_valid_generalMatrix, 1),
+	CALL_METHOD(R_valid_symmetricMatrix, 1),
+	CALL_METHOD(R_valid_triangularMatrix, 1),
+	CALL_METHOD(R_valid_unpackedMatrix, 1),
+	CALL_METHOD(R_valid_packedMatrix, 1),
+	CALL_METHOD(R_valid_CsparseMatrix, 1),
+	CALL_METHOD(R_valid_RsparseMatrix, 1),
+	CALL_METHOD(R_valid_TsparseMatrix, 1),
+	CALL_METHOD(R_valid_diagonalMatrix, 1),
+	CALL_METHOD(R_valid_indMatrix, 1),
+	CALL_METHOD(R_valid_pMatrix, 1),
+	CALL_METHOD(R_valid_sCMatrix, 1),
+	CALL_METHOD(R_valid_tCMatrix, 1),
+	CALL_METHOD(R_valid_sRMatrix, 1),
+	CALL_METHOD(R_valid_tRMatrix, 1),
+	CALL_METHOD(R_valid_sTMatrix, 1),
+	CALL_METHOD(R_valid_tTMatrix, 1),
+	CALL_METHOD(R_valid_xgCMatrix, 1),
+	CALL_METHOD(R_valid_xsCMatrix, 1),
+	CALL_METHOD(R_valid_xtCMatrix, 1),
+	CALL_METHOD(R_valid_xgRMatrix, 1),
+	CALL_METHOD(R_valid_xsRMatrix, 1),
+	CALL_METHOD(R_valid_xtRMatrix, 1),
+	CALL_METHOD(R_valid_xgTMatrix, 1),
+	CALL_METHOD(R_valid_xsTMatrix, 1),
+	CALL_METHOD(R_valid_xtTMatrix, 1),
+	CALL_METHOD(R_valid_xpoMatrix, 1),
+	CALL_METHOD(R_valid_xppMatrix, 1),
+	CALL_METHOD(R_valid_xpCMatrix, 1),
+	CALL_METHOD(R_valid_xpRMatrix, 1),
+	CALL_METHOD(R_valid_xpTMatrix, 1),
+	CALL_METHOD(R_valid_corMatrix, 1),
+	CALL_METHOD(R_valid_copMatrix, 1),
+	CALL_METHOD(R_valid_sparseVector, 1),
+	CALL_METHOD(R_valid_lsparseVector, 1),
+	CALL_METHOD(R_valid_isparseVector, 1),
+	CALL_METHOD(R_valid_dsparseVector, 1),
+	CALL_METHOD(R_valid_zsparseVector, 1),
+	CALL_METHOD(R_valid_MatrixFactorization, 1),
+	CALL_METHOD(R_valid_denseSchur, 1),
+	CALL_METHOD(R_valid_denseQR, 1),
+	CALL_METHOD(R_valid_denseLU, 1),
+	CALL_METHOD(R_valid_denseBunchKaufman, 1),
+	CALL_METHOD(R_valid_denseCholesky, 1),
+	CALL_METHOD(R_valid_sparseQR, 1),
+	CALL_METHOD(R_valid_sparseLU, 1),
+	CALL_METHOD(R_valid_sparseCholesky, 1),
+	CALL_METHOD(R_valid_simplicialCholesky, 1),
+	CALL_METHOD(R_valid_supernodalCholesky, 1),
 
 	/* version.c */
 	CALL_METHOD(R_Matrix_version, 0),

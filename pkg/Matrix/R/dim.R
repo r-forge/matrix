@@ -1,7 +1,3 @@
-validDim <-
-function(d)
-    .Call(R_Dim_validate, d)
-
 validDimGetsValue <-
 function(value, dim, len = .Call(R_Dim_prod, as.integer(dim))) {
     if (mode(value) != "numeric")
@@ -43,18 +39,14 @@ function(value, max) {
     else (if (is.double(value)) trunc else as.integer)(value)
 }
 
-validDN <-
-function(dn, d)
-    .Call(R_DimNames_validate, dn, d)
-
 fixupDN <-
 function(dn)
     .Call(R_DimNames_fixup, dn)
 
 fixupDN.if.valid <-
 function(dn, d) {
-    if (is.character(s <- validDim(d)) ||
-        is.character(s <- validDN(dn, d)))
+    if (is.character(s <- validSlot.Dim(d)) ||
+        is.character(s <- validSlot.Dimnames(dn, d)))
         stop(s, domain = NA)
     fixupDN(dn)
 }

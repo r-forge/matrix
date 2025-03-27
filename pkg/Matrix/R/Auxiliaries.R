@@ -259,8 +259,8 @@ mat2triplet <- function(x, uniqT = FALSE) {
 
 .validateCsparse <- function(x, sort.if.needed = FALSE) {
     if(sort.if.needed)
-        .Call(CsparseMatrix_validate_maybe_sorting, x)
-    else .Call(CsparseMatrix_validate, x)
+        .Call(R_valid_CsparseMatrix_maybe_sorting, x)
+    else .Call(R_valid_CsparseMatrix, x)
 }
 
 dmperm <- function(x, nAns = 6L, seed = 0L) {
