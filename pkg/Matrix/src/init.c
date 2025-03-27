@@ -33,6 +33,7 @@ SEXP R_sparse_aggregate(SEXP);
 
 /* attrib.c : */
 SEXP R_Dim_prod(SEXP);
+SEXP R_DimNames_fixup(SEXP);
 SEXP R_DimNames_is_symmetric(SEXP);
 SEXP R_symDN(SEXP);
 SEXP R_set_factor(SEXP, SEXP, SEXP, SEXP);
@@ -231,7 +232,6 @@ SEXP Matrix_rle_i(SEXP, SEXP);
 /* validity.c : */
 SEXP R_Dim_validate(SEXP);
 SEXP R_DimNames_validate(SEXP, SEXP);
-SEXP R_DimNames_fixup(SEXP);
 SEXP Matrix_validate(SEXP);
 SEXP nMatrix_validate(SEXP);
 SEXP lMatrix_validate(SEXP);

@@ -35,6 +35,41 @@ SEXP R_Dim_prod(SEXP dim)
 
 /* .... Dimnames .................................................... */
 
+SEXP R_DimNames_fixup(SEXP dn)
+{
+	SEXP s;
+	int i, fixup = 0;
+	for (i = 0; i < 2 && !fixup; ++i)
+		fixup =
+			(s = VECTOR_ELT(dn, i)) != R_NilValue &&
+			(LENGTH(s) == 0 || TYPEOF(s) != STRSXP);
+	if (!fixup)
+		return dn;
+	SEXP value = PROTECT(Rf_allocVector(VECSXP, 2));
+	for (i = 0; i < 2; ++i) {
+		if ((s = VECTOR_ELT(dn, i)) == R_NilValue || LENGTH(s) == 0)
+			continue;
+		if (TYPEOF(s) == STRSXP)
+			PROTECT(s);
+		else if (TYPEOF(s) == INTSXP && Rf_inherits(s, "factor"))
+			PROTECT(s = Rf_asCharacterFactor(s));
+		else {
+			PROTECT(s = Rf_coerceVector(s, STRSXP));
+			CLEAR_ATTRIB(s);
+		}
+		SET_VECTOR_ELT(value, i, s);
+		UNPROTECT(1); /* s */
+	}
+	s = Rf_getAttrib(dn, R_NamesSymbol);
+	if (s != R_NilValue) {
+		PROTECT(s);
+		Rf_setAttrib(value, R_NamesSymbol, s);
+		UNPROTECT(1); /* s */
+	}
+	UNPROTECT(1); /* value */
+	return value;
+}
+
 int DimNames_is_trivial(SEXP dn)
 {
 	return

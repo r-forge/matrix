@@ -63,7 +63,7 @@ char *DimNames_validate(SEXP dimnames, int *pdim)
 
 	/* Behave as do_matrix() from src/main/array.c:
 	   Dimnames[[i]] must be NULL or _coercible to_ character
-	   of length Dim[i] or 0 ... see R_Dimnames_fixup() below
+	   of length Dim[i] or 0 ... see ./attrib.c, R_DimNames_fixup()
 	*/
 
 	SEXP s;
@@ -90,41 +90,6 @@ SEXP R_DimNames_validate(SEXP dimnames, SEXP dim)
 {
 	char *msg = DimNames_validate(dimnames, INTEGER(dim));
 	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
-}
-
-SEXP R_DimNames_fixup(SEXP dimnames)
-{
-	SEXP s;
-	int i, fixup = 0;
-	for (i = 0; i < 2 && !fixup; ++i)
-		fixup =
-			(s = VECTOR_ELT(dimnames, i)) != R_NilValue &&
-			(LENGTH(s) == 0 || TYPEOF(s) != STRSXP);
-	if (!fixup)
-		return dimnames;
-	SEXP dimnames_ = PROTECT(Rf_allocVector(VECSXP, 2));
-	for (i = 0; i < 2; ++i) {
-		if ((s = VECTOR_ELT(dimnames, i)) == R_NilValue || LENGTH(s) == 0)
-			continue;
-		if (TYPEOF(s) == STRSXP)
-			PROTECT(s);
-		else if (TYPEOF(s) == INTSXP && Rf_inherits(s, "factor"))
-			PROTECT(s = Rf_asCharacterFactor(s));
-		else {
-			PROTECT(s = Rf_coerceVector(s, STRSXP));
-			CLEAR_ATTRIB(s);
-		}
-		SET_VECTOR_ELT(dimnames_, i, s);
-		UNPROTECT(1); /* s */
-	}
-	s = Rf_getAttrib(dimnames, R_NamesSymbol);
-	if (s != R_NilValue) {
-		PROTECT(s);
-		Rf_setAttrib(dimnames_, R_NamesSymbol, s);
-		UNPROTECT(1); /* s */
-	}
-	UNPROTECT(1); /* dimnames_ */
-	return dimnames_;
 }
 
 
