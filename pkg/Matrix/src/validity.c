@@ -462,7 +462,7 @@ SEXP R_valid_diagonalMatrix(SEXP obj)
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (XLENGTH(x) != ((nu == 'N') ? n : 0))
 		RMKMS(_("'%s' slot is \"%c\" but '%s' slot does not have length %s"),
-		      "diag", nu, "x", (nonunit) ? "Dim[1]" : "0");
+		      "diag", nu, "x", (nu == 'N') ? "Dim[1]" : "0");
 
 	return Rf_ScalarLogical(1);
 }
