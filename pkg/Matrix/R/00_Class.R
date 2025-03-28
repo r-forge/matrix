@@ -90,7 +90,7 @@ setClass("triangularMatrix",
 ## Virtual class of diagonal matrices
 setClass("diagonalMatrix",
          contains = c("VIRTUAL", "Matrix"),
-         slots = c(diag = "character"),
+         slots = c(diag = "character", x = "vector"),
          prototype = list(diag = "N"),
          validity = function(object) .Call(R_valid_diagonalMatrix, object))
 
@@ -446,7 +446,8 @@ setClass("ltTMatrix",
 
 ## Diagonal
 setClass("ldiMatrix",
-         contains = c("diagonalMatrix", "lMatrix", "sparseMatrix"))
+         contains = c("diagonalMatrix", "lMatrix", "sparseMatrix"),
+         slots = c(x = "logical"))
 
 
 ## ...... Sparse, integer ..............................................
@@ -498,7 +499,8 @@ setClass("itTMatrix",
 
 ## Diagonal
 setClass("idiMatrix",
-         contains = c("diagonalMatrix", "iMatrix", "sparseMatrix"))
+         contains = c("diagonalMatrix", "iMatrix", "sparseMatrix"),
+         slots = c(x = "integer"))
 
 
 ## ...... Sparse, double ...............................................
@@ -565,7 +567,8 @@ setClass("dtTMatrix",
 
 ## Diagonal
 setClass("ddiMatrix",
-         contains = c("diagonalMatrix", "dMatrix", "sparseMatrix"))
+         contains = c("diagonalMatrix", "dMatrix", "sparseMatrix"),
+         slots = c(x = "numeric"))
 
 
 ## ...... Sparse, complex ..............................................
@@ -638,7 +641,8 @@ setClass("ztTMatrix",
 
 ## Diagonal
 setClass("zdiMatrix",
-         contains = c("diagonalMatrix", "zMatrix", "sparseMatrix"))
+         contains = c("diagonalMatrix", "zMatrix", "sparseMatrix"),
+         slots = c(x = "complex"))
 
 
 ########################################################################
