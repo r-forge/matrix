@@ -241,14 +241,13 @@ SEXP R_valid_zMatrix(SEXP);
 SEXP R_valid_generalMatrix(SEXP);
 SEXP R_valid_symmetricMatrix(SEXP);
 SEXP R_valid_triangularMatrix(SEXP);
+SEXP R_valid_diagonalMatrix(SEXP);
+SEXP R_valid_indexMatrix(SEXP);
 SEXP R_valid_unpackedMatrix(SEXP);
 SEXP R_valid_packedMatrix(SEXP);
 SEXP R_valid_CsparseMatrix(SEXP);
 SEXP R_valid_RsparseMatrix(SEXP);
 SEXP R_valid_TsparseMatrix(SEXP);
-SEXP R_valid_diagonalMatrix(SEXP);
-SEXP R_valid_indexMatrix(SEXP);
-SEXP R_valid_pMatrix(SEXP);
 SEXP R_valid_sCMatrix(SEXP);
 SEXP R_valid_tCMatrix(SEXP);
 SEXP R_valid_sRMatrix(SEXP);
@@ -271,6 +270,7 @@ SEXP R_valid_xpRMatrix(SEXP);
 SEXP R_valid_xpTMatrix(SEXP);
 SEXP R_valid_corMatrix(SEXP);
 SEXP R_valid_copMatrix(SEXP);
+SEXP R_valid_pMatrix(SEXP);
 SEXP R_valid_sparseVector(SEXP);
 SEXP R_valid_lsparseVector(SEXP);
 SEXP R_valid_isparseVector(SEXP);
@@ -530,14 +530,13 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_valid_generalMatrix, 1),
 	CALL_METHOD(R_valid_symmetricMatrix, 1),
 	CALL_METHOD(R_valid_triangularMatrix, 1),
+	CALL_METHOD(R_valid_diagonalMatrix, 1),
+	CALL_METHOD(R_valid_indexMatrix, 1),
 	CALL_METHOD(R_valid_unpackedMatrix, 1),
 	CALL_METHOD(R_valid_packedMatrix, 1),
 	CALL_METHOD(R_valid_CsparseMatrix, 1),
 	CALL_METHOD(R_valid_RsparseMatrix, 1),
 	CALL_METHOD(R_valid_TsparseMatrix, 1),
-	CALL_METHOD(R_valid_diagonalMatrix, 1),
-	CALL_METHOD(R_valid_indexMatrix, 1),
-	CALL_METHOD(R_valid_pMatrix, 1),
 	CALL_METHOD(R_valid_sCMatrix, 1),
 	CALL_METHOD(R_valid_tCMatrix, 1),
 	CALL_METHOD(R_valid_sRMatrix, 1),
@@ -560,6 +559,7 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_valid_xpTMatrix, 1),
 	CALL_METHOD(R_valid_corMatrix, 1),
 	CALL_METHOD(R_valid_copMatrix, 1),
+	CALL_METHOD(R_valid_pMatrix, 1),
 	CALL_METHOD(R_valid_sparseVector, 1),
 	CALL_METHOD(R_valid_lsparseVector, 1),
 	CALL_METHOD(R_valid_isparseVector, 1),
