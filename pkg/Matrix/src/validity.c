@@ -80,6 +80,62 @@ char *valid_slot_Dimnames(SEXP dimnames, SEXP dim)
 	return NULL;
 }
 
+static
+char *valid_slot_factors(SEXP factors)
+{
+	if (TYPEOF(factors) != VECSXP)
+		RMS(_("'%s' slot is not of type \"%s\""), "factors", "list");
+	if (XLENGTH(factors) > 0) {
+		SEXP nms = Rf_getAttrib(factors, R_NamesSymbol);
+		if (nms == R_NilValue)
+			RMS(_("'%s' slot has no '%s' attribute"), "factors", "names");
+	}
+
+	return NULL;
+}
+
+static
+char *valid_slot_uplo(SEXP uplo)
+{
+	if (TYPEOF(uplo) != STRSXP)
+		RMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
+	if (XLENGTH(uplo) != 1)
+		RMS(_("'%s' slot does not have length %d"), "uplo", 1);
+	const char *ul = CHAR(STRING_ELT(uplo, 0));
+	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
+		RMS(_("'%s' slot is not \"%c\" or \"%c\""), "uplo", 'U', 'L');
+
+	return NULL;
+}
+
+static
+char *valid_slot_trans(SEXP trans)
+{
+	if (TYPEOF(trans) != STRSXP)
+		RMS(_("'%s' slot is not of type \"%s\""), "trans", "character");
+	if (XLENGTH(trans) != 1)
+		RMS(_("'%s' slot does not have length %d"), "trans", 1);
+	const char *ct = CHAR(STRING_ELT(trans, 0));
+	if (ct[0] == '\0' || ct[1] != '\0' || (ct[0] != 'C' && ct[0] != 'T'))
+		RMS(_("'%s' slot is not \"%c\" or \"%c\""), "trans", 'C', 'T');
+
+	return NULL;
+}
+
+static
+char *valid_slot_diag(SEXP diag)
+{
+	if (TYPEOF(diag) != STRSXP)
+		RMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
+	if (XLENGTH(diag) != 1)
+		RMS(_("'%s' slot does not have length %d"), "diag", 1);
+	const char *nu = CHAR(STRING_ELT(diag, 0));
+	if (nu[0] == '\0' || nu[1] != '\0' || (nu[0] != 'N' && nu[0] != 'U'))
+		RMS(_("'%s' slot is not \"%c\" or \"%c\""), "diag", 'N', 'U');
+
+	return NULL;
+}
+
 SEXP R_valid_slot_Dim(SEXP dim)
 {
 	char *msg = valid_slot_Dim(dim);
@@ -129,18 +185,10 @@ TEMPLATE(zMatrix, CPLXSXP)
 
 SEXP R_valid_generalMatrix(SEXP obj)
 {
-	SEXP factors = GET_SLOT(obj, Matrix_factorsSym);
-	if (TYPEOF(factors) != VECSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "factors", "list");
-	if (XLENGTH(factors) > 0) {
-		PROTECT(factors);
-		SEXP nms = Rf_getAttrib(factors, R_NamesSymbol);
-		UNPROTECT(1); /* factors */
-		if (nms == R_NilValue)
-			RMKMS(_("'%s' slot has no '%s' attribute"), "factors", "names");
-	}
-
-	return Rf_ScalarLogical(1);
+	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym));
+	char *msg = valid_slot_factors(factors);
+	UNPROTECT(1); /* factors */
+	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
 SEXP R_valid_symmetricMatrix(SEXP obj)
@@ -193,27 +241,29 @@ SEXP R_valid_symmetricMatrix(SEXP obj)
 
 #endif
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	if (TYPEOF(uplo) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
-	if (XLENGTH(uplo) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "uplo", 1);
-	const char *ul = CHAR(STRING_ELT(uplo, 0));
-	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
+	char *msg;
+
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	msg = valid_slot_uplo(uplo);
+	UNPROTECT(1); /* uplo */
+	if (msg)
+		RMK(msg);
 
 	if (HAS_SLOT(obj, Matrix_transSym)) {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (TYPEOF(trans) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "trans", "character");
-	if (XLENGTH(trans) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "trans", 1);
-	const char *ct = CHAR(STRING_ELT(trans, 0));
-	if (ct[0] == '\0' || ct[1] != '\0' || (ct[0] != 'C' && ct[0] != 'T'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
+	SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
+	msg = valid_slot_trans(trans);
+	UNPROTECT(1); /* trans */
+	if (msg)
+		RMK(msg);
 	}
 
-	return R_valid_generalMatrix(obj);
+	SEXP factors = PROTECT(GET_SLOT(obj, Matrix_factorsSym));
+	msg = valid_slot_factors(factors);
+	UNPROTECT(1); /* factors */
+	if (msg)
+		RMK(msg);
+
+	return Rf_ScalarLogical(1);
 }
 
 SEXP R_valid_triangularMatrix(SEXP obj)
@@ -221,24 +271,19 @@ SEXP R_valid_triangularMatrix(SEXP obj)
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+	char *msg;
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	if (TYPEOF(uplo) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
-	if (XLENGTH(uplo) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "uplo", 1);
-	const char *ul = CHAR(STRING_ELT(uplo, 0));
-	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	msg = valid_slot_uplo(uplo);
+	UNPROTECT(1); /* uplo */
+	if (msg)
+		RMK(msg);
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	if (TYPEOF(diag) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
-	if (XLENGTH(diag) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "diag", 1);
-	const char *nu = CHAR(STRING_ELT(diag, 0));
-	if (nu[0] == '\0' || nu[1] != '\0' || (nu[0] != 'N' && nu[0] != 'U'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
+	SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	msg = valid_slot_diag(diag);
+	UNPROTECT(1); /* diag */
+	if (msg)
+		RMK(msg);
 
 	return Rf_ScalarLogical(1);
 }
@@ -405,20 +450,19 @@ SEXP R_valid_diagonalMatrix(SEXP obj)
 	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
 
-	SEXP diag = GET_SLOT(obj, Matrix_diagSym);
-	if (TYPEOF(diag) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "diag", "character");
-	if (XLENGTH(diag) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "diag", 1);
-	const char *nu = CHAR(STRING_ELT(diag, 0));
-	if (nu[0] == '\0' || nu[1] != '\0' || (nu[0] != 'N' && nu[0] != 'U'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "diag", "N", "U");
-	int nonunit = nu[0] == 'N';
+	char *msg, nu;
+
+	SEXP diag = PROTECT(GET_SLOT(obj, Matrix_diagSym));
+	msg = valid_slot_diag(diag);
+	UNPROTECT(1); /* diag */
+	if (msg)
+		RMK(msg);
+	nu = CHAR(STRING_ELT(diag, 0))[0];
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (XLENGTH(x) != ((nonunit) ? n : 0))
-		RMKMS(_("'%s' slot is \"%s\" but '%s' slot does not have length %s"),
-		      "diag", (nonunit) ? "N" : "U", "x", (nonunit) ? "Dim[1]" : "0");
+	if (XLENGTH(x) != ((nu == 'N') ? n : 0))
+		RMKMS(_("'%s' slot is \"%c\" but '%s' slot does not have length %s"),
+		      "diag", nu, "x", (nonunit) ? "Dim[1]" : "0");
 
 	return Rf_ScalarLogical(1);
 }
@@ -434,7 +478,7 @@ SEXP R_valid_indMatrix(SEXP obj)
 	if (mg != 0 && mg != 1)
 		RMKMS(_("'%s' slot is not %d or %d"), "margin", 1, 2);
 
-	int *pdim = DIM(obj), m = pdim[0], n = pdim[1];
+	int *pdim = DIM(obj), m = pdim[mg != 0], n = pdim[mg == 0];
 	if (m > 0 && n == 0)
 		RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
 		      (mg == 0) ? "m" : "0", (mg == 0) ? "0" : "n", "indMatrix",
@@ -451,7 +495,7 @@ SEXP R_valid_indMatrix(SEXP obj)
 			RMKMS(_("'%s' slot contains NA"), "perm");
 		if (*pperm < 1 || *pperm > n)
 			RMKMS(_("'%s' slot has elements not in {%s}"),
-			      "perm", "1,...,Dim[1+margin%%2]");
+			      "perm", "1,...,Dim[-margin]");
 		++pperm;
 	}
 
@@ -1255,25 +1299,20 @@ SEXP R_valid_denseBunchKaufman(SEXP obj)
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+	char *msg;
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	if (TYPEOF(uplo) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
-	if (XLENGTH(uplo) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "uplo", 1);
-	const char *ul = CHAR(STRING_ELT(uplo, 0));
-	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	msg = valid_slot_uplo(uplo);
+	UNPROTECT(1); /* uplo */
+	if (msg)
+		RMK(msg);
 
 	if (HAS_SLOT(obj, Matrix_transSym)) {
-	SEXP trans = GET_SLOT(obj, Matrix_transSym);
-	if (TYPEOF(trans) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "trans", "character");
-	if (XLENGTH(trans) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "trans", 1);
-	const char *ct = CHAR(STRING_ELT(trans, 0));
-	if (ct[0] == '\0' || ct[1] != '\0' || (ct[0] != 'C' && ct[0] != 'T'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "trans", "C", "T");
+	SEXP trans = PROTECT(GET_SLOT(obj, Matrix_transSym));
+	msg = valid_slot_trans(trans);
+	UNPROTECT(1); /* trans */
+	if (msg)
+		RMK(msg);
 	}
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
@@ -1315,15 +1354,14 @@ SEXP R_valid_denseCholesky(SEXP obj)
 	int *pdim = DIM(obj), n = pdim[1];
 	if (pdim[0] != n)
 		RMKMS(_("%s[1] != %s[2] (matrix is not square)"), "Dim", "Dim");
+	char *msg, ul;
 
-	SEXP uplo = GET_SLOT(obj, Matrix_uploSym);
-	if (TYPEOF(uplo) != STRSXP)
-		RMKMS(_("'%s' slot is not of type \"%s\""), "uplo", "character");
-	if (XLENGTH(uplo) != 1)
-		RMKMS(_("'%s' slot does not have length %d"), "uplo", 1);
-	const char *ul = CHAR(STRING_ELT(uplo, 0));
-	if (ul[0] == '\0' || ul[1] != '\0' || (ul[0] != 'U' && ul[0] != 'L'))
-		RMKMS(_("'%s' slot is not \"%s\" or \"%s\""), "uplo", "U", "L");
+	SEXP uplo = PROTECT(GET_SLOT(obj, Matrix_uploSym));
+	msg = valid_slot_uplo(uplo);
+	UNPROTECT(1); /* uplo */
+	if (msg)
+		RMK(msg);
+	ul = CHAR(STRING_ELT(uplo, 0))[0];
 
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
 	if (TYPEOF(x) != REALSXP && TYPEOF(x) != CPLXSXP)
@@ -1342,7 +1380,7 @@ SEXP R_valid_denseCholesky(SEXP obj)
 		for (j = 0; j < n; ++j, px += n1a)
 			if (!ISNAN(*px) && *px < 0.0)
 				RMK(_("Cholesky factor has negative diagonal elements"));
-	} else if (*ul == 'U') {
+	} else if (ul == 'U') {
 		for (j = 0; j < n; ++j, px += (++j)+1)
 			if (!ISNAN(*px) && *px < 0.0)
 				RMK(_("Cholesky factor has negative diagonal elements"));
@@ -1358,7 +1396,7 @@ SEXP R_valid_denseCholesky(SEXP obj)
 		for (j = 0; j < n; ++j, px += n1a)
 			if (!ISNAN((*px).r) && (*px).r < 0.0)
 				RMK(_("Cholesky factor has diagonal elements with negative real part"));
-	} else if (*ul == 'U') {
+	} else if (ul == 'U') {
 		for (j = 0; j < n; ++j, px += (++j)+1)
 			if (!ISNAN((*px).r) && (*px).r < 0.0)
 				RMK(_("Cholesky factor has diagonal elements with negative real part"));
