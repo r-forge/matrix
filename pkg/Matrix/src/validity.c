@@ -467,7 +467,7 @@ SEXP R_valid_diagonalMatrix(SEXP obj)
 	return Rf_ScalarLogical(1);
 }
 
-SEXP R_valid_indMatrix(SEXP obj)
+SEXP R_valid_indexMatrix(SEXP obj)
 {
 	SEXP margin = GET_SLOT(obj, Matrix_marginSym);
 	if (TYPEOF(margin) != INTSXP)
@@ -481,7 +481,7 @@ SEXP R_valid_indMatrix(SEXP obj)
 	int *pdim = DIM(obj), m = pdim[mg != 0], n = pdim[mg == 0];
 	if (m > 0 && n == 0)
 		RMKMS(_("%s-by-%s %s invalid for positive '%s' when %s=%d"),
-		      (mg == 0) ? "m" : "0", (mg == 0) ? "0" : "n", "indMatrix",
+		      (mg == 0) ? "m" : "0", (mg == 0) ? "0" : "n", "indexMatrix",
 		      (mg == 0) ? "m" : "n", "margin", (mg == 0) ? 1 : 2);
 
 	SEXP perm = GET_SLOT(obj, Matrix_permSym);
@@ -2041,19 +2041,12 @@ void validObject(SEXP obj, const char *cl)
 	IS_VALID(Matrix);
 
 	const char *cl_ = cl;
-	if (cl[0] == 'c')
+	if (cl[0] == 'c' && cl[1] == 'o' && (cl[2] == 'r' || cl[2] == 'p'))
 		cl = (cl[2] != 'p') ? "dpoMatrix" : "dppMatrix";
-	else if (cl[0] == 'p')
-		cl = "indMatrix";
+	else if ((cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') || cl[0] == 'p')
+		cl = "ninMatrix";
 
-	if (cl[0] == 'i' && cl[1] == 'n' && cl[2] == 'd') {
-		IS_VALID(indMatrix);
-		if (cl_[0] == 'p')
-			IS_VALID(pMatrix);
-		return;
-	}
-
-	if (cl[0] == 'n' && cl[2] != 'C' && cl[2] != 'R' && cl[2] != 'T')
+	if (cl[0] == 'n' && !(cl[1] == 'i' || cl[2] == 'C' || cl[2] == 'R' || cl[2] == 'T'))
 		IS_VALID(nMatrix);
 	else if (cl[0] == 'l')
 		IS_VALID(lMatrix);
@@ -2070,8 +2063,14 @@ void validObject(SEXP obj, const char *cl)
 		IS_VALID(symmetricMatrix);
 	else if (cl[1] == 't')
 		IS_VALID(triangularMatrix);
-	else if (cl[1] == 'd') {
+	else if (cl[1] == 'd' && cl[2] == 'i') {
 		IS_VALID(diagonalMatrix);
+		return;
+	}
+	else if (cl[1] == 'i' && cl[2] == 'n') {
+		IS_VALID(indexMatrix);
+		if (cl_[0] == 'p')
+			IS_VALID(pMatrix);
 		return;
 	}
 

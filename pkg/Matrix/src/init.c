@@ -247,7 +247,7 @@ SEXP R_valid_CsparseMatrix(SEXP);
 SEXP R_valid_RsparseMatrix(SEXP);
 SEXP R_valid_TsparseMatrix(SEXP);
 SEXP R_valid_diagonalMatrix(SEXP);
-SEXP R_valid_indMatrix(SEXP);
+SEXP R_valid_indexMatrix(SEXP);
 SEXP R_valid_pMatrix(SEXP);
 SEXP R_valid_sCMatrix(SEXP);
 SEXP R_valid_tCMatrix(SEXP);
@@ -536,7 +536,7 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(R_valid_RsparseMatrix, 1),
 	CALL_METHOD(R_valid_TsparseMatrix, 1),
 	CALL_METHOD(R_valid_diagonalMatrix, 1),
-	CALL_METHOD(R_valid_indMatrix, 1),
+	CALL_METHOD(R_valid_indexMatrix, 1),
 	CALL_METHOD(R_valid_pMatrix, 1),
 	CALL_METHOD(R_valid_sCMatrix, 1),
 	CALL_METHOD(R_valid_tCMatrix, 1),

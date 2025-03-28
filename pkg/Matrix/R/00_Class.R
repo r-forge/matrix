@@ -96,7 +96,10 @@ setClass("diagonalMatrix",
 
 ## Virtual class of generalized index matrices
 setClass("indexMatrix",
-         contains = c("VIRTUAL", "Matrix"))
+         contains = c("VIRTUAL", "Matrix"),
+         slots = c(perm = "integer", margin = "integer"),
+         prototype = list(margin = 1L),
+         validity = function(object) .Call(R_valid_indexMatrix, object))
 
 
 ## ------ Virtual by storage format ------------------------------------
@@ -386,10 +389,7 @@ setClass("ndiMatrix",
 
 ## Row or column index
 setClass("indMatrix",
-         contains = c("indexMatrix", "nMatrix", "sparseMatrix"),
-         slots = c(perm = "integer", margin = "integer"),
-         prototype = list(margin = 1L), # to be valid
-         validity = function(object) .Call(R_valid_indMatrix, object))
+         contains = c("indexMatrix", "nMatrix", "sparseMatrix"))
 
 ## Row or column permutation
 setClass("pMatrix",
