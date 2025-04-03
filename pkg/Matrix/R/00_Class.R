@@ -127,7 +127,7 @@ setClass("sparseMatrix",
 ## Virtual class of compressed sparse column (CSC) format matrices
 setClass("CsparseMatrix",
          contains = c("VIRTUAL", "sparseMatrix"),
-         slots = c(i = "integer", p = "integer"),
+         slots = c(p = "integer", i = "integer"),
          prototype = list(p = 0L), # to be valid
          validity = function(object) .Call(R_valid_CsparseMatrix, object))
 
@@ -367,7 +367,7 @@ setClass("ntRMatrix",
          contains = c("RsparseMatrix", "nsparseMatrix", "triangularMatrix"),
          validity = function(object) .Call(R_valid_tRMatrix, object))
 
-## Triplet general
+## Triplet, general
 setClass("ngTMatrix",
          contains = c("TsparseMatrix", "nsparseMatrix", "generalMatrix"))
 
