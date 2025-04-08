@@ -57,25 +57,20 @@ setMethod("-", c(e1 = "sparseVector", e2 = "missing"),
 
 ## .... binary .........................................................
 
-if(FALSE) {
-
-## vvvv MJ: for _after_ 1.6-2, ditto ./(Arith|Compare|Logic).R
-for(.cl in c("Matrix", "sparseVector")) {
+for (.cl in c("Matrix", "sparseVector")) {
 setMethod("Ops", c(e1 = .cl, e2 = "ANY"),
           function(e1, e2)
-              if(any(typeof(e2) == c("logical", "integer", "double"))) {
-                  if(is.matrix(e2))
-                      callGeneric(e1, unclass(e2))
-                  else callGeneric(e2, as.vector(e2))
-              } else stop(.Ops.invalid(e2), domain = NA))
+              if (any(typeof(e2) == c("logical", "integer", "double", "complex")) &&
+                  (is.null(d <- dim(e2)) || length(d) == 2L))
+                  callGeneric(e1, if (isS4(e2)) getDataPart(e2) else unclass(e2))
+              else stop(.Ops.invalid(e2), domain = NA))
 
 setMethod("Ops", c(e1 = "ANY", e2 = .cl),
           function(e1, e2)
-              if(any(typeof(e1) == c("logical", "integer", "double"))) {
-                  if(is.matrix(e1))
-                      callGeneric(unclass(e1), e2)
-                  else callGeneric(as.vector(e1), e2)
-              } else stop(.Ops.invalid(e1), domain = NA))
+              if (any(typeof(e1) == c("logical", "integer", "double", "complex")) &&
+                  (is.null(d <- dim(e1)) || length(d) == 2L))
+                  callGeneric(e1, if (isS4(e1)) getDataPart(e1) else unclass(e1))
+              else stop(.Ops.invalid(e1), domain = NA))
 
 setMethod("Ops", c(e1 = .cl, e2 = "NULL"),
           function(e1, e2) callGeneric(e1, .NULL2vec(e1)))
@@ -86,34 +81,18 @@ setMethod("Ops", c(e1 = "NULL", e2 = .cl),
 ## MJ: OK, but I'd prefer to handle all "matrix" as ".geMatrix"
 setMethod("Ops", c(e1 = .cl, e2 = "matrix"),
           function(e1, e2)
-              if(any(typeof(e2) == c("logical", "integer", "double")))
+              if (any(typeof(e2) == c("logical", "integer", "double", "complex")))
                   callGeneric(e1, Matrix(e2))
               else stop(.Ops.invalid(e2), domain = NA))
 
 ## MJ: OK, but I'd prefer to handle all "matrix" as ".geMatrix"
 setMethod("Ops", c(e1 = "matrix", e2 = .cl),
           function(e1, e2)
-              if(any(typeof(e1) == c("logical", "integer", "double")))
+              if (any(typeof(e1) == c("logical", "integer", "double", "complex")))
                   callGeneric(Matrix(e1), e2)
               else stop(.Ops.invalid(e1), domain = NA))
 }
 rm(.cl)
-## ^^^^ MJ: for _after_ 1.6-2, ditto ./(Arith|Compare|Logic).R
-}
-
-## "sparseVector" o "matrix"  is *not* dealt with correctly otherwise;
-setMethod("Ops", c(e1 = "sparseVector", e2 = "matrix"),
-          function(e1, e2)
-              if(is.atomic(e2) && nzchar(kn <- .M.kind(e2)))
-                  callGeneric(e1, as(e2, paste0(kn,"Matrix")))
-              else stop(.Ops.invalid(e2), domain = NA))
-setMethod("Ops", c(e1 = "matrix", e2 = "sparseVector"),
-          function(e1, e2)
-              if(is.atomic(e1) && nzchar(kn <- .M.kind(e1)))
-                  callGeneric(as(e1, paste0(kn,"Matrix")), e2)
-              else stop(.Ops.invalid(e1), domain = NA))
-
-
 
 .Ops.checkDim <- function(d.a, d.b) {
     if(any(d.a != d.b))
@@ -183,32 +162,6 @@ rm(.cl, .fn1, .fn2, .fn3)
 ### --  0 -- (not dense *or* sparse) -----------------------------------
 
 ##-------- originally from ./Matrix.R --------------------
-
-## old-style matrices are made into new ones
-setMethod("Ops", c(e1 = "Matrix", e2 = "matrix"),
-          function(e1, e2) callGeneric(e1, Matrix(e2)))
-
-setMethod("Ops", c(e1 = "matrix", e2 = "Matrix"),
-          function(e1, e2) callGeneric(Matrix(e1), e2))
-## Note: things like  callGeneric(Matrix(e1, sparse=is(e2,"sparseMatrix")), e2))
-##   may *not* be better: e.g. Matrix(.) can give *diagonal* instead of sparse
-
-##  Used to treat NULL as logical(0), now (+integer+complex) more careful:
-setMethod("Ops", c(e1 = "Matrix", e2 = "NULL"),
-          function(e1, e2) callGeneric(e1, .NULL2vec(e1)))
-setMethod("Ops", c(e1 = "NULL", e2 = "Matrix"),
-          function(e1, e2) callGeneric(.NULL2vec(e2), e2))
-
-setMethod("Ops", c(e1 = "Matrix", e2 = "ANY"),
-          function(e1, e2)
-              if(is.object(e2) && is.matrix(e2))
-                  callGeneric(e1, unclass(e2)) # e.g., for "table"
-              else .bail.out.2(.Generic, class(e1), class(e2)))
-setMethod("Ops", c(e1 = "ANY", e2 = "Matrix"),
-          function(e1, e2)
-              if(is.object(e1) && is.matrix(e1))
-                  callGeneric(unclass(e1), e2) # e.g., for "table"
-              else .bail.out.2(.Generic, class(e1), class(e2)))
 
 ## "General principle"
 ##  - - - - - - - - -
@@ -1809,12 +1762,6 @@ setMethod("Ops", c(e1 = "numeric", e2 = "sparseMatrix"),
 
 ###-------- sparseVector -------------
 ###-------- ============ -------------
-
-## Catch all remaining
-setMethod("Ops", c(e1 = "sparseVector", e2 = "ANY"),
-          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
-setMethod("Ops", c(e1 = "ANY", e2 = "sparseVector"),
-          function(e1, e2) .bail.out.2(.Generic, class(e1), class(e2)))
 
 ## 1)  spVec  o  (sp)Vec : -------------
 

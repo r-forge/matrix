@@ -16,7 +16,9 @@
 \alias{Logic-methods}
 % ------------------------- existing S4 methods (most in ../R/Ops.R )
 \alias{Ops,Matrix,NULL-method}
+\alias{Ops,sparseVector,NULL-method}
 \alias{Ops,NULL,Matrix-method}
+\alias{Ops,NULL,sparseVector-method}
 %
 \alias{Ops,ANY,Matrix-method}
 \alias{Ops,Matrix,ANY-method}

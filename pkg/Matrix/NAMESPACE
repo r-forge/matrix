@@ -19,10 +19,10 @@ importFrom("lattice", levelplot, panel.levelplot.raster)
 importFrom("methods", .hasSlot, .selectSuperClasses, .slotNames, Arith,
            Compare, Complex, Logic, Math, Math2, Ops, Summary, as,
            callGeneric, callNextMethod, canCoerce, cbind2, coerce,
-           extends, getClassDef, getGroupMembers, initialize, is,
-           isClassDef, kronecker, new, rbind2, setAs, setClass,
-           setClassUnion, setGeneric, setMethod, show, slot, "slot<-",
-           slotNames, validObject)
+           extends, getClassDef, getDataPart, getGroupMembers,
+           initialize, is, isClassDef, kronecker, new, rbind2, setAs,
+           setClass, setClassUnion, setGeneric, setMethod, show, slot,
+           "slot<-", slotNames, validObject)
 
 importFrom("stats", contr.SAS, contr.helmert, contr.poly, contr.sum,
            contr.treatment, "contrasts<-", cov2cor , diffinv,
