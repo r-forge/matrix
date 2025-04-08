@@ -5,47 +5,6 @@
 ## [1] "+"   "-"   "*"   "^"   "%%"  "%/%" "/"
 
 
-## .... unary ..........................................................
-
-setMethod("+", c(e1 = "Matrix", e2 = "missing"),
-          function(e1, e2)
-              if(any(.M.kind(e1) == c("n", "l"))) .M2kind(e1, "d") else e1)
-
-setMethod("+", c(e1 = "sparseVector", e2 = "missing"),
-          function(e1, e2)
-              if(any(.M.kind(e1) == c("n", "l"))) .V2kind(e1, "i") else e1)
-
-for(.cl in c("generalMatrix", "symmetricMatrix"))
-setMethod("-", c(e1 = .cl, e2 = "missing"),
-          function(e1, e2) {
-              if(any(.M.kind(e1) == c("n", "l")))
-                  e1 <- .M2kind(e1, "d")
-              if(length(e1@factors) > 0L)
-                  e1@factors <- list()
-              e1@x <- -e1@x
-              e1
-          })
-
-for(.cl in c("triangularMatrix", "diagonalMatrix"))
-setMethod("-", c(e1 = .cl, e2 = "missing"),
-          function(e1, e2) {
-              if(any(.M.kind(e1) == c("n", "l")))
-                  e1 <- .M2kind(e1, "d")
-              if(e1@diag != "N")
-                  diag(e1) <- TRUE
-              e1@x <- -e1@x
-              e1
-          })
-
-setMethod("-", c(e1 = "sparseVector", e2 = "missing"),
-          function(e1, e2) {
-              if(any(.M.kind(e1) == c("n", "l")))
-                  e1 <- .V2kind(e1, "i")
-              e1@x <- -e1@x
-              e1
-          })
-
-
 ## .... denseMatrix ....................................................
 
 setMethod("Arith", c(e1 = "denseMatrix", e2 = "denseMatrix"),

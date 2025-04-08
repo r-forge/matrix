@@ -17,6 +17,46 @@
 }
 
 
+## .... unary ..........................................................
+
+setMethod("+", c(e1 = "Matrix", e2 = "missing"),
+          function(e1, e2)
+              switch(.M.kind(e1),
+                     "n" =, "l" = .M2kind(e1, "i"), # FIXME: MM option
+                     "i" =, "d" =, "z" = .promote(e1)))
+
+setMethod("+", c(e1 = "sparseVector", e2 = "missing"),
+          function(e1, e2)
+              switch(.M.kind(e1),
+                     "n" =, "l" = .V2kind(e1, "i"),
+                     "i" =, "d" =, "z" = .promote(e1)))
+
+setMethod("-", c(e1 = "Matrix", e2 = "missing"),
+          function(e1, e2) {
+              e1 <-
+              switch(.M.kind(e1),
+                     "n" =, "l" = .M2kind(e1, "i"), # FIXME: MM option
+                     "i" =, "d" =, "z" = .promote(e1))
+              switch(.M.shape(e1),
+                     "g" =, "s" = e1@factors <- list(),
+                     "t" =, "d" = if (e1@diag != "N") diag(e1) <- TRUE)
+              e1@x <- -e1@x
+              e1
+          })
+
+setMethod("-", c(e1 = "sparseVector", e2 = "missing"),
+          function(e1, e2) {
+              e1 <-
+              switch(.M.kind(e1),
+                     "n" =, "l" = .V2kind(e1, "i"),
+                     "i" =, "d" =, "z" = .promote(e1))
+              e1@x <- -e1@x
+              e1
+          })
+
+
+## .... binary .........................................................
+
 if(FALSE) {
 
 ## vvvv MJ: for _after_ 1.6-2, ditto ./(Arith|Compare|Logic).R
@@ -143,42 +183,6 @@ rm(.cl, .fn1, .fn2, .fn3)
 ### --  0 -- (not dense *or* sparse) -----------------------------------
 
 ##-------- originally from ./Matrix.R --------------------
-
-## Some ``Univariate'' "Arith" (univariate := 2nd argument 'e2' is missing)
-setMethod("+", c(e1 = "Matrix", e2 = "missing"), function(e1,e2) e1)
-
-## -- unary `-` :  - <Matrix> ----------------------
-## "fallback":
-setMethod("-", c(e1 = "Matrix", e2 = "missing"),
-          function(e1, e2) {
-              warning("inefficient method used for \"- e1\"")
-              0 - e1
-          })
-setMethod("-", c(e1 = "denseMatrix", e2 = "missing"),
-          function(e1, e2) {
-              e1@x <- -e1@x
-              if(.hasSlot(e1, "factors") && length(e1@factors))
-                  e1@factors <- list()
-              e1
-          })
-## with these exceptions:
-setMethod("-", c(e1 = "ndenseMatrix", e2 = "missing"), function(e1, e2) -.M2kind(e1, "i"))
-setMethod("-", c(e1 = "ldenseMatrix", e2 = "missing"), function(e1, e2) -.M2kind(e1, "i"))
-
-setMethod("-", c(e1 = "diagonalMatrix", e2 = "missing"),
-          function(e1, e2) {
-              kind <- .M.kind(e1)
-              r <- new(if(kind == "z") "zdiMatrix" else "ddiMatrix")
-              r@Dim <- d <- e1@Dim
-              r@Dimnames <- e1@Dimnames
-              r@x <-
-                  if(e1@diag != "N")
-                      rep.int(if(kind == "z") -1+0i else -1, d[1L])
-                  else -(if(kind == "n") e1@x | is.na(e1@x) else e1@x)
-              r
-          })
-
-
 
 ## old-style matrices are made into new ones
 setMethod("Ops", c(e1 = "Matrix", e2 = "matrix"),
@@ -1767,23 +1771,6 @@ setMethod("Compare", c(e1 = "CsparseMatrix", e2 = "CsparseMatrix"),
 
 ##-------- originally from ./sparseMatrix.R --------------------
 
-## "Arith" short cuts / exceptions
-setMethod("-", c(e1 = "sparseMatrix", e2 = "missing"),
-          function(e1, e2) {
-              e1 <- diagU2N(e1)
-              e1@x <- -e1@x
-              if(.hasSlot(e1, "factors") && length(e1@factors))
-                  e1@factors <- list()
-              e1
-          })
-## with the following exceptions (" unary `-` "):
-##--- __FIXME__ use_iMatrix ==>  s/d/i/ :
-setMethod("-", c(e1 = "nsparseMatrix", e2 = "missing"), function(e1, e2) - .M2kind(e1, "d"))
-setMethod("-", c(e1 = "lsparseMatrix", e2 = "missing"), function(e1, e2) - .M2kind(e1, "d"))
-setMethod("-", c(e1 = "indMatrix", e2 = "missing"), function(e1, e2) -as(e1, "dsparseMatrix"))
-
-## Group method  "Arith"
-
 ## have CsparseMatrix methods above
 ## which may preserve "symmetric", "triangular" -- simply defer to those:
 
@@ -1985,11 +1972,6 @@ setMethod("Arith", c(e1 = "sparseVector", e2 = "sparseVector"),
                                        as(e2, "dsparseVector")))
 setMethod("Arith", c(e1 = "dsparseVector", e2 = "dsparseVector"),
           Ops.spV.spV)
-
-## "Arith"  exception (shortcut)
-setMethod("-", c(e1 = "dsparseVector", e2 = "missing"),
-          function(e1) { e1@x <- -e1@x ; e1 })
-
 
 setMethod("Logic", c(e1 = "sparseVector", e2 = "sparseVector"),
           ## FIXME: this is suboptimal for "nsparseVector" !!
