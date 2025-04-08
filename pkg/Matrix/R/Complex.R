@@ -7,7 +7,6 @@
 .nm <- getGroupMembers("Complex")
 .fn <- mget(.nm, mode = "function", inherits = TRUE)
 .cc <- c("Conj", "Mod", "Re")
-suppressWarnings({
 ## is.integer(g(integer()))
 .Complex.integer <-
 vapply(.fn, function(g) is.integer(g(integer())), FALSE)
@@ -23,7 +22,6 @@ vapply(.fn, function(g) identical(g(1), 1), FALSE)
 ## g(Conj(z)) == Conj(g(z))
 .Complex.identityH <-
 `names<-`(match(.nm, .cc, 0L) > 0L, .nm)
-})
 rm(.fn, .nm, .cc)
 
 # Assumed below:

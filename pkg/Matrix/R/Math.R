@@ -16,7 +16,7 @@
          "acos", "acosh", "asin", "asinh", "atan", "atanh",
          "cospi", "sinpi", "tanpi",
          "gamma", "lgamma", "digamma", "trigamma")
-suppressWarnings({
+suppressWarnings({ # else 3 warnings with message "NaN produced"
 ## is.integer(g(integer()))
 .Math.integer <-
 vapply(.fn, function(g) is.integer(g(integer())), FALSE)
