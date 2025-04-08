@@ -17,10 +17,10 @@
          "cospi", "sinpi", "tanpi",
          "gamma", "lgamma", "digamma", "trigamma")
 suppressWarnings({
-## is.integer(g(integer())
+## is.integer(g(integer()))
 .Math.integer <-
 vapply(.fn, function(g) is.integer(g(integer())), FALSE)
-## is.complex(g(complex())
+## is.complex(g(complex()))
 .Math.complex <-
 vapply(.fn, function(g) tryCatch(is.complex(g(complex())), error = function(e) TRUE), FALSE)
 ## g(0) == 0
