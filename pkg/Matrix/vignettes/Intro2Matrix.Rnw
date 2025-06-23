@@ -365,7 +365,7 @@ column indices \code{j}, only the \emph{start} index of every column is stored.
 Analogously, there is also a compressed sparse row (csr) representation,
 which e.g. is used in in the \pkg{SparseM} package, and we provide the
 \class{RsparseMatrix} for compatibility and completeness purposes, in
-addition to basic coercion (\code({as(., \textit{<cl>})} between the classes.
+addition to basic coercion (\code{as(., \textit{<cl>})}) between the classes.
 %% (column-oriented triplet) except that \code{i} (\code{j}) just stores
 %% the index of the first element in the row (column).  (There are a
 %% couple of other details but that is the gist of it.)
