@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2025-04-08, svn r5168)}{
+\section{Changes in version 1.8-0 (2025-08-27, svn r5172)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -203,7 +203,16 @@
   }
 }
 
-\section{Changes in version 1.7-4 (2025-03-16, svn r5140)}{
+\section{Changes in version 1.7-4 (2025-08-27, svn r5172)}{
+  \subsection{Installation}{
+    \itemize{
+      \item Warnings surfaced by \option{-Wtautological-overlap-compare}
+      are squashed.  These revealed two typos in \file{src/matmult.c}
+      causing optimizations for \code{crossprod(\var{.sRMatrix}, y)} and
+      \code{tcrossprod(x, \var{.sRMatrix})} to be skipped.  Thanks to
+      Brian Ripley and Michael Chirico for the reports.
+    }
+  }
   \subsection{Bug Fixes}{
     \itemize{
       \item Methods for \code{band}, \code{triu}, and \code{tril} with
