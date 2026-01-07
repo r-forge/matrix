@@ -112,11 +112,13 @@ setClass("denseMatrix",
 ## Virtual class of conventional, dense format matrices
 setClass("unpackedMatrix",
          contains = c("VIRTUAL", "denseMatrix"),
+         ## slot = c(x = "vector"), # PR#18868
          validity = function(object) .Call(R_valid_unpackedMatrix, object))
 
 ## Virtual class of packed, dense format matrices
 setClass("packedMatrix",
          contains = c("VIRTUAL", "denseMatrix"),
+         ## slot = c(uplo = "character", x = "vector"), # PR#18868
          slots = c(uplo = "character"),
          prototype = list(uplo = "U"),
          validity = function(object) .Call(R_valid_packedMatrix, object))

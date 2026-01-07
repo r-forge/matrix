@@ -253,7 +253,7 @@ SEXP R_valid_symmetricMatrix(SEXP obj)
 	    strcmp(ndn0, ndn1) != 0)
 		RMKMS(_("%s[1] differs from %s[2]"), "Dimnames", "Dimnames");
 	if (n > 0) {
-		/* NB: It is already known that the length of 'dn[[i]]' is 0 or 'n' */
+		/* It is already known that the length of dn[[i]] is 0 or 'n' */
 		SEXP rn, cn;
 		if ((rn = VECTOR_ELT(dn, 0)) != R_NilValue &&
 		    (cn = VECTOR_ELT(dn, 1)) != R_NilValue &&
@@ -859,9 +859,8 @@ SEXP R_valid_xtTMatrix(SEXP obj)
 	return val;
 }
 
-/* NB: Non-finite entries are "valid" because we consider
-   crossprod(x) and tcrossprod(x) to be positive semidefinite
-   even if 'x' contains non-finite entries (for speed) ...
+/* NB: posdefMatrix with NaN entries are valid so that
+   crossprod(x) and tcrossprod(x) can be valid for 'x' with NaN entries
 */
 
 SEXP R_valid_xpoMatrix(SEXP obj)
