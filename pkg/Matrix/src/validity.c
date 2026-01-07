@@ -167,21 +167,52 @@ SEXP R_valid_Matrix(SEXP obj)
 	return (msg) ? Rf_mkString(msg) : Rf_ScalarLogical(1);
 }
 
-#define TEMPLATE(_CLASS_, _SEXPTYPE_) \
-SEXP R_valid_ ## _CLASS_(SEXP obj) \
-{ \
-	SEXP x = GET_SLOT(obj, Matrix_xSym); \
-	if (TYPEOF(x) != _SEXPTYPE_) \
-		RMKMS(_("'%s' slot is not of type \"%s\""), \
-		      "x", Rf_type2char(_SEXPTYPE_)); \
-	return Rf_ScalarLogical(1); \
+SEXP R_valid_nMatrix(SEXP obj)
+{
+	if (HAS_SLOT(obj, Matrix_xSym)) {
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != LGLSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "x", "logical");
+	}
+	return Rf_ScalarLogical(1);
 }
-TEMPLATE(nMatrix,  LGLSXP)
-TEMPLATE(lMatrix,  LGLSXP)
-TEMPLATE(iMatrix,  INTSXP)
-TEMPLATE(dMatrix, REALSXP)
-TEMPLATE(zMatrix, CPLXSXP)
-#undef TEMPLATE
+
+SEXP R_valid_lMatrix(SEXP obj)
+{
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != LGLSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "x", "logical");
+	return Rf_ScalarLogical(1);
+}
+
+SEXP R_valid_iMatrix(SEXP obj)
+{
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != LGLSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "x", "integer");
+	return Rf_ScalarLogical(1);
+}
+
+SEXP R_valid_dMatrix(SEXP obj)
+{
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != REALSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "x", "double");
+	return Rf_ScalarLogical(1);
+}
+
+SEXP R_valid_zMatrix(SEXP obj)
+{
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (TYPEOF(x) != CPLXSXP)
+		RMKMS(_("'%s' slot is not of type \"%s\""),
+		      "x", "complex");
+	return Rf_ScalarLogical(1);
+}
 
 SEXP R_valid_generalMatrix(SEXP obj)
 {

@@ -34,7 +34,8 @@ setClass("Matrix",
 
 ## Virtual class of nonzero pattern matrices
 setClass("nMatrix",
-         contains = c("VIRTUAL", "Matrix"))
+         contains = c("VIRTUAL", "Matrix"),
+         validity = function(object) .Call(R_valid_nMatrix, object))
 
 ## Virtual class of logical matrices,
 setClass("lMatrix",
@@ -149,8 +150,7 @@ setClass("TsparseMatrix",
 
 setClass("ndenseMatrix",
          contains = c("VIRTUAL", "nMatrix", "denseMatrix"),
-         slots = c(x = "logical"),
-         validity = function(object) .Call(R_valid_nMatrix, object))
+         slots = c(x = "logical"))
 
 setClass("ldenseMatrix",
          contains = c("VIRTUAL", "lMatrix", "denseMatrix"))
@@ -384,8 +384,7 @@ setClass("ntTMatrix",
 ## Diagonal
 setClass("ndiMatrix",
          contains = c("diagonalMatrix", "nMatrix", "sparseMatrix"),
-         slots = c(x = "logical"),
-         validity = function(object) .Call(R_valid_nMatrix, object))
+         slots = c(x = "logical"))
 
 ## Row or column index
 setClass("indMatrix",
