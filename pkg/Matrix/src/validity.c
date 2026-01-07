@@ -350,9 +350,10 @@ SEXP R_valid_indexMatrix(SEXP obj)
 		RMKMS(_("'%s' slot is not of type \"%s\""), "margin", "integer");
 	if (XLENGTH(margin) != 1)
 		RMKMS(_("'%s' slot does not have length %d"), "margin", 1);
-	int mg = INTEGER(margin)[0] - 1;
-	if (mg != 0 && mg != 1)
+	int mg = INTEGER(margin)[0];
+	if (mg != 1 && mg != 2)
 		RMKMS(_("'%s' slot is not %d or %d"), "margin", 1, 2);
+	mg -= 1;
 
 	int *pdim = DIM(obj), m = pdim[mg != 0], n = pdim[mg == 0];
 	if (m > 0 && n == 0)
@@ -373,6 +374,13 @@ SEXP R_valid_indexMatrix(SEXP obj)
 			RMKMS(_("'%s' slot has elements not in {%s}"),
 			      "perm", "1,...,Dim[-margin]");
 		++pperm;
+	}
+
+	if (HAS_SLOT(obj, Matrix_xSym)) {
+	SEXP x = GET_SLOT(obj, Matrix_xSym);
+	if (XLENGTH(x) != m)
+		RMKMS(_("'%s' slot does not have length %s"),
+		      "x", "Dim[margin]");
 	}
 
 	return Rf_ScalarLogical(1);
