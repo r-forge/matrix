@@ -64,14 +64,14 @@ setMethod("tril", c(x = "diagonalMatrix"),
 
 setMethod("band", c(x = "indMatrix"),
           function(x, k1, k2, ...)
-              band(.M2kind(x, "n"), k1, k2, ...))
+              band(.ind2sparse(x), k1, k2, ...))
 
 setMethod("triu", c(x = "indMatrix"),
           function(x, k = 0L, ...)
-              triu(.M2kind(x, "n"), k, ...))
+              triu(.ind2sparse(x), k, ...))
 
 setMethod("tril", c(x = "indMatrix"),
           function(x, k = 0L, ...)
-              tril(.M2kind(x, "n"), k, ...))
+              tril(.ind2sparse(x), k, ...))
 
 rm(.cl)

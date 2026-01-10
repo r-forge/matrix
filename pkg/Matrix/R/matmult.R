@@ -207,7 +207,7 @@ setMethod("%*%", c(x = "indMatrix", y = "indMatrix"),
 setMethod("%*%", c(x = "indMatrix", y = "Matrix"),
           function(x, y) {
               if(x@margin != 1L)
-                  return(.M2kind(x, "d") %*% y)
+                  return(.ind2sparse(x, "d") %*% y)
               matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .M2kind(y[x@perm, , drop = FALSE], ",")
               r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
@@ -217,7 +217,7 @@ setMethod("%*%", c(x = "indMatrix", y = "Matrix"),
 setMethod("%*%", c(x = "Matrix", y = "indMatrix"),
           function(x, y) {
               if(y@margin == 1L)
-                  return(x %*% .M2kind(y, "d"))
+                  return(x %*% .ind2sparse(y, "d"))
               matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .M2kind(x[, y@perm, drop = FALSE], ",")
               r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
@@ -227,7 +227,7 @@ setMethod("%*%", c(x = "Matrix", y = "indMatrix"),
 setMethod("%*%", c(x = "indMatrix", y = "matrix"),
           function(x, y) {
               if(x@margin != 1L)
-                  return(.M2kind(x, "d") %*% y)
+                  return(.ind2sparse(x, "d") %*% y)
               matmultDim(x@Dim, dim(y), type = 1L)
               r <- .m2dense(y[x@perm, , drop = FALSE], ",ge")
               r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
@@ -237,7 +237,7 @@ setMethod("%*%", c(x = "indMatrix", y = "matrix"),
 setMethod("%*%", c(x = "matrix", y = "indMatrix"),
           function(x, y) {
               if(y@margin == 1L)
-                  return(x %*% .M2kind(y, "d"))
+                  return(x %*% .ind2sparse(y, "d"))
               matmultDim(dim(x), y@Dim, type = 1L)
               r <- .m2dense(x[, y@perm, drop = FALSE], ",ge")
               r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
@@ -247,7 +247,7 @@ setMethod("%*%", c(x = "matrix", y = "indMatrix"),
 setMethod("%*%", c(x = "indMatrix", y = "vector"),
           function(x, y) {
               if(x@margin != 1L)
-                  return(.M2kind(x, "d") %*% y)
+                  return(.ind2sparse(x, "d") %*% y)
               k <- (d <- x@Dim)[2L]
               r <-
               if(k == length(y))
@@ -262,7 +262,7 @@ setMethod("%*%", c(x = "indMatrix", y = "vector"),
 setMethod("%*%", c(x = "vector", y = "indMatrix"),
           function(x, y) {
               if(y@margin == 1L)
-                  return(x %*% .M2kind(y, "d"))
+                  return(x %*% .ind2sparse(y, "d"))
               k <- (d <- y@Dim)[1L]
               r <-
               if(k == length(x))
@@ -643,7 +643,7 @@ setMethod("%&%", c(x = "indMatrix", y = "indMatrix"),
 setMethod("%&%", c(x = "indMatrix", y = "Matrix"),
           function(x, y) {
               if(x@margin != 1L)
-                  return(.M2kind(x, "n") %&% y)
+                  return(.ind2sparse(x, "n") %&% y)
               matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .M2kind(y[x@perm, , drop = FALSE], "n")
               r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
@@ -653,7 +653,7 @@ setMethod("%&%", c(x = "indMatrix", y = "Matrix"),
 setMethod("%&%", c(x = "Matrix", y = "indMatrix"),
           function(x, y) {
               if(y@margin == 1L)
-                  return(x %&% .M2kind(y, "n"))
+                  return(x %&% .ind2sparse(y, "n"))
               matmultDim(x@Dim, y@Dim, type = 1L)
               r <- .M2kind(x[, y@perm, drop = FALSE], "n")
               r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
@@ -663,7 +663,7 @@ setMethod("%&%", c(x = "Matrix", y = "indMatrix"),
 setMethod("%&%", c(x = "indMatrix", y = "matrix"),
           function(x, y) {
               if(x@margin != 1L)
-                  return(.M2kind(x, "n") %&% y)
+                  return(.ind2sparse(x, "n") %&% y)
               matmultDim(x@Dim, dim(y), type = 1L)
               r <- .m2dense(y[x@perm, , drop = FALSE], "nge")
               r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 1L)
@@ -673,7 +673,7 @@ setMethod("%&%", c(x = "indMatrix", y = "matrix"),
 setMethod("%&%", c(x = "matrix", y = "indMatrix"),
           function(x, y) {
               if(y@margin == 1L)
-                  return(x %&% .M2kind(y, "n"))
+                  return(x %&% .ind2sparse(y, "n"))
               matmultDim(dim(x), y@Dim, type = 1L)
               r <- .m2dense(x[, y@perm, drop = FALSE], "nge")
               r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 1L)
@@ -683,7 +683,7 @@ setMethod("%&%", c(x = "matrix", y = "indMatrix"),
 setMethod("%&%", c(x = "indMatrix", y = "vector"),
           function(x, y) {
               if(x@margin != 1L)
-                  return(.M2kind(x, "n") %&% y)
+                  return(.ind2sparse(x, "n") %&% y)
               k <- (d <- x@Dim)[2L]
               r <-
               if(k == length(y))
@@ -698,7 +698,7 @@ setMethod("%&%", c(x = "indMatrix", y = "vector"),
 setMethod("%&%", c(x = "vector", y = "indMatrix"),
           function(x, y) {
               if(y@margin == 1L)
-                  return(x %&% .M2kind(y, "n"))
+                  return(x %&% .ind2sparse(y, "n"))
               k <- (d <- y@Dim)[1L]
               r <-
               if(k == length(x))
@@ -1077,7 +1077,7 @@ setMethod("crossprod", c(x = "Matrix", y = "indMatrix"),
               matmultDim(x@Dim, y@Dim, type = 2L)
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
               if(y@margin == 1L)
-                  r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
+                  r <- crossprod(x, .ind2sparse(y, l), boolArith = boolArith, ...)
               else {
                   r <- .M2kind(t(x)[, y@perm, drop = FALSE], l)
                   r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
@@ -1090,7 +1090,7 @@ setMethod("crossprod", c(x = "matrix", y = "indMatrix"),
               matmultDim(dim(x), y@Dim, type = 2L)
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
               if(y@margin == 1L)
-                  r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
+                  r <- crossprod(x, .ind2sparse(y, l), boolArith = boolArith, ...)
               else {
                   r <- .m2dense(t(x)[, y@perm, drop = FALSE], paste0(l, "ge"))
                   r@Dimnames <- matmultDN(dimnames(x), y@Dimnames, type = 2L)
@@ -1104,7 +1104,7 @@ setMethod("crossprod", c(x = "vector", y = "indMatrix"),
                   stop("non-conformable arguments")
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
               if(y@margin == 1L)
-                  r <- crossprod(x, .M2kind(y, l), boolArith = boolArith, ...)
+                  r <- crossprod(x, .ind2sparse(y, l), boolArith = boolArith, ...)
               else {
                   r <- .m2dense(x[y@perm], paste0(l, "ge"), margin = 1L)
                   r@Dimnames <- c(list(NULL), y@Dimnames[2L])
@@ -1459,7 +1459,7 @@ setMethod("tcrossprod", c(x = "indMatrix", y = "Matrix"),
               matmultDim(x@Dim, y@Dim, type = 3L)
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
               if(y@margin != 1L)
-                  r <- tcrossprod(.M2kind(x, l), y, boolArith = boolArith, ...)
+                  r <- tcrossprod(.ind2sparse(x, l), y, boolArith = boolArith, ...)
               else {
                   r <- .M2kind(t(y)[x@perm, , drop = FALSE], l)
                   r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)
@@ -1472,7 +1472,7 @@ setMethod("tcrossprod", c(x = "indMatrix", y = "matrix"),
               matmultDim(x@Dim, dim(y), type = 3L)
               l <- if(!is.na(boolArith) && boolArith) "n" else ","
               if(y@margin != 1L)
-                  r <- tcrossprod(.M2kind(x, l), y, boolArith = boolArith, ...)
+                  r <- tcrossprod(.ind2sparse(x, l), y, boolArith = boolArith, ...)
               else {
                   r <- .m2dense(t(y)[x@perm, , drop = FALSE], paste0(l, "ge"))
                   r@Dimnames <- matmultDN(x@Dimnames, dimnames(y), type = 3L)

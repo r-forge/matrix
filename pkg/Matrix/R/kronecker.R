@@ -731,11 +731,11 @@ setMethod("kronecker", c(X = "TsparseMatrix", Y = "TsparseMatrix"),
 
 setMethod("kronecker", c(X = "diagonalMatrix", Y = "indMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(X, .M2kind(Y, "n"), FUN, make.dimnames, ...))
+              kronecker(X, .ind2sparse(Y), FUN, make.dimnames, ...))
 
 setMethod("kronecker", c(X = "indMatrix", Y = "diagonalMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(.M2kind(X, "n"), Y, FUN, make.dimnames, ...))
+              kronecker(.ind2sparse(X), Y, FUN, make.dimnames, ...))
 
 setMethod("kronecker", c(X = "indMatrix", Y = "indMatrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
@@ -801,4 +801,4 @@ setMethod("kronecker", c(X = "diagonalMatrix", Y = "Matrix"),
 
 setMethod("kronecker", c(X = "indMatrix", Y = "Matrix"),
           function(X, Y, FUN = "*", make.dimnames = FALSE, ...)
-              kronecker(.M2kind(X, "n"), Y, FUN, make.dimnames, ...))
+              kronecker(.ind2sparse(X), Y, FUN, make.dimnames, ...))

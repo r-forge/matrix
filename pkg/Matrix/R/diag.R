@@ -94,6 +94,6 @@ setMethod("diag<-", c(x = "diagonalMatrix"),
 
 setMethod("diag<-", c(x = "indMatrix"),
           function(x, value)
-              `diag<-`(.M2kind(x, "n"), value))
+              `diag<-`(.ind2sparse(x), value))
 
 rm(.cl)
