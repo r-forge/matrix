@@ -190,7 +190,7 @@ SEXP R_valid_lMatrix(SEXP obj)
 SEXP R_valid_iMatrix(SEXP obj)
 {
 	SEXP x = GET_SLOT(obj, Matrix_xSym);
-	if (TYPEOF(x) != LGLSXP)
+	if (TYPEOF(x) != INTSXP)
 		RMKMS(_("'%s' slot is not of type \"%s\""),
 		      "x", "integer");
 	return Rf_ScalarLogical(1);
