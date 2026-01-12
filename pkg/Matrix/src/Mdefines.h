@@ -201,7 +201,7 @@ do { \
 do { \
 	if (TYPEOF(s) != STRSXP || LENGTH(s) < 1 || \
 	    (s = STRING_ELT(s, 0)) == NA_STRING || \
-	    ((c = CHAR(s)[0]) != 'C' && c != 'R' && c != 'T' && !(dot && c != '.'))) \
+	    ((c = CHAR(s)[0]) != 'C' && c != 'R' && c != 'T' && !(dot && c == '.'))) \
 		Rf_error(_("'%s' is not \"%c\", \"%c\", or \"%c\""), \
 		         "repr", 'C', 'R', 'T'); \
 } while (0)
