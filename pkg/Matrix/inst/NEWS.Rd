@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2026-01-07, svn r5173)}{
+\section{Changes in version 1.8-0 (2026-01-12, svn r5178)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -42,6 +42,13 @@
       when the matrix dimensions do not match exactly, as it has been in \R
       for several years.  Previously, only \code{nrow(.)} needed to match
       for the two matrices.
+
+      \item Methods for \code{\%*\%}, \code{crossprod}, and
+      \code{tcrossprod} with signature \code{c(x="ANY", y="Matrix")} or
+      \code{c(x="ANY", y="sparseVector")} return the value of a call to
+      the next method if \code{x} has a class attribute, ceding priority
+      to methods available for that class, including S3 methods and the
+      internal default method.
     }
   }
   \subsection{Classes}{

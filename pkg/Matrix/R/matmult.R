@@ -33,8 +33,11 @@ setMethod("%*%", c(x = .cl, y = "ANY"),
               x %*% (if(length(dim(y)) == 2L) as.matrix else as.vector)(y))
 
 setMethod("%*%", c(x = "ANY", y = .cl),
-          function(x, y)
-              (if(length(dim(x)) == 2L) as.matrix else as.vector)(x) %*% y)
+          function(x, y) {
+              if(is.object(x))
+                  callNextMethod()
+              else (if(length(dim(x)) == 2L) as.matrix else as.vector)(x) %*% y
+          })
 }
 
 
@@ -886,8 +889,11 @@ setMethod("crossprod", c(x = .cl, y = "ANY"),
               crossprod(x, (if(length(dim(y)) == 2L) as.matrix else as.vector)(y), ...))
 
 setMethod("crossprod", c(x = "ANY", y = .cl),
-          function(x, y = NULL, ...)
-              crossprod((if(length(dim(x)) == 2L) as.matrix else as.vector)(x), y, ...))
+          function(x, y = NULL, ...) {
+              if(is.object(x))
+                  callNextMethod()
+              else crossprod((if(length(dim(x)) == 2L) as.matrix else as.vector)(x), y, ...)
+          })
 }
 
 
@@ -1268,8 +1274,11 @@ setMethod("tcrossprod", c(x = .cl, y = "ANY"),
               tcrossprod(x, (if(length(dim(y)) == 2L) as.matrix else as.vector)(y), ...))
 
 setMethod("tcrossprod", c(x = "ANY", y = .cl),
-          function(x, y = NULL, ...)
-              tcrossprod((if(length(dim(x)) == 2L) as.matrix else as.vector)(x), y, ...))
+          function(x, y = NULL, ...) {
+              if(is.object(x))
+                  callNextMethod()
+              else tcrossprod((if(length(dim(x)) == 2L) as.matrix else as.vector)(x), y, ...)
+          })
 }
 
 
