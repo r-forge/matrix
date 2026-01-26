@@ -78,8 +78,8 @@ setMethod("diag<-", c(x = "diagonalMatrix"),
               n <- (d <- x@Dim)[2L]
               if (all(length(value) != c(1L, n)))
                   stop("replacement diagonal has wrong length")
- ### FIXME: keep  x@diag == "U"  if(all(value == as1(x@x)))
-             if (tt.[1L] < tt.[2L])
+### FIXME: keep  x@diag == "U"  if(all(value == as1(x@x)))
+              if (tt.[1L] < tt.[2L])
                   kind <- c("l", "i", "d", "z")[tt.[2L]]
               else {
                   kind <- .M.kind(x)

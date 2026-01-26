@@ -40,13 +40,6 @@ as0 <- function(x, type = typeof(x))
                   name, cl1[1L], cl2[1L], "Matrix"),
          call. = FALSE, domain = NA)
 
-if(FALSE) {
-Matrix.verbose <- function()
-    getOption("Matrix.verbose", .MatrixEnv[["verbose"]])
-Matrix.warn <- function()
-    getOption("Matrix.warn", .MatrixEnv[["warn"]])
-}
-
 Matrix.getOption <- function(x, default = .MatrixEnv[[x]])
     getOption(paste0("Matrix.", x), default)
 Matrix.verbose <- function() Matrix.getOption("verbose")
@@ -358,18 +351,19 @@ diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = TRUE) {
 
 .diagN2U <- function(x, cl = getClassDef(class(x)), checkDense = FALSE) {
     if(checkDense & (isDense <- extends(cl, "denseMatrix")))
-         ..diagN2U(as(x, "CsparseMatrix"), sparse = TRUE)
+        ..diagN2U(as(x, "CsparseMatrix"), sparse = TRUE)
     else ..diagN2U(x, sparse = !isDense)
 }
 
 ..diagN2U <- function(x, sparse) {
     if(x@Dim[1L] > 0L) {
-            if(sparse && .M.shape(x) == "t") # x is  sparse & triangular ( => has x@uplo )
-                x <- switch(x@uplo,
-                            U = .Call(R_sparse_band, x, 1L, NULL),
-                            L = .Call(R_sparse_band, x, NULL, -1L))
-            else if(.isDiagonal(x))
-                x@x <- x@x[0L] # empty 'x'
+        shape <- .M.shape(x)
+        if(sparse && shape == "t") # x is  sparse & triangular ( => has x@uplo )
+            x <- switch(x@uplo,
+                        U = .Call(R_sparse_band, x, 1L, NULL),
+                        L = .Call(R_sparse_band, x, NULL, -1L))
+        else if(shape == "d")
+            x@x <- x@x[0L] # empty 'x'
     }
     x@diag <- "U"
     x
