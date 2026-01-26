@@ -77,20 +77,22 @@ setMethod("isSymmetric", c(object = "diagonalMatrix"),
                   ca <- function(check.attributes = TRUE, ...)
                       check.attributes
                   if (ca(...) && !isSymmetricDN(object@Dimnames))
-                     return(FALSE) # else continue
+                      return(FALSE)
               }
               !is.complex(x <- object@x) || # check more only if <complex>
-              !identical(trans, "C") ||
-               object@diag != "N" || {
-                   ae <- function(target, current, tolerance, scale = NULL, ...)
-                       all.equal.numeric(target = target,
-                                         current = current,
-                                         tolerance = tolerance,
-                                         scale = scale,
-                                         check.attributes = FALSE,
-                                         check.class = FALSE)
-                   isTRUE(ae(x, Conj(x), tolerance = tol, ...))
-               }
+                  !identical(trans, "C") ||
+                  object@diag != "N" ||
+                  {
+                      ae <- function(target, current,
+                                     tolerance, scale = NULL, ...)
+                          all.equal.numeric(target = target,
+                                            current = current,
+                                            tolerance = tolerance,
+                                            scale = scale,
+                                            check.attributes = FALSE,
+                                            check.class = FALSE)
+                      isTRUE(ae(x, Conj(x), tolerance = tol, ...))
+                  }
           })
 
 setMethod("isSymmetric", c(object = "indMatrix"),
