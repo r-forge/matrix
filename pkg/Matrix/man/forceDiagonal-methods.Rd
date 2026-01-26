@@ -21,7 +21,9 @@
    \code{\link{diag}(x)} to create a corresponding \code{\linkS4class{diagonalMatrix}}.
 }
 \usage{
-forceDiagonal(x, diag = NULL, \dots)
+forceDiagonal(x, \dots)
+
+\S4method{forceDiagonal}{matrix}(x, diag = NULL, \dots)
 }
 \arguments{
   \item{x}{a \code{matrix} or \code{\linkS4class{Matrix}}.}

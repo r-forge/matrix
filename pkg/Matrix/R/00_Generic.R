@@ -58,9 +58,8 @@ setGeneric("forceCanonical",
                standardGeneric("forceCanonical"))
 
 setGeneric("forceDiagonal",
-           function(x, diag = NULL, ...)
-               standardGeneric("forceDiagonal"),
-           signature = "x")
+           function(x, ...)
+               standardGeneric("forceDiagonal"))
 
 setGeneric("forceSymmetric",
            function(x, ...)
