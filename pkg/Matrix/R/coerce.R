@@ -237,13 +237,20 @@ function(from, kind) { # coerce simple vector _if_ needed
     if (kind == .kind.type[[typeof(from)]])
         from
     else switch(kind,
-                "d" = as.numeric(from),
+                "n" =
+                    {
+                        to <- as.logical(from)
+                        if (anyNA(to))
+                            to | is.na(to)
+                        else to
+                    },
                 "l" = as.logical(from),
                 "i" = as.integer(from),
+                "d" = as.double (from),
                 "z" = as.complex(from),
-                stop("invalid 'kind': ", kind))
+                stop(gettextf("%s=\"%s\" is invalid", "kind", kind),
+                     domain = NA))
 }
-
 
 .V2v <-
 function(from) {

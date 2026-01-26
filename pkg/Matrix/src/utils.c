@@ -127,7 +127,7 @@ SEXP allocUnit(SEXPTYPE type, R_xlen_t length)
 	case CPLXSXP:
 	{
 		Rcomplex *pans = COMPLEX(ans),
-			u = { .r = 1., .i = 0. };
+			u = { .r = 1.0, .i = 0.0 };
 		for (i = 0; i < length; ++i)
 			*(pans++) = u;
 		break;
@@ -185,7 +185,7 @@ void naToUnit(SEXP x)
 	case CPLXSXP:
 	{
 		Rcomplex *px = COMPLEX(x),
-			u = { .r = 1., .i = 0. };
+			u = { .r = 1.0, .i = 0.0 };
 		for (i = 0; i < length; ++i) {
 			if (ISNAN((*px).r) || ISNAN((*px).i))
 				*px = u;
