@@ -245,7 +245,7 @@ SEXP sparse_symmpart(SEXP from, const char *class,
 	if (op_ct != '\0' && op_ct != 'C')
 		SET_TRANS(to);
 
-	int up = (class[0] != 'R') == (op_ul == 'U' || ul == 'U');
+	int up = (class[2] != 'R') == (op_ul == 'U' || ul == 'U');
 
 	if (class[2] != 'T') {
 

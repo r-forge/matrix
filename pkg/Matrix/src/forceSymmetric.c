@@ -119,7 +119,7 @@ SEXP sparse_force_symmetric(SEXP from, const char *class,
 	if (ct1 != 'C' && ct1 != '\0')
 		SET_TRANS(to);
 
-	int up = (class[0] != 'R') == (ul1 == 'U');
+	int up = (class[2] != 'R') == (ul1 == 'U');
 
 	if (class[2] != 'T') {
 
