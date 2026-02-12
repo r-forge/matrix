@@ -261,10 +261,10 @@
 \usage{
 \S4method{\%*\%}{CsparseMatrix,diagonalMatrix}(x, y)
 
-\S4method{crossprod}{CsparseMatrix,diagonalMatrix}(x, y = NULL, boolArith = NA, \dots)
+\S4method{crossprod}{CsparseMatrix,diagonalMatrix}(x, y = NULL, trans = "T", boolArith = NA, \dots)
        ## .... and for many more signatures
 
-\S4method{tcrossprod}{TsparseMatrix,missing}(x, y = NULL, boolArith = NA, \dots)
+\S4method{tcrossprod}{TsparseMatrix,missing}(x, y = NULL, trans = "T", boolArith = NA, \dots)
        ## .... and for many more signatures
 }
 \arguments{
@@ -272,6 +272,7 @@
   \item{y}{a matrix-like object, or for \code{[t]crossprod()}
     \code{NULL} (by default); the latter case is formally equivalent to
     \code{y = x}.}
+  \item{trans}{TODO.}
   \item{boolArith}{\code{\link{logical}}, i.e., \code{NA}, \code{TRUE},
     or \code{FALSE}.  If true the result is (coerced to) a pattern
     matrix, i.e., \code{"\linkS4class{nMatrix}"}, unless there are
