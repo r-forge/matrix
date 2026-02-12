@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2026-01-12, svn r5178)}{
+\section{Changes in version 1.8-0 (2026-02-12, svn r5187)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -98,7 +98,7 @@
       \item New generic function \code{ct} for the conjugate transpose.
       \code{ct(x)} is equivalent to \code{t(x)} except for complex
       \code{x}, for which it is intended to be at least as efficient as
-      (if not more efficient than) \code{Conj(t(x))}.
+      \code{Conj(t(x))}.
 
       \item The formal argument list of generic function
       \code{forceSymmetric} is changed from \code{(x, uplo)} to
@@ -155,6 +155,13 @@
       implementation of the scaling and squaring algorithm for
       non-Hermitian \code{x}.  The result for Hermitian \code{x} is now
       formally positive definite.
+
+      \item Methods for \code{crossprod} and \code{tcrossprod} gain
+      argument \code{trans} with valid values \code{"C"} and \code{"T"}
+      indicating conjugate transpose and transpose, respectively.
+      For backwards compatibility, the default value is \code{"T"},
+      whereas methods for \code{isSymmetric} and other generic functions
+      use \code{"C"} by default.
 
       \item \code{isDiagonal()} now also works for \code{table(X, Y)} tables.
 
