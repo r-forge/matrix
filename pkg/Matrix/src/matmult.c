@@ -722,15 +722,15 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 	PROTECT_WITH_INDEX(s_x, &xpid);
 	PROTECT_WITH_INDEX(s_y, &ypid);
 
-#define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
+#define DO_S3(s_a, atrans, apid, isv) \
 	do { \
-	if (TYPEOF(_A_) != OBJSXP) { \
-	REPROTECT(_A_ = matrix_as_dense(_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 0), _PID_); \
-	if (_ISV_) { \
+	if (TYPEOF(s_a) != OBJSXP) { \
+	REPROTECT(s_a = matrix_as_dense(s_a, ",ge", '\0', '\0', '\0', (atrans != 'N') ? 0 : 1, 0), apid); \
+	if (isv) { \
 		/* Vector: discard names and don't transpose again */ \
-		SET_VECTOR_ELT(DIMNAMES(_A_, 0), \
-		               (_TRANS_ != 'N') ? 1 : 0, R_NilValue); \
-		_TRANS_ = 'N'; \
+		SET_VECTOR_ELT(DIMNAMES(s_a, 0), \
+		               (atrans != 'N') ? 1 : 0, R_NilValue); \
+		atrans = 'N'; \
 	} \
 	} \
 	} while (0)
@@ -750,11 +750,11 @@ SEXP R_dense_matmult(SEXP s_x, SEXP s_y,
 	char kind = (xclass[0] == 'z' || (s_y != R_NilValue && yclass[0] == 'z'))
 		? 'z' : 'd';
 
-#define DO_AS(_A_, _CLASS_, _TRANS_, _PID_) \
+#define DO_AS(s_a, aclass, atrans, apid) \
 	do { \
-	if (_CLASS_[0] != kind) { \
-		REPROTECT(_A_ = dense_as_kind(_A_, _CLASS_, kind, 0), _PID_); \
-		_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+	if (aclass[0] != kind) { \
+		REPROTECT(s_a = dense_as_kind(s_a, aclass, kind, 0), apid); \
+		aclass = Matrix_class(s_a, valid, 6, __func__); \
 	} \
 	} while (0)
 
@@ -855,6 +855,7 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 
 	SEXP z;
 	char zclass[] = "..CMatrix";
+	Rprintf("x=%c, y=%c, z=%c\n", xtrans, ytrans, ztrans);
 
 	if (y == R_NilValue) {
 
@@ -1037,20 +1038,20 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	PROTECT_WITH_INDEX(s_x, &xpid);
 	PROTECT_WITH_INDEX(s_y, &ypid);
 
-#define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
+#define DO_S3(s_a, atrans, apid, isv) \
 	do { \
-	if (TYPEOF(_A_) != OBJSXP) { \
+	if (TYPEOF(s_a) != OBJSXP) { \
 	if (boolean == NA_LOGICAL || !boolean) \
-	REPROTECT(_A_ = matrix_as_dense (_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 0), _PID_); \
-	else if (_TRANS_ != 'N') \
-	REPROTECT(_A_ = matrix_as_sparse(_A_, "ngR", '\0', '\0', '\0', 0), _PID_); \
+	REPROTECT(s_a = matrix_as_dense (s_a, ",ge", '\0', '\0', '\0', (atrans != 'N') ? 0 : 1, 0), apid); \
+	else if (atrans != 'N') \
+	REPROTECT(s_a = matrix_as_sparse(s_a, "ngR", '\0', '\0', '\0', 0), apid); \
 	else \
-	REPROTECT(_A_ = matrix_as_sparse(_A_, "ngC", '\0', '\0', '\0', 0), _PID_); \
-	if (_ISV_) { \
+	REPROTECT(s_a = matrix_as_sparse(s_a, "ngC", '\0', '\0', '\0', 0), apid); \
+	if (isv) { \
 		/* Discard names and don't transpose again */ \
-		SET_VECTOR_ELT(DIMNAMES(_A_, 0), \
-		               (_TRANS_ != 'N') ? 1 : 0, R_NilValue); \
-		_TRANS_ = 'N'; \
+		SET_VECTOR_ELT(DIMNAMES(s_a, 0), \
+		               (atrans != 'N') ? 1 : 0, R_NilValue); \
+		atrans = 'N'; \
 	} \
 	} \
 	} while (0)
@@ -1072,33 +1073,33 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	char kind = (boolean) ? 'n' :
 		((xclass[0] != 'z' && (s_y == R_NilValue || yclass[0] != 'z')) ? 'd' : 'z');
 
-#define DO_AS(_A_, _CLASS_, _TRANS_, _PID_) \
+#define DO_AS(s_a, aclass, atrans, apid) \
 	do { \
-	if (_CLASS_[2] != 'C' && _TRANS_ != 'N') { \
-		if (_CLASS_[2] != 'R' && _CLASS_[2] != 'T') { \
-			REPROTECT(_A_ = dense_as_sparse(_A_, _CLASS_, 'R'), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+	if (aclass[2] != 'C' && atrans != 'N') { \
+		if (aclass[2] != 'R' && aclass[2] != 'T') { \
+			REPROTECT(s_a = dense_as_sparse(s_a, aclass, 'R'), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
-		REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, _TRANS_, 1), _PID_); \
-		_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
-		_TRANS_ = 'N'; \
+		REPROTECT(s_a = sparse_transpose(s_a, aclass, atrans, 1), apid); \
+		aclass = Matrix_class(s_a, valid, 6, __func__); \
+		atrans = 'N'; \
 	} \
-	if (_CLASS_[2] != 'C') { \
-		if (_CLASS_[2] != 'R' && _CLASS_[2] != 'T') \
-			REPROTECT(_A_ = dense_as_sparse(_A_, _CLASS_, 'C'), _PID_); \
+	if (aclass[2] != 'C') { \
+		if (aclass[2] != 'R' && aclass[2] != 'T') \
+			REPROTECT(s_a = dense_as_sparse(s_a, aclass, 'C'), apid); \
 		else \
-			REPROTECT(_A_ = sparse_as_Csparse(_A_, _CLASS_), _PID_); \
-		_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+			REPROTECT(s_a = sparse_as_Csparse(s_a, aclass), apid); \
+		aclass = Matrix_class(s_a, valid, 6, __func__); \
 	} \
-	if (_TRANS_ != 'N' && _CLASS_[1] == 's' && \
-	    (_CLASS_[0] != 'z' || TRANS(_A_) == _TRANS_)) \
-		_TRANS_ = 'N'; \
-	if (_CLASS_[0] != kind) { \
+	if (atrans != 'N' && aclass[1] == 's' && \
+	    (aclass[0] != 'z' || TRANS(s_a) == atrans)) \
+		atrans = 'N'; \
+	if (aclass[0] != kind) { \
 		if (boolean) \
-			REPROTECT(_A_ = sparse_dropzero(_A_, _CLASS_, 0.0), _PID_); \
+			REPROTECT(s_a = sparse_dropzero(s_a, aclass, 0.0), apid); \
 		else { \
-			REPROTECT(_A_ = sparse_as_kind(_A_, _CLASS_, kind), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+			REPROTECT(s_a = sparse_as_kind(s_a, aclass, kind), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
 	} \
 	} while (0)
@@ -1328,18 +1329,18 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	PROTECT_WITH_INDEX(s_x, &xpid);
 	PROTECT_WITH_INDEX(s_y, &ypid);
 
-#define DO_S3(_A_, _TRANS_, _PID_, _ISV_) \
+#define DO_S3(s_a, atrans, apid, isv) \
 	do { \
-	if (TYPEOF(_A_) != OBJSXP) { \
+	if (TYPEOF(s_a) != OBJSXP) { \
 	if (boolean == NA_LOGICAL || !boolean) \
-	REPROTECT(_A_ = matrix_as_dense(_A_, ",ge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 2), _PID_); \
+	REPROTECT(s_a = matrix_as_dense(s_a, ",ge", '\0', '\0', '\0', (atrans != 'N') ? 0 : 1, 2), apid); \
 	else \
-	REPROTECT(_A_ = matrix_as_dense(_A_, "nge", '\0', '\0', '\0', (_TRANS_ != 'N') ? 0 : 1, 2), _PID_); \
-	if (_ISV_) { \
+	REPROTECT(s_a = matrix_as_dense(s_a, "nge", '\0', '\0', '\0', (atrans != 'N') ? 0 : 1, 2), apid); \
+	if (isv) { \
 		/* Vector: discard names and don't transpose again */ \
-		SET_VECTOR_ELT(DIMNAMES(_A_, 0), \
-		               (_TRANS_ != 'N') ? 1 : 0, R_NilValue); \
-		_TRANS_ = 'N'; \
+		SET_VECTOR_ELT(DIMNAMES(s_a, 0), \
+		               (atrans != 'N') ? 1 : 0, R_NilValue); \
+		atrans = 'N'; \
 	} \
 	} \
 	} while (0)
@@ -1372,48 +1373,48 @@ SEXP R_diagonal_matmult(SEXP s_x, SEXP s_y,
 	} else
 		Rf_error(_("should never happen ..."));
 
-#define DO_AS(_A_, _CLASS_, _TRANS_, _PID_) \
+#define DO_AS(s_a, aclass, atrans, apid) \
 	do { \
-	if (_TRANS_ != 'N' && _CLASS_[1] == 's' && \
-	    (_CLASS_[0] != 'z' || TRANS(_A_) == _TRANS_)) \
-		_TRANS_ = 'N'; \
-	switch (_CLASS_[2]) { \
+	if (atrans != 'N' && aclass[1] == 's' && \
+	    (aclass[0] != 'z' || TRANS(s_a) == atrans)) \
+		atrans = 'N'; \
+	switch (aclass[2]) { \
 	case 'i': \
-		if (!id && _CLASS_[0] != ks) { \
-			REPROTECT(_A_ = diagonal_as_kind(_A_, _CLASS_, ks), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+		if (!id && aclass[0] != ks) { \
+			REPROTECT(s_a = diagonal_as_kind(s_a, aclass, ks), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
 		break; \
 	case 'C': \
 	case 'R': \
 	case 'T': \
-		if (_CLASS_[0] != ks) { \
-			REPROTECT(_A_ = sparse_as_kind(_A_, _CLASS_, ks), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+		if (aclass[0] != ks) { \
+			REPROTECT(s_a = sparse_as_kind(s_a, aclass, ks), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
-		if (!id && _CLASS_[1] == 's') { \
-			REPROTECT(_A_ = sparse_as_general(_A_, _CLASS_), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+		if (!id && aclass[1] == 's') { \
+			REPROTECT(s_a = sparse_as_general(s_a, aclass), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
-		if (!id && _CLASS_[1] == 't') \
-			REPROTECT(_A_ = sparse_diag_U2N(_A_, _CLASS_), _PID_); \
-		if (_TRANS_ != 'N') { \
-			REPROTECT(_A_ = sparse_transpose(_A_, _CLASS_, _TRANS_, 0), _PID_); \
-			_TRANS_ = 'N'; \
+		if (!id && aclass[1] == 't') \
+			REPROTECT(s_a = sparse_diag_U2N(s_a, aclass), apid); \
+		if (atrans != 'N') { \
+			REPROTECT(s_a = sparse_transpose(s_a, aclass, atrans, 0), apid); \
+			atrans = 'N'; \
 		} \
 		break; \
 	default: \
-		if (_CLASS_[0] != kd) { \
-			REPROTECT(_A_ = dense_as_kind(_A_, _CLASS_, kd, 1), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+		if (aclass[0] != kd) { \
+			REPROTECT(s_a = dense_as_kind(s_a, aclass, kd, 1), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
-		if (!id && _CLASS_[1] == 's') { \
-			REPROTECT(_A_ = dense_as_general(_A_, _CLASS_, _A_ == _ ## _A_), _PID_); \
-			_CLASS_ = Matrix_class(_A_, valid, 6, __func__); \
+		if (!id && aclass[1] == 's') { \
+			REPROTECT(s_a = dense_as_general(s_a, aclass, s_a == _ ## s_a), apid); \
+			aclass = Matrix_class(s_a, valid, 6, __func__); \
 		} \
-		if (_TRANS_ != 'N') { \
-			REPROTECT(_A_ = dense_transpose(_A_, _CLASS_, _TRANS_), _PID_); \
-			_TRANS_ = 'N'; \
+		if (atrans != 'N') { \
+			REPROTECT(s_a = dense_transpose(s_a, aclass, atrans), apid); \
+			atrans = 'N'; \
 		} \
 		break; \
 	} \
