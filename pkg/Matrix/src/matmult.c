@@ -855,7 +855,6 @@ SEXP gCgCMatrix_matmult(SEXP x, SEXP y, char xtrans, char ytrans, char ztrans,
 
 	SEXP z;
 	char zclass[] = "..CMatrix";
-	Rprintf("x=%c, y=%c, z=%c\n", xtrans, ytrans, ztrans);
 
 	if (y == R_NilValue) {
 
@@ -1073,7 +1072,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	char kind = (boolean) ? 'n' :
 		((xclass[0] != 'z' && (s_y == R_NilValue || yclass[0] != 'z')) ? 'd' : 'z');
 
-#define DO_AS(s_a, aclass, atrans, apid) \
+#define DO_AS(s_a, s_b, aclass, atrans, btrans, apid) \
 	do { \
 	if (aclass[2] != 'C' && atrans != 'N') { \
 		if (aclass[2] != 'R' && aclass[2] != 'T') { \
@@ -1082,7 +1081,10 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 		} \
 		REPROTECT(s_a = sparse_transpose(s_a, aclass, atrans, 1), apid); \
 		aclass = Matrix_class(s_a, valid, 6, __func__); \
-		atrans = 'N'; \
+		if (s_b == R_NilValue) \
+			SWAP(atrans, btrans, char, ); \
+		else \
+			atrans = 'N'; \
 	} \
 	if (aclass[2] != 'C') { \
 		if (aclass[2] != 'R' && aclass[2] != 'T') \
@@ -1104,7 +1106,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 	} \
 	} while (0)
 
-	DO_AS(s_x, xclass, xtrans, xpid);
+	DO_AS(s_x, s_y, xclass, xtrans, ytrans, xpid);
 
 	if (s_y == R_NilValue) {
 		REPROTECT(s_x = sparse_as_general(s_x, xclass), xpid);
@@ -1138,7 +1140,7 @@ SEXP R_sparse_matmult(SEXP s_x, SEXP s_y,
 		return s_x;
 	}
 
-	DO_AS(s_y, yclass, ytrans, ypid);
+	DO_AS(s_y, s_x, yclass, ytrans, xtrans, ypid);
 
 #undef DO_AS
 
