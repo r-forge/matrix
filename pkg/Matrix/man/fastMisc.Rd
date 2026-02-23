@@ -27,7 +27,6 @@
 \alias{.diag2sparse}
 \alias{.ind2sparse}
 \alias{.m2sparse}
-\alias{.tCRT}
 % coercions, predating API finalization, hence no longer documented:
 \alias{.CR2RC}
 \alias{.CR2T}
@@ -88,8 +87,6 @@
 .ind2sparse(from, kind = "n", repr = ".")
 .m2sparse(from, class = ".gC",
           uplo = "U", trans = "C", diag = "N", margin = 2L)
-
-.tCRT(x, trans = "T", lazy = TRUE)
 
 .diag.dsC(x, Chx = Cholesky(x, LDL = TRUE), res.kind = "diag")
 
@@ -152,10 +149,6 @@
     where \code{"."} in the first position is equivalent to \code{"l"}
     for logical arguments and \code{"d"} for numeric arguments.}
   \item{\dots}{optional arguments passed to \code{\link{isSymmetric}}.}
-  %% .tCRT :
-  \item{lazy}{a logical indicating if the transpose should be
-    constructed with minimal allocation, but possibly \emph{without}
-    preserving representation.}
   %% .diag.dsC :
   \item{Chx}{optionally, the \code{\link{Cholesky}(x, \dots)}
     factorization of \code{x}.  If supplied, then \code{x} is unused.}
@@ -209,13 +202,6 @@
   \code{.m2sparse}, and \code{.m2V} accept vectors that are
   not matrices.
 
-  \subsection{\code{.tCRT(x)}}{
-    If \code{lazy = TRUE}, then \code{.tCRT} constructs the transpose
-    of \code{x} using the most efficient representation,
-    which for \samp{CRT} is \samp{RCT}.  If \code{lazy = FALSE},
-    then \code{.tCRT} preserves the representation of \code{x},
-    behaving as the corresponding methods for generic function \code{t}.
-  }
   \subsection{\code{.diag.dsC(x)}}{
     \code{.diag.dsC} computes (or uses if \code{Chx} is supplied)
     the Cholesky factorization of \code{x} as \eqn{L D L'} in order

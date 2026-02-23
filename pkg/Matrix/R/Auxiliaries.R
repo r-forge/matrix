@@ -96,10 +96,6 @@ Matrix.message <- function(..., .M.level = 1, call. = FALSE, domain = NULL) {
     x
 }
 
-
-.tCRT <- function(x, trans = "T", lazy = TRUE) # called from ./t.R with `trans = "*"`
-    .Call(R_sparse_transpose, x, trans, lazy)
-
 .drop0 <- function(x, tol = 0, isM = TRUE) {
     if(isM)
         return(.Call(R_sparse_dropzero, x, tol))
