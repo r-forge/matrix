@@ -8,24 +8,17 @@ setMethod("updown",
 
 setMethod("updown",
           c(update = "logical", C = "Matrix", L = "sparseCholesky"),
-          function(update, C, L)
-              updown(update, .M2C(C), L))
+          function(update, C, L) {
+              C <- .M2gen(.M2C(C), ",")
+              if (length(perm <- L@perm))
+                  C <- C[perm + 1L, , drop = FALSE]
+              .Call(sparseCholesky_updown, L, C, update)
+          })
 
 setMethod("updown",
           c(update = "logical", C = "matrix", L = "sparseCholesky"),
           function(update, C, L)
               updown(update, .m2sparse(C, ",gC"), L))
-
-setMethod("updown",
-          c(update = "logical", C = "CsparseMatrix", L = "sparseCholesky"),
-          function(update, C, L) {
-              C <- .M2kind(C, ",")
-              if (length(perm <- L@perm))
-                  C <- C[perm + 1L, , drop = FALSE]
-              if (.M.shape(C) == "t" && C@diag != "N")
-                  C <- ..diagU2N(C)
-              .Call(sparseCholesky_updown, L, C, update)
-          })
 
 
 ## METHODS FOR GENERIC: update
