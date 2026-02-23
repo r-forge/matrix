@@ -31,8 +31,11 @@ function(object, parent, mult = 0)
 
 setMethod("update", c(object = "sparseCholesky"),
           function(object, parent, mult = 0, ...) {
-              parent <- .M2kind(.M2C(parent), ",")
-              if (.M.shape(parent) == "t" && parent@diag != "N")
-                  parent <- ..diagU2N(parent)
+              parent <- .M2C(parent)
+              parent <-
+              if (.M.shape(parent) == "s" &&
+                  (.M.kind(parent) != "z" || parent@trans == "C"))
+                  .M2kind(parent, ",") # stays formally Hermitian
+              else .M2gen(parent, ",")
               .Call(sparseCholesky_update, object, parent, mult)
           })
