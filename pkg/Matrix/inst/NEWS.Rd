@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2026-02-12, svn r5187)}{
+\section{Changes in version 1.8-0 (2026-02-23, svn r5192)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -162,6 +162,10 @@
       For backwards compatibility, the default value is \code{"T"},
       whereas methods for \code{isSymmetric} and other generic functions
       use \code{"C"} by default.
+
+      \item Method for \code{toeplitz(x=<sparseVector>)} gain argument
+      \code{r} enabling construction of asymmetric Toeplitz matrices,
+      following the function in \pkg{base}.
 
       \item \code{isDiagonal()} now also works for \code{table(X, Y)} tables.
 
