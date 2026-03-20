@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2026-02-23, svn r5194)}{
+\section{Changes in version 1.8-0 (2026-03-20, svn r5198)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -220,6 +220,15 @@
       \item \file{test-tools-1.R}: update \code{relErrV()}, and use it
       and \code{relErr()} unconditionally to improve strict
       reproducibility.
+    }
+  }
+}
+
+\section{Changes in version 1.7-5 (2026-03-20, svn r5197)}{
+  \subsection{Misc}{
+    \itemize{
+      \item Non-API entry point \code{Rf_findVarInFrame} is no longer
+      used.
     }
   }
 }
