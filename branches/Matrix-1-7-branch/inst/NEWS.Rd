@@ -5,7 +5,7 @@
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
 
-\section{Changes in version 1.7-5 (2026-03-20, svn r5197)}{
+\section{Changes in version 1.7-5 (2026-03-20, svn r5198)}{
   \subsection{Misc}{
     \itemize{
       \item Non-API entry point \code{Rf_findVarInFrame} is no longer

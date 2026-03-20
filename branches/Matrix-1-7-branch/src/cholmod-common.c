@@ -1217,7 +1217,7 @@ void R_cholmod_common_envget(void) {
 
 #if R_VERSION >= R_Version(4, 5, 0)
 # undef findVarInFrame
-# define findVarInFrame(env, sym) R_getVar(sym, rho, FALSE)
+# define findVarInFrame(env, sym) R_getVar(sym, env, FALSE)
 #endif
 
 #define GET_MEMBER_FROM_FRAME(_MEMBER_, _KIND_) \
