@@ -1215,6 +1215,11 @@ void R_cholmod_common_envset(void) {
 void R_cholmod_common_envget(void) {
 	SEXP rho = cholmod_common_env, tmp;
 
+#if R_VERSION >= R_Version(4, 5, 0)
+# undef findVarInFrame
+# define findVarInFrame(env, sym) R_getVar(sym, rho, FALSE)
+#endif
+
 #define GET_MEMBER_FROM_FRAME(_MEMBER_, _KIND_) \
 	do { \
 		PROTECT(tmp = findVarInFrame(rho, _MEMBER_ ## Sym)); \
