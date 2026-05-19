@@ -32,8 +32,8 @@
   A new \code{\linkS4class{sparseCholesky}} object representing the
   Cholesky factorization of \code{op(parent)} plus \code{mult[1]} times
   the identity matrix, where \code{op} is \code{\link{identity}} for
-  formally Hermitian \code{parent} and \code{\link{tcrossprod}} for all
-  other \code{parent}.
+  formally Hermitian \code{parent} and
+  \code{\link{tcrossprod}(trans = "C")} for all other \code{parent}.
 }
 \seealso{
   Virtual class \code{\linkS4class{sparseCholesky}}.
