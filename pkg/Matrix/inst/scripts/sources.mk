@@ -36,7 +36,7 @@ sources = \
 	skewpart.c \
 	solve.c \
 	subassign.c \
-	subscript.c \
+	subset.c \
 	symmpart.c \
 	t.c \
 	updown.c \

@@ -113,7 +113,7 @@ solve.o: solve.c Lapack-etc.h \
   M5.h idz.h
 subassign.o: subassign.c Mdefines.h \
   t_subassign.c
-subscript.o: subscript.c Mdefines.h \
+subset.o: subset.c Mdefines.h \
   M5.h idz.h
 symmpart.o: symmpart.c Mdefines.h \
   M5.h idz.h
