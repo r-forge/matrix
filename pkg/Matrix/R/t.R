@@ -7,11 +7,21 @@ function(x, lazy = TRUE) .Call(R_sparse_transpose, x, "T", lazy)
 .ctCRT <-
 function(x, lazy = TRUE) .Call(R_sparse_transpose, x, "C", lazy)
 
-setMethod("ct", c(x = "ANY"),
+setMethod("ct", c(x = "vector"),
           function(x) {
-              if (is.object(x) && is.data.frame(x))
-                  x <- as.matrix(x)
-              (if (is.complex(x)) Conj else identity)(t.default(x))
+              if (is.object(x)) {
+                  ## typeof(t(x)) == typeof(x) is not guaranteed,
+                  ## e.g., if 'x' is a data frame
+                  if (is.complex(y <- t(x)))
+                      Conj(y)
+                  else y
+              } else {
+                  ## typeof(t(x)) == typeof(x)
+                  ## hence avoid copy in 'Conj' by not assigning t(x)
+                  if (is.complex(x))
+                      Conj(t.default(x))
+                  else t.default(x)
+              }
           })
 
 setMethod( "t", c(x = "denseMatrix"),

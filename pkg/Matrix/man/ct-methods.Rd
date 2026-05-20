@@ -2,7 +2,6 @@
 %%
 \alias{ct}
 \alias{ct-methods}
-\alias{ct,ANY-method}
 \alias{ct,CsparseMatrix-method}
 \alias{ct,RsparseMatrix-method}
 \alias{ct,TsparseMatrix-method}
@@ -11,6 +10,7 @@
 \alias{ct,indMatrix-method}
 \alias{ct,pMatrix-method}
 \alias{ct,sparseVector-method}
+\alias{ct,vector-method}
 \alias{.ctCRT}
 %%
 \title{Matrix Conjugate Transpose}
@@ -22,7 +22,6 @@
 \usage{
 ct(x)
 
-\S4method{ct}{ANY}(x)
 \S4method{ct}{CsparseMatrix}(x)
 \S4method{ct}{RsparseMatrix}(x)
 \S4method{ct}{TsparseMatrix}(x)
@@ -31,6 +30,7 @@ ct(x)
 \S4method{ct}{indMatrix}(x)
 \S4method{ct}{pMatrix}(x)
 \S4method{ct}{sparseVector}(x)
+\S4method{ct}{vector}(x)
 
 .ctCRT(x, lazy = TRUE)
 }
@@ -82,7 +82,7 @@ typeof(print(     ct(x2) )) # "integer"
 typeof(print(Conj( t(x2)))) # "double" as 'Conj' coerces
 
 stopifnot(identical(ct(1:2), t(1:2)), # keeping non-complex data type
-          identical(Conj(t(1:2)), 0 + t(1:2))) 
+          identical(Conj(t(1:2)), 0 + t(1:2)))
 
 rcplx <-
 function (n)
