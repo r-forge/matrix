@@ -35,6 +35,6 @@ setMethod("skewpart", c(x = "diagonalMatrix"),
 
 setMethod("skewpart", c(x = "indMatrix"),
           function(x, ...)
-              skewpart(.M2kind(x, "d"), ...))
+              skewpart(.ind2sparse(x, "d"), ...))
 
 rm(.cl)

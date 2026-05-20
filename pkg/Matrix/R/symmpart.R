@@ -44,6 +44,6 @@ setMethod("symmpart", c(x = "diagonalMatrix"),
 
 setMethod("symmpart", c(x = "indMatrix"),
           function(x, ...)
-              symmpart(.M2kind(x, "d"), ...))
+              symmpart(.ind2sparse(x, "d"), ...))
 
 rm(.cl)
