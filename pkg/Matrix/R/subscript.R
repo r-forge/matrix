@@ -45,7 +45,7 @@ function(i, n, pattern) {
 }
 
 ## x[i]
-.subscript.1ary <-
+.subset.1ary <-
 function(x, i) {
     x.length <- length(x)
     if (is.null(i))
@@ -112,7 +112,7 @@ function(x, i) {
                        i <- i[i. >= 1L, , drop = FALSE]
                    if (!all(j., na.rm = TRUE))
                        i <- i[j. >= 1L, , drop = FALSE]
-                   ..subscript.1ary.2col(x, i)
+                   ..subset.1ary.2col(x, i)
 
                    } else {
 
@@ -121,7 +121,7 @@ function(x, i) {
                        i <- if (r <= -1L)
                                 seq_len(x.length)[i] # FIXME
                             else i[i >= 1L]
-                   ..subscript.1ary(x, i)
+                   ..subset.1ary(x, i)
 
                    }
                },
@@ -133,7 +133,7 @@ function(x, i) {
                            as.vector(x)
                        else `length<-`(as.vector(x), i.length)
                    }
-                   else .subscript.1ary(x, .m2V(i)) # recursively
+                   else .subset.1ary(x, .m2V(i)) # recursively
                },
            character =
                {
@@ -149,7 +149,7 @@ function(x, i) {
                        ## indicating non-match that should not be
                        ## ignored
                        stop("subscript out of bounds")
-                   ..subscript.1ary.2col(x, m)
+                   ..subset.1ary.2col(x, m)
 
                    } else {
 
@@ -163,7 +163,7 @@ function(x, i) {
 
 ## x[i] where 'i' is a vector of type "integer" or "double"
 ## with elements greater than or equal to 1 (or NA)
-..subscript.1ary <-
+..subset.1ary <-
 function(x, i,
          shape = .M.shape(x),
          repr = .M.repr(x),
@@ -206,12 +206,12 @@ function(x, i,
     else if ((repr == "C" || repr == "T") &&
              (is.na(unsorted) || unsorted))
         (if (shape == "s") order(j., i.) else sort.list(i))
-    .Call(R_subscript_1ary, x, i, o)
+    .Call(R_subset_1ary, x, i, o)
 }
 
 ## x[i] where 'i' is a 2-column matrix of type "integer"
 ## with i[, 1L] in 1:m (or NA) and i[, 2L] in 1:n (or NA)
-..subscript.1ary.2col <-
+..subset.1ary.2col <-
 function(x, i,
          shape = .M.shape(x),
          repr = .M.repr(x)) {
@@ -236,11 +236,11 @@ function(x, i,
             order(j., i.)
         }
     }
-    .Call(R_subscript_1ary_2col, x, i, o)
+    .Call(R_subset_1ary_2col, x, i, o)
 }
 
 ## x[i, j, drop]
-.subscript.2ary <-
+.subset.2ary <-
 function(x, i, j, drop) {
     l <-
     list(if (missing(i)) NULL else if (is.null(i)) integer(0L) else i,
@@ -312,18 +312,18 @@ function(x, i, j, drop) {
     if (is.double(lengths(l, use.names = FALSE)))
         stop(gettextf("dimensions cannot exceed %s", "2^31-1"),
              domain = NA)
-    ..subscript.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])
+    ..subset.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])
 }
 
 ## x[i, j, drop] where 'i' and 'j' are vectors of type "integer"
 ## of length not exceeding 2^31-1 with 'i' in 1:m (or NA) and 'j'
 ## in 1:n (or NA) ... NULL => missing
-..subscript.2ary <-
+..subset.2ary <-
 function(x, i, j, drop) {
     if (is.null(i) && is.null(j))
         r <- x
     else {
-        r <- .Call(R_subscript_2ary, x, i, j)
+        r <- .Call(R_subset_2ary, x, i, j)
         dn <- dimnames(x)
         if (!(is.null(i) || is.null(rn <- dn[[1L]])))
             dn[1L] <- list(if (length(i)) rn[i] else NULL)
@@ -372,10 +372,10 @@ setMethod("[",
               na <- nargs()
               if (na == 2L)
                   ## x[i=]
-                  .subscript.1ary(x, i)
+                  .subset.1ary(x, i)
               else if (na == 3L)
                   ## x[i=, ], x[, i=]
-                  .subscript.2ary(x, i, , drop = TRUE)
+                  .subset.2ary(x, i, , drop = TRUE)
               else
                   ## x[i=, , ], etc.
                   stop("incorrect number of dimensions")
@@ -387,10 +387,10 @@ setMethod("[",
               na <- nargs()
               if (na == 3L)
                   ## x[i=, drop=]
-                  .subscript.1ary(x, i)
+                  .subset.1ary(x, i)
               else if (na == 4L)
                   ## x[i=, , drop=], x[, i=, drop=]
-                  .subscript.2ary(x, i, , drop = drop)
+                  .subset.2ary(x, i, , drop = drop)
               else
                   ## x[i=, , , drop=], etc.
                   stop("incorrect number of dimensions")
@@ -402,10 +402,10 @@ setMethod("[",
               na <- nargs()
               if (na == 2L)
                   ## x[j=]
-                  .subscript.1ary(x, j)
+                  .subset.1ary(x, j)
               else if (na == 3L)
                   ## x[j=, ], x[, j=]
-                  .subscript.2ary(x, , j, drop = TRUE)
+                  .subset.2ary(x, , j, drop = TRUE)
               else
                   ## x[, j=, ], etc.
                   stop("incorrect number of dimensions")
@@ -417,10 +417,10 @@ setMethod("[",
               na <- nargs()
               if (na == 3L)
                   ## x[j=, drop=]
-                  .subscript.1ary(x, j)
+                  .subset.1ary(x, j)
               else if (na == 4L)
                   ## x[j=, , drop=], x[, j=, drop=]
-                  .subscript.2ary(x, , j, drop = drop)
+                  .subset.2ary(x, , j, drop = drop)
               else
                   ## x[, j=, , drop=], etc.
                   stop("incorrect number of dimensions")
@@ -432,7 +432,7 @@ setMethod("[",
               na <- nargs()
               if (na == 3L)
                   ## x[i=, j=], x[j=, i=]
-                  .subscript.2ary(x, i, j, drop = TRUE)
+                  .subset.2ary(x, i, j, drop = TRUE)
               else
                   ## x[i=, j=, ], etc.
                   stop("incorrect number of dimensions")
@@ -444,7 +444,7 @@ setMethod("[",
               na <- nargs()
               if (na == 4L)
                   ## x[i=, j=, drop=], x[j=, i=, drop=]
-                  .subscript.2ary(x, i, j, drop = drop)
+                  .subset.2ary(x, i, j, drop = drop)
               else
                   ## x[i=, j=, , drop=], etc.
                   stop("incorrect number of dimensions")

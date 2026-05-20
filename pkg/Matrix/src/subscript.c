@@ -34,7 +34,7 @@ do { \
 #define nCAST(x) (x != 0)
 
 static
-SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
+SEXP dense_subset_1ary(SEXP obj, const char *class, SEXP s)
 {
 	R_xlen_t slen = XLENGTH(s);
 	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
@@ -125,7 +125,7 @@ SEXP dense_subscript_1ary(SEXP obj, const char *class, SEXP s)
 #define nCAST(x) (1)
 
 static
-SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
+SEXP sparse_subset_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 {
 	R_xlen_t slen = XLENGTH(s);
 	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
@@ -249,7 +249,7 @@ SEXP sparse_subscript_1ary(SEXP obj, const char *class, SEXP s, SEXP o)
 #define nCAST(x) (x != 0)
 
 static
-SEXP diagonal_subscript_1ary(SEXP obj, const char *class, SEXP s)
+SEXP diagonal_subset_1ary(SEXP obj, const char *class, SEXP s)
 {
 	R_xlen_t slen = XLENGTH(s);
 	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
@@ -293,7 +293,7 @@ SEXP diagonal_subscript_1ary(SEXP obj, const char *class, SEXP s)
 }
 
 static
-SEXP index_subscript_1ary(SEXP obj, const char *class, SEXP s)
+SEXP index_subset_1ary(SEXP obj, const char *class, SEXP s)
 {
 	R_xlen_t slen = XLENGTH(s);
 	SEXP ans = Rf_allocVector(LGLSXP, slen);
@@ -345,7 +345,7 @@ SEXP index_subscript_1ary(SEXP obj, const char *class, SEXP s)
 /*                     \ j+i*m if (i,j) is "off-side"            */
 /*                                                               */
 /*     o=NULL <==> o=seq_along(s)                                */
-SEXP R_subscript_1ary(SEXP s_obj, SEXP s_s, SEXP s_o)
+SEXP R_subset_1ary(SEXP s_obj, SEXP s_s, SEXP s_o)
 {
 	const char *class = Matrix_class(s_obj, valid_matrix, 7, __func__);
 	validObject(s_obj, class);
@@ -354,15 +354,15 @@ SEXP R_subscript_1ary(SEXP s_obj, SEXP s_s, SEXP s_o)
 	case 'y':
 	case 'r':
 	case 'p':
-		return    dense_subscript_1ary(s_obj, class, s_s);
+		return    dense_subset_1ary(s_obj, class, s_s);
 	case 'C':
 	case 'R':
 	case 'T':
-		return   sparse_subscript_1ary(s_obj, class, s_s, s_o);
+		return   sparse_subset_1ary(s_obj, class, s_s, s_o);
 	case 'i':
-		return diagonal_subscript_1ary(s_obj, class, s_s);
+		return diagonal_subset_1ary(s_obj, class, s_s);
 	case 'd':
-		return    index_subscript_1ary(s_obj, class, s_s);
+		return    index_subset_1ary(s_obj, class, s_s);
 	default:
 		return R_NilValue;
 	}
@@ -374,7 +374,7 @@ SEXP R_subscript_1ary(SEXP s_obj, SEXP s_s, SEXP s_o)
 #define nCAST(x) (x != 0)
 
 static
-SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
+SEXP dense_subset_1ary_2col(SEXP obj, const char *class, SEXP s)
 {
 	int slen = (int) (XLENGTH(s) / 2);
 	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
@@ -462,7 +462,7 @@ SEXP dense_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 #define nCAST(x) (1)
 
 static
-SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
+SEXP sparse_subset_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
 {
 	int slen = (int) (XLENGTH(s) / 2);
 	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
@@ -582,7 +582,7 @@ SEXP sparse_subscript_1ary_2col(SEXP obj, const char *class, SEXP s, SEXP o)
 #define nCAST(x) (x != 0)
 
 static
-SEXP diagonal_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
+SEXP diagonal_subset_1ary_2col(SEXP obj, const char *class, SEXP s)
 {
 	int slen = (int) (XLENGTH(s) / 2);
 	SEXP ans = Rf_allocVector(kindToType(class[0]), slen);
@@ -621,7 +621,7 @@ SEXP diagonal_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 }
 
 static
-SEXP index_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
+SEXP index_subset_1ary_2col(SEXP obj, const char *class, SEXP s)
 {
 	int slen = (int) (XLENGTH(s) / 2);
 	SEXP ans = Rf_allocVector(LGLSXP, slen);
@@ -661,7 +661,7 @@ SEXP index_subscript_1ary_2col(SEXP obj, const char *class, SEXP s)
 /*                     \ (j,i) if (i,j) is "off-side"            */
 /*                                                               */
 /*     o=NULL <==> o=seq_len(nrow(s))                            */
-SEXP R_subscript_1ary_2col(SEXP s_obj, SEXP s_s, SEXP s_o)
+SEXP R_subset_1ary_2col(SEXP s_obj, SEXP s_s, SEXP s_o)
 {
 	const char *class = Matrix_class(s_obj, valid_matrix, 7, __func__);
 	validObject(s_obj, class);
@@ -670,15 +670,15 @@ SEXP R_subscript_1ary_2col(SEXP s_obj, SEXP s_s, SEXP s_o)
 	case 'y':
 	case 'r':
 	case 'p':
-		return    dense_subscript_1ary_2col(s_obj, class, s_s);
+		return    dense_subset_1ary_2col(s_obj, class, s_s);
 	case 'C':
 	case 'R':
 	case 'T':
-		return   sparse_subscript_1ary_2col(s_obj, class, s_s, s_o);
+		return   sparse_subset_1ary_2col(s_obj, class, s_s, s_o);
 	case 'i':
-		return diagonal_subscript_1ary_2col(s_obj, class, s_s);
+		return diagonal_subset_1ary_2col(s_obj, class, s_s);
 	case 'd':
-		return    index_subscript_1ary_2col(s_obj, class, s_s);
+		return    index_subset_1ary_2col(s_obj, class, s_s);
 	default:
 		return R_NilValue;
 	}
@@ -814,7 +814,7 @@ int stay_di(int *pi, int ni, int *pj, int nj, int n, int checkNA)
 }
 
 static
-SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
+SEXP dense_subset_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 {
 	if (si == R_NilValue && sj == R_NilValue)
 		return obj;
@@ -1034,7 +1034,7 @@ SEXP dense_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 }
 
 static
-SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
+SEXP sparse_subset_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 {
 	if (si == R_NilValue && sj == R_NilValue)
 		return obj;
@@ -1293,7 +1293,7 @@ SEXP sparse_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 }
 
 static
-SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
+SEXP diagonal_subset_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 {
 	if (si == R_NilValue && sj == R_NilValue)
 		return obj;
@@ -1440,7 +1440,7 @@ SEXP diagonal_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 }
 
 static
-SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
+SEXP index_subset_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 {
 	if (si == R_NilValue && sj == R_NilValue)
 		return obj;
@@ -1577,7 +1577,7 @@ SEXP index_subscript_2ary(SEXP obj, const char *class, SEXP si, SEXP sj)
 /* x[i, j, drop = FALSE] where 'i' and 'j' are vectors of type "integer"   */
 /* of length at most 2^31-1 with 'i' in 1:m (or NA) and 'j' in 1:n (or NA) */
 /* ... _not_ handling 'Dimnames' here                                      */
-SEXP R_subscript_2ary(SEXP s_obj, SEXP s_si, SEXP s_sj)
+SEXP R_subset_2ary(SEXP s_obj, SEXP s_si, SEXP s_sj)
 {
 	const char *class = Matrix_class(s_obj, valid_matrix, 6, __func__);
 	validObject(s_obj, class);
@@ -1586,16 +1586,16 @@ SEXP R_subscript_2ary(SEXP s_obj, SEXP s_si, SEXP s_sj)
 	case 'y':
 	case 'r':
 	case 'p':
-		return    dense_subscript_2ary(s_obj, class, s_si, s_sj);
+		return    dense_subset_2ary(s_obj, class, s_si, s_sj);
 	case 'C':
 	case 'R':
 	case 'T':
-		return   sparse_subscript_2ary(s_obj, class, s_si, s_sj);
+		return   sparse_subset_2ary(s_obj, class, s_si, s_sj);
 	case 'i':
-		return diagonal_subscript_2ary(s_obj, class, s_si, s_sj);
+		return diagonal_subset_2ary(s_obj, class, s_si, s_sj);
 	case 'd':
 	case 'a':
-		return    index_subscript_2ary(s_obj, class, s_si, s_sj);
+		return    index_subset_2ary(s_obj, class, s_si, s_sj);
 	default:
 		return R_NilValue;
 	}

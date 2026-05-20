@@ -198,10 +198,10 @@ SEXP iCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
 SEXP dCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
 SEXP zCsparse_subassign(SEXP, SEXP, SEXP, SEXP);
 
-/* subscript.c : */
-SEXP R_subscript_1ary(SEXP, SEXP, SEXP);
-SEXP R_subscript_1ary_2col(SEXP, SEXP, SEXP);
-SEXP R_subscript_2ary(SEXP, SEXP, SEXP);
+/* subset.c : */
+SEXP R_subset_1ary(SEXP, SEXP, SEXP);
+SEXP R_subset_1ary_2col(SEXP, SEXP, SEXP);
+SEXP R_subset_2ary(SEXP, SEXP, SEXP);
 
 /* symmpart.c : */
 SEXP R_dense_symmpart(SEXP, SEXP, SEXP);
@@ -488,10 +488,10 @@ static R_CallMethodDef CallMethodTable[] = {
 	CALL_METHOD(dCsparse_subassign, 4),
 	CALL_METHOD(zCsparse_subassign, 4),
 
-	/* subscript.c : */
-	CALL_METHOD(R_subscript_1ary, 3),
-	CALL_METHOD(R_subscript_1ary_2col, 3),
-	CALL_METHOD(R_subscript_2ary, 3),
+	/* subset.c : */
+	CALL_METHOD(R_subset_1ary, 3),
+	CALL_METHOD(R_subset_1ary_2col, 3),
+	CALL_METHOD(R_subset_2ary, 3),
 
 	/* symmpart.c : */
 	CALL_METHOD(R_dense_symmpart, 3),
