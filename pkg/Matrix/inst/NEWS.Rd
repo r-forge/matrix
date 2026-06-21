@@ -4,7 +4,7 @@
 \title{News for \R{} Package \pkg{Matrix}}
 \encoding{UTF-8}
 \newcommand{\MPR}{\pkg{Matrix} \href{https://R-forge.R-project.org/tracker/index.php?func=detail&aid=#1&group_id=61&atid=294}{PR##1}}
-\section{Changes in version 1.8-0 (2026-05-14, svn r5200)}{
+\section{Changes in version 1.8-0 (2026-06-21, svn r5207)}{
   \subsection{Installation}{
     \itemize{
       \item \pkg{Matrix} \eqn{\ge}{>=} 1.8-0 depends on \R{}
@@ -205,6 +205,10 @@
 
       \item \code{updown(., C, L)} treated formally symmetric \code{C}
       as triangular when \code{L} was unpivoted.
+
+      \item Methods for \code{Summary(x, \dots, na.rm=)} behave
+      correctly when \code{list(\dots)} contains objects inheriting
+      from virtual class \code{Matrix} or \code{sparseVector}.
     }
   }
   \subsection{Misc}{

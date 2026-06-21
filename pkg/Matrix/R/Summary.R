@@ -7,15 +7,43 @@
 ## NB: Summary depends on the existence, _not_ count, of zeros and ones.
 ##     The only exception is 'sum' which ignores zeros and counts ones.
 
+.Summary <-
+function(.Generic, ..., na.rm = FALSE) {
+    g <- get(.Generic, mode = "function")
+    L <- list(..., na.rm = na.rm)
+    for (i in seq_len(...length()))
+        if (nzchar(.M.class(x <- L[[i]])))
+            L[[i]] <-
+            switch(.Generic,
+                   "max" =, "min" =, "range" =
+                       if (length(x))
+                           g(x, na.rm = na.rm)
+                       else vector(.type.kind[[.M.kind(x)]], 0L),
+                   "sum" =, "prod" =
+                       g(x, na.rm = na.rm),
+                   "any" =
+                       if (!is.na(y <- g(x, na.rm = na.rm)) &&  y)
+                           return(TRUE)
+                       else y,
+                   "all" =
+                       if (!is.na(y <- g(x, na.rm = na.rm)) && !y)
+                           return(FALSE)
+                       else y,
+                   stop(gettextf("not yet implemented .Generic=\"%s\"",
+                                 .Generic),
+                        domain = NA))
+    do.call(g, L)
+}
+
 setMethod("Summary", c(x = "denseMatrix"),
           function(x, ..., na.rm = FALSE) {
+              if (...length())
+                  return(.Summary(.Generic, x, ..., na.rm = na.rm))
               ## Avoid wrong overflow :
               if (.Generic == "sum")
-                  return(sum (.Call(R_dense_sum , x, na.rm),
-                              ..., na.rm = na.rm))
+                  return(.Call(R_dense_sum , x, na.rm))
               if (.Generic == "prod")
-                  return(prod(.Call(R_dense_prod, x, na.rm),
-                              ..., na.rm = na.rm))
+                  return(.Call(R_dense_prod, x, na.rm))
               g <- get(.Generic, mode = "function")
               x <- forceCanonical(x)
               cl <- .M.class(x)
@@ -26,18 +54,19 @@ setMethod("Summary", c(x = "denseMatrix"),
               y1 <- x@x
               y2 <- if (shape == "t" && n > 1L)
                         zero
-              g(y1, y2, ..., na.rm = na.rm)
+              g(y1, y2, na.rm = na.rm)
           })
 
-setMethod("Summary", c(x = "sparseMatrix"), # (*not* diagonalM*, nor indMatrix (done below))
+for (.cl in paste0(c("C", "R", "T"), "sparseMatrix"))
+setMethod("Summary", c(x = .cl),
           function(x, ..., na.rm = FALSE) {
+              if (...length())
+                  return(.Summary(.Generic, x, ..., na.rm = na.rm))
               ## Avoid wrong overflow :
               if (.Generic == "sum")
-                  return(sum (.Call(R_sparse_sum , x, na.rm),
-                              ..., na.rm = na.rm))
+                  return(.Call(R_sparse_sum , x, na.rm))
               if (.Generic == "prod")
-                  return(prod(.Call(R_sparse_prod, x, na.rm),
-                              ..., na.rm = na.rm))
+                  return(.Call(R_sparse_prod, x, na.rm))
               g <- get(.Generic, mode = "function")
               x <- forceCanonical(x)
               cl <- .M.class(x)
@@ -47,8 +76,9 @@ setMethod("Summary", c(x = "sparseMatrix"), # (*not* diagonalM*, nor indMatrix (
               zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
               unit <- switch(kind, "z" = 1+0i, "d" = 1, "i" = 1L,  TRUE)
               n <- (d <- x@Dim)[2L]
-              nnz <- length(switch(repr, "C" = x@i, "R"=, "T" = x@j, stop("invalid 'repr': ", repr)))
-              if(shape == "t" && x@diag == "U") nnz <- nnz + n
+              nnz <- length(switch(repr, "C" = x@i, "R" =, "T" = x@j))
+              if (shape == "t" && x@diag == "U")
+                  nnz <- nnz + n
               nnz.max <- if (shape == "s") 0.5 * (prod(d) + n) else prod(d)
               y1 <- if (kind != "n")
                         x@x
@@ -59,11 +89,13 @@ setMethod("Summary", c(x = "sparseMatrix"), # (*not* diagonalM*, nor indMatrix (
                         zero
               y3 <- if (shape == "t" && n > 0L && x@diag != "N")
                         unit
-              g(y1, y2, y3, ..., na.rm = na.rm)
+              g(y1, y2, y3, na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "diagonalMatrix"),
           function(x, ..., na.rm = FALSE) {
+              if (...length())
+                  return(.Summary(.Generic, x, ..., na.rm = na.rm))
               g <- get(.Generic, mode = "function")
               kind <- .M.kind(x)
               zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
@@ -88,11 +120,13 @@ setMethod("Summary", c(x = "diagonalMatrix"),
                             unit
                         else unit[0L]
                     }
-              g(y1, y2, y3, ..., na.rm = na.rm)
+              g(y1, y2, y3, na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "indMatrix"),
           function(x, ..., na.rm = FALSE) {
+              if (...length())
+                  return(.Summary(.Generic, x, ..., na.rm = na.rm))
               g <- get(.Generic, mode = "function")
               nnz <- length(x@perm)
               nnz.max <- prod(x@Dim)
@@ -103,11 +137,13 @@ setMethod("Summary", c(x = "indMatrix"),
                     else logical(0L)
               y2 <- if (nnz < nnz.max)
                         FALSE
-              g(y1, y2, ..., na.rm = na.rm)
+              g(y1, y2, na.rm = na.rm)
           })
 
 setMethod("Summary", c(x = "sparseVector"),
           function(x, ..., na.rm = FALSE) {
+              if (...length())
+                  return(.Summary(.Generic, x, ..., na.rm = na.rm))
               g <- get(.Generic, mode = "function")
               kind <- .M.kind(x)
               zero <- switch(kind, "z" = 0+0i, "d" = 0, "i" = 0L, FALSE)
@@ -132,5 +168,7 @@ setMethod("Summary", c(x = "sparseVector"),
                     else logical(0L)
               y2 <- if (nnz < nnz.max)
                         zero
-              g(y1, y2, ..., na.rm = na.rm)
+              g(y1, y2, na.rm = na.rm)
           })
+
+rm(.cl)

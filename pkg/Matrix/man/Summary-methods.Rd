@@ -9,10 +9,12 @@
 \alias{Summary}
 \alias{Summary-methods}
 %
+\alias{Summary,CsparseMatrix-method}
+\alias{Summary,RsparseMatrix-method}
+\alias{Summary,TsparseMatrix-method}
 \alias{Summary,denseMatrix-method}
 \alias{Summary,diagonalMatrix-method}
 \alias{Summary,indMatrix-method}
-\alias{Summary,sparseMatrix-method}
 \alias{Summary,sparseVector-method}
 %
 \description{TODO.}

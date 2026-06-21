@@ -1685,6 +1685,15 @@ assertError(new("dsparseVector", length = 2L, i = 2:1, x = 0))
 assertError(new("dsparseVector", length = 2L, i = 2:1, x = c(0, 0, 0)))
 
 
+## Summary(x, ..., na.rm=) when list(...) contains "our" objects
+L <- mget(getGroupMembers("Summary"), mode = "function", inherits = TRUE)
+gl0 <- suppressWarnings(lapply(L, function(g) g(logical(0L))))
+for (cl in c("ngeMatrix", "ngCMatrix", "ndiMatrix", "indMatrix",
+             "nsparseVector")) {
+    x <- new(cl)
+    gxx <- suppressWarnings(lapply(L, function(g) g(x, x))) # was error for all 'g', 'x'
+    stopifnot(identical(gxx, gl0))
+}
 
 
 ## Platform - and other such info -- so we find it in old saved outputs
